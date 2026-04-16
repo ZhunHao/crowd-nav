@@ -8,6 +8,7 @@ import gym
 from crowd_nav.utils.explorer import Explorer
 from crowd_nav.policy.policy_factory import policy_factory
 from crowd_sim.envs.utils.robot import Robot
+from crowd_sim.envs.utils.seeding import seed_everything
 from crowd_sim.envs.policy.orca import ORCA
 
 
@@ -26,6 +27,8 @@ def main():
     parser.add_argument('--circle', default=False, action='store_true')
     parser.add_argument('--video_file', type=str, default=None)
     parser.add_argument('--traj', default=False, action='store_true')
+    parser.add_argument('--seed', type=int, default=None,
+                        help='RNG seed. Overrides env.config [env] random_seed. Defaults to 42 if unset in both.')
     args = parser.parse_args()
 
     if args.model_dir is not None:
@@ -61,7 +64,17 @@ def main():
     # configure environment
     env_config = configparser.RawConfigParser()
     env_config.read(env_config_file)
-    
+
+    # Resolve seed: CLI flag > env.config > 42 (hardcoded default).
+    if args.seed is not None:
+        resolved_seed = args.seed
+    elif env_config.has_option('env', 'random_seed'):
+        resolved_seed = env_config.getint('env', 'random_seed')
+    else:
+        resolved_seed = 42
+    seed_everything(resolved_seed)
+    logging.info('Seeded RNGs with %d', resolved_seed)
+
     # load environment
     env = gym.make('CrowdSim-v0')
     env.local_goal = [0,0]
