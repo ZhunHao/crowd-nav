@@ -1,13 +1,20 @@
 import logging
+import shutil
 import gym
 import matplotlib.lines as mlines
 import numpy as np
 import rvo2
 from matplotlib import patches
+from matplotlib import rcParams as _mpl_rcParams
 from numpy.linalg import norm
 from crowd_sim.envs.utils.human import Human
 from crowd_sim.envs.utils.info import *
 from crowd_sim.envs.utils.utils import point_to_segment_dist
+
+
+_FFMPEG = shutil.which("ffmpeg")
+if _FFMPEG:
+    _mpl_rcParams["animation.ffmpeg_path"] = _FFMPEG
 
 
 class CrowdSim(gym.Env):
@@ -591,7 +598,6 @@ class CrowdSim(gym.Env):
     def render(self, mode='human', goal_list=None, output_file=None):
         from matplotlib import animation
         import matplotlib.pyplot as plt
-        plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
 
         x_offset = 0.11
         y_offset = 0.11
@@ -795,6 +801,11 @@ class CrowdSim(gym.Env):
             anim.running = True
 
             if output_file is not None:
+                if not _FFMPEG:
+                    raise RuntimeError(
+                        "ffmpeg not found on PATH. Install ffmpeg (Linux: apt install ffmpeg, "
+                        "macOS: brew install ffmpeg) before using --video_file."
+                    )
                 ffmpeg_writer = animation.writers['ffmpeg']
                 writer = ffmpeg_writer(fps=8, metadata=dict(artist='Me'), bitrate=1800)
                 anim.save(output_file, writer=writer)
