@@ -21,8 +21,11 @@ def test_run_baseline_invokes_test_py_with_video_flag():
     assert "--model_dir data/output_trained" in body
     assert "--video_file" in body
     assert "exports/baseline.mp4" in body
-    # Non-interactive: no --visualize (so it can run in CI).
-    assert "--visualize" not in body, "run_baseline.sh must be headless — no --visualize"
+    # --visualize is required to run one rollout per goal (vs. 500 test-size
+    # episodes) and populate the position_list that render() animates into the
+    # mp4. With MPLBACKEND=Agg (exported above in the script) it is headless.
+    assert "--visualize" in body, "run_baseline.sh needs --visualize for the video rollout"
+    assert 'MPLBACKEND="${MPLBACKEND:-Agg}"' in body, "must export MPLBACKEND=Agg for CI headlessness"
 
 
 @pytest.mark.unit

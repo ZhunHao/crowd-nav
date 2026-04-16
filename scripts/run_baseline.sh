@@ -12,10 +12,15 @@ mkdir -p exports
 export MPLBACKEND="${MPLBACKEND:-Agg}"
 
 cd crowd_nav
+# --visualize runs a single rollout per goal (vs. 500 test-size episodes per
+# goal without it) and is what populates the position list that render() draws
+# into the mp4. With MPLBACKEND=Agg set above, no matplotlib window is opened,
+# so this remains CI-safe.
 python test.py \
   --policy sarl \
   --model_dir data/output_trained \
   --phase test \
   --test_case 0 \
   --seed 42 \
+  --visualize \
   --video_file ../exports/baseline.mp4
