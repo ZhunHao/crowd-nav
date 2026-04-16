@@ -1,0 +1,15 @@
+# R1 baseline outputs
+exports/*.mp4
+exports/*.csv
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Build artifacts
+Python-RVO2-main/build/
+*.egg-info/
+
+# macOS
+.DS_Store
