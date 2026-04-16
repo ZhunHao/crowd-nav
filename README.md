@@ -33,36 +33,34 @@ Implemented in [crowd_nav/policy/](crowd_nav/policy) — see [crowd_sim/README.m
 
 ## Setup
 
-> All commands assume the `navigate` conda environment is active after step 1.
+One command sets everything up (conda env + Python-RVO2 + package in editable mode + gym pin):
 
-0. **System packages** (skip if using the school's server)
+```bash
+./scripts/setup_env.sh
+conda activate navigate
+```
 
-   ```bash
-   sudo apt update && sudo apt install cmake build-essential ffmpeg
-   ```
+The script is idempotent — safe to re-run. Requires `conda` and, for video export, `ffmpeg`:
 
-1. **Create the conda environment** — install Anaconda first from https://www.anaconda.com/download/success
+- Linux: `sudo apt install ffmpeg cmake build-essential`
+- macOS: `brew install ffmpeg cmake`
 
-   ```bash
-   conda create -n navigate python=3.10
-   conda activate navigate
-   pip install cython
-   ```
+<details>
+<summary>Manual setup (if you prefer not to use the script)</summary>
 
-2. **Install [Python-RVO2](https://github.com/sybrenstuvel/Python-RVO2)** (vendored in `Python-RVO2-main/`)
+```bash
+conda create -n navigate --override-channels -c conda-forge python=3.10
+conda activate navigate
+pip install "cython<3"
 
-   ```bash
-   cd Python-RVO2-main
-   python setup.py build && python setup.py install
-   cd ..
-   ```
+# Python-RVO2 (CMake >= 4 requires the policy flag)
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
+(cd Python-RVO2-main && python setup.py build && python setup.py install)
 
-3. **Install `crowd_sim` and `crowd_nav`** — run from the `crowdnav-dip/` project root
-
-   ```bash
-   pip install -e .
-   pip install gym==0.15.7
-   ```
+pip install -e .
+pip install "gym==0.15.7" pytest
+```
+</details>
 
 ## Getting Started
 
@@ -103,8 +101,32 @@ Useful `train.py` flags (see [crowd_nav/train.py](crowd_nav/train.py)):
 
 Training parameters live in [crowd_nav/configs/train.config](crowd_nav/configs/train.config); environment parameters (number of humans, scenario type, reward shaping) in [crowd_nav/configs/env.config](crowd_nav/configs/env.config); policy hyperparameters in [crowd_nav/configs/policy.config](crowd_nav/configs/policy.config).
 
+## Reproducing R1 (baseline + video)
+
+R1 means: install the env, re-run the given DRL policy, export a simulation video.
+
+```bash
+./scripts/run_baseline.sh
+# → exports/baseline.mp4
+```
+
+Verify end-to-end with the smoke test:
+
+```bash
+pytest -m smoke -v
+```
+
+What this covers:
+
+- Loads the trained SARL policy from `crowd_nav/data/output_trained/rl_model.pth` (no retraining — per R7).
+- Runs test case 0 under seed 42 — deterministic log lines are byte-identical across runs on the same machine (NF3).
+- Writes `exports/baseline.mp4` (~500 KB–1 MB, ffmpeg-encoded).
+
+See [docs/R1_VERIFICATION.md](docs/R1_VERIFICATION.md) for the full manual checklist.
+
 ## Troubleshooting
 
-- **`Python-RVO2` build fails** — make sure `cython` is installed in the active env and `cmake`/`build-essential` are on the system.
+- **`Python-RVO2` build fails** — make sure `cython` is installed in the active env and `cmake`/`build-essential` are on the system. On CMake 4+, `setup_env.sh` exports `CMAKE_POLICY_VERSION_MINIMUM=3.5` to keep the vendored build compatible.
 - **`gym` API errors** — this project pins `gym==0.15.7`; newer versions break the env interface.
 - **CUDA/GPU** — omit `--gpu` to run on CPU; all scripts work without a GPU.
+- **ffmpeg not found** — `--video_file` will error with "ffmpeg not found on PATH". Install ffmpeg (Linux `apt install ffmpeg`, macOS `brew install ffmpeg`) and re-run. The render module autodetects via `shutil.which` at import time.
