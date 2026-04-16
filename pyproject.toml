@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: fast unit tests with no external deps",
+    "integration: tests that invoke the CLI or file system",
+    "smoke: end-to-end R1 baseline reproduction (slow, requires model + ffmpeg)",
+    "slow: tests that take > 30s",
+]
+addopts = "-ra --strict-markers"
