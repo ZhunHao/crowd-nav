@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -33,7 +34,7 @@ def test_static_map_rollout_produces_video(repo_root: Path, exports_dir: Path):
     # data/output_trained/env.config has [sim] static_obs=true, static_obs_shapes=rect
     # and [static_map] enabled=true — this exercises the WP-3 StaticMap code path.
     cmd = [
-        "python", "test.py",
+        sys.executable, "test.py",
         "--policy", "sarl",
         "--model_dir", "data/output_trained",
         "--phase", "test",

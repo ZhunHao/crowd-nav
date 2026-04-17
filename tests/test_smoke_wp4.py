@@ -26,6 +26,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -44,7 +45,7 @@ def test_theta_star_rollout_produces_video(repo_root: Path, exports_dir: Path):
     # data/output_trained/env.config already has [planner] enabled=true,
     # algorithm=theta_star — no extra CLI flag needed.
     cmd = [
-        "python", "test.py",
+        sys.executable, "test.py",
         "--policy", "sarl",
         "--model_dir", "data/output_trained",
         "--phase", "test",
