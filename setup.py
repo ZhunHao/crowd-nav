@@ -7,6 +7,9 @@ setup(
     packages=[
         'crowd_nav',
         'crowd_nav.configs',
+        'crowd_nav.gui',
+        'crowd_nav.gui.controllers',
+        'crowd_nav.gui.workers',
         'crowd_nav.policy',
         'crowd_nav.utils',
         'crowd_sim',
@@ -24,9 +27,16 @@ setup(
         'torchvision',
     ],
     extras_require={
+        'gui': [
+            'Pillow',
+            'PyQt5',
+        ],
         'test': [
+            'Pillow',
+            'PyQt5',
             'pylint',
             'pytest',
+            'pytest-qt',
         ],
     },
 )

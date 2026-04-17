@@ -5,5 +5,6 @@ markers = [
     "integration: tests that invoke the CLI or file system",
     "smoke: end-to-end R1 baseline reproduction (slow, requires model + ffmpeg)",
     "slow: tests that take > 30s",
+    "gui: tests that require a QApplication (headless via pytest-qt + offscreen platform)",
 ]
 addopts = "-ra --strict-markers"
