@@ -85,8 +85,14 @@ def test_allocator_driven_baseline_produces_video(repo_root: Path, exports_dir: 
         obs_list.append({"type": "rect", "cx": 15 - obs_idx, "cy": 5, "w": 1, "h": 1})
 
     sm = StaticMap.from_static_obstacles(obs_list, margin=0.5)
-    # Assert on interpolated waypoints; the final waypoint is pinned to the
-    # externally-specified global goal — ensuring that goal is feasible is the
-    # env config's responsibility, and Tier-B collision handles the robot case.
-    for w in waypoints[:-1]:
+    # Every waypoint — including the final one, which is pinned to the goal
+    # after project_to_free has run — must be free of the cordon.
+    for w in waypoints:
         assert sm.is_free(*w), f"waypoint {w} lies inside a cordon obstacle"
+
+    # The infeasible config goal (5,5) sits inside the y=5 cordon bar.
+    # test.py must log the projection so downstream consumers know the robot's
+    # effective destination.
+    assert "projected to (" in merged_log, (
+        "expected 'projected to (...)' warning for infeasible global goal"
+    )
