@@ -23,27 +23,35 @@ jobs:
           python-version: "3.10"
 
       - name: Install Python deps
+        # .[test] installs PyQt5, pytest-qt, pytest, pylint, and Pillow
         env:
           CMAKE_POLICY_VERSION_MINIMUM: "3.5"
         run: |
           python -m pip install --upgrade pip
           pip install "cython<3"
           (cd Python-RVO2-main && python setup.py build && python setup.py install)
-          pip install -e .
-          pip install "gym==0.15.7" pytest
+          pip install -e ".[test]"
+          pip install "gym==0.15.7"
+
+      - name: Preflight
+        run: crowdnav-preflight
 
       - name: Fast tests
-        run: pytest -v -m "not slow"
+        run: pytest -v -m "not slow and not smoke"
 
-      - name: R1 baseline smoke (headless)
+      - name: All smoke tests (R1 + WP-3 + WP-4 + WP-5 GUI, headless)
         env:
           MPLBACKEND: Agg
+          QT_QPA_PLATFORM: offscreen
         run: pytest -v -m "smoke"
 
-      - name: Upload baseline video
+      - name: Upload smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: baseline-mp4
-          path: exports/baseline.mp4
+          name: smoke-outputs
+          path: |
+            exports/baseline.mp4
+            exports/wp3_smoke.mp4
+            exports/wp4_smoke.mp4
           if-no-files-found: warn
