@@ -19,7 +19,7 @@ import pytest
 pytestmark = [pytest.mark.gui, pytest.mark.integration, pytest.mark.slow]
 
 
-def test_gui_full_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) -> None:
+def _run_full_gui_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) -> None:
     Image = pytest.importorskip("PIL.Image")
 
     from crowd_nav.gui.controllers.sim_controller import SimController
@@ -75,3 +75,7 @@ def test_gui_full_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) ->
 
     assert (tmp_path / "run.csv").exists()
     assert (tmp_path / "trajectory.png").exists()
+
+
+def test_gui_full_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) -> None:
+    _run_full_gui_voyage(qtbot, repo_root, tmp_path, monkeypatch)
