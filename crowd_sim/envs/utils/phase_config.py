@@ -23,6 +23,14 @@ class AllocatorParams:
 
 
 @dataclass(frozen=True)
+class StaticMapParams:
+    """[static_map] section — toggle + default margin for ``StaticMap.is_free``."""
+
+    enabled: bool = True
+    margin: float = 0.5
+
+
+@dataclass(frozen=True)
 class PhaseConfig:
     """Resolves allocator params and per-phase human counts."""
 
@@ -31,6 +39,7 @@ class PhaseConfig:
     human_num_train: int | None
     human_num_val: int | None
     human_num_test: int | None
+    static_map: StaticMapParams = StaticMapParams()
 
     @classmethod
     def from_configparser(cls, cp: configparser.RawConfigParser) -> "PhaseConfig":
@@ -46,6 +55,9 @@ class PhaseConfig:
                 return cp.getint(section, key)
             return None
 
+        sm_enabled = cp.getboolean("static_map", "enabled", fallback=True)
+        sm_margin = cp.getfloat("static_map", "margin", fallback=0.5)
+
         return cls(
             params=AllocatorParams(
                 num_waypoints=num_waypoints,
@@ -56,6 +68,7 @@ class PhaseConfig:
             human_num_train=_opt("human_num_train"),
             human_num_val=_opt("human_num_val"),
             human_num_test=_opt("human_num_test"),
+            static_map=StaticMapParams(enabled=sm_enabled, margin=sm_margin),
         )
 
     def human_num_for(self, phase: Phase) -> int:

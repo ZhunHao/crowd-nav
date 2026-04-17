@@ -112,3 +112,40 @@ def test_phase_config_parses_checked_in_env_config() -> None:
     # train/val not overridden -> fall back to [sim].
     assert pc.human_num_for("train") == pc.sim_human_num
     assert pc.human_num_for("val") == pc.sim_human_num
+    # WP-3: [static_map] section must round-trip too.
+    assert pc.static_map.enabled is True
+    assert pc.static_map.margin == 0.5
+
+
+@pytest.mark.unit
+def test_phase_config_static_map_defaults_when_section_missing() -> None:
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    cp = _cfg(
+        """
+        [sim]
+        human_num = 5
+        """
+    )
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.static_map.enabled is True
+    assert pc.static_map.margin == 0.5
+
+
+@pytest.mark.unit
+def test_phase_config_reads_explicit_static_map_section() -> None:
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    cp = _cfg(
+        """
+        [sim]
+        human_num = 5
+
+        [static_map]
+        enabled = false
+        margin = 0.8
+        """
+    )
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.static_map.enabled is False
+    assert pc.static_map.margin == 0.8
