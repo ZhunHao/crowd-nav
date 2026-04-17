@@ -10,6 +10,8 @@ from numpy.linalg import norm
 from crowd_sim.envs.utils.human import Human
 from crowd_sim.envs.utils.info import *
 from crowd_sim.envs.utils.utils import point_to_segment_dist
+from crowd_sim.envs.utils.goal_allocator import GoalAllocator
+from crowd_sim.envs.utils.static_map import StaticMap, rect_vertices_ccw
 
 
 _FFMPEG = shutil.which("ffmpeg")
@@ -82,6 +84,9 @@ class CrowdSim(gym.Env):
         self.static_obs_cfg = self.config.getboolean('sim', 'static_obs', fallback=False)
         self.static_obs_num = self.config.getint('sim', 'static_obs_num', fallback=0)
         self.static_obs_shapes = self.config.get('sim', 'static_obs_shapes', fallback='circle').split(',')  # e.g. "circle,rect"
+        self.static_map: StaticMap | None = None  # WP-3: built in reset() / light_reset()
+        # Cache human radius for allocator min_dist calculations (WP-3).
+        self.humans_radius = self.config.getfloat('humans', 'radius')
         
         self.robot_goalx = self.config.getfloat('robot', 'goal_x')
         self.robot_goaly = self.config.getfloat('robot', 'goal_y')
@@ -125,10 +130,22 @@ class CrowdSim(gym.Env):
                 self.humans.append(self.generate_square_crossing_human())
         elif rule == 'circle_crossing':
             self.humans = []
-            for _ in range(human_num):
-                self.humans.append(
-                    self.generate_circle_crossing_human_new(self.curr_post, self.local_goal)
-                )
+            is_free = self.static_map.is_free if self.static_map is not None else None
+            allocator = GoalAllocator(max_tries=500)
+            pairs = allocator.allocate_human_positions(
+                robot_start=tuple(self.curr_post),
+                robot_goal=tuple(self.local_goal),
+                occupied=[(self.robot.px, self.robot.py)],
+                human_num=human_num,
+                min_dist=self.humans_radius * 2 + self.discomfort_dist,
+                is_free=is_free,
+            )
+            for (sx, sy), (gx, gy) in pairs:
+                human = Human(self.config, 'humans')
+                if self.randomize_attributes:
+                    human.sample_random_attributes()
+                human.set(sx, sy, gx, gy, 0, 0, 0)
+                self.humans.append(human)
         elif rule == 'static':
             self.humans = []
             static_post = [[120,-120],[5.2,0],[4.4,0],[3.6,0],[2.8,0],[2.0,0],[1.2,0],[0.4,0],[-0.4,0],[-1.2,0],[-2,0],[-2.8,0],[-3.6,0],[-4.4,0],[-5.2,0],[-6.0,0]]
