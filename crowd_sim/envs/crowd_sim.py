@@ -124,13 +124,11 @@ class CrowdSim(gym.Env):
             for i in range(human_num):
                 self.humans.append(self.generate_square_crossing_human())
         elif rule == 'circle_crossing':
-            start_point = [-11,-11]
-            goal_list = [[2,-2], [-4,2], [0,4], [-3,0]]
             self.humans = []
-            for i in range(human_num):
-                # self.humans.append(self.generate_circle_crossing_human())
-                print(self.curr_post, self.local_goal)
-                self.humans.append(self.generate_circle_crossing_human_new(self.curr_post, self.local_goal))
+            for _ in range(human_num):
+                self.humans.append(
+                    self.generate_circle_crossing_human_new(self.curr_post, self.local_goal)
+                )
         elif rule == 'static':
             self.humans = []
             static_post = [[120,-120],[5.2,0],[4.4,0],[3.6,0],[2.8,0],[2.0,0],[1.2,0],[0.4,0],[-0.4,0],[-1.2,0],[-2,0],[-2.8,0],[-3.6,0],[-4.4,0],[-5.2,0],[-6.0,0]]
@@ -202,8 +200,9 @@ class CrowdSim(gym.Env):
         # Use half of rectangle’s diagonal as the "circle radius"
         center_x = (min_x + max_x) / 2
         center_y = (min_y + max_y) / 2
-        radius_x = (max_x - min_x) / 1
-        radius_y = (max_y - min_y) / 1
+        # Half-extent of the bounding box — original used "/ 1" (no-op divide).
+        radius_x = (max_x - min_x) / 2
+        radius_y = (max_y - min_y) / 2
 
         while True:
             angle = np.random.random() * np.pi * 2
@@ -226,10 +225,9 @@ class CrowdSim(gym.Env):
                     break
             if not collide:
                 break
-        print(px, py, gx, gy)
         human.set(px, py, gx, gy, 0, 0, 0)
         return human
-    
+
     def generate_circle_crossing_human(self):
         human = Human(self.config, 'humans')
         if self.randomize_attributes:
