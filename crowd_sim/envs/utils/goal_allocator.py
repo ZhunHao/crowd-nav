@@ -24,6 +24,26 @@ def _always_free(_x: float, _y: float) -> bool:
     return True
 
 
+WaypointSourceFn = Callable[[Point, Point, int], Sequence[Point]]
+
+
+def _straight_line_source(start: Point, goal: Point, n: int) -> list[Point]:
+    """Interpolate ``n`` points between ``start`` and ``goal`` (excluding start).
+
+    The last point is always exactly ``goal`` so :meth:`allocate_waypoints`
+    terminates on the global goal. WP-4 will replace this with Theta*.
+    """
+    if n <= 0:
+        raise ValueError(f"num_waypoints must be >= 1, got {n}")
+    return [
+        (
+            start[0] + (goal[0] - start[0]) * (i / n),
+            start[1] + (goal[1] - start[1]) * (i / n),
+        )
+        for i in range(1, n + 1)
+    ]
+
+
 @dataclass(frozen=True)
 class GoalAllocator:
     """Stateless allocator for waypoints and dynamic-obstacle start/goal pairs.
@@ -65,3 +85,77 @@ class GoalAllocator:
             f"(bounds={bounds}, min_dist={min_dist}, "
             f"n_used={len(used_regions)})"
         )
+
+    def allocate_waypoints(
+        self,
+        start: Point,
+        goal: Point,
+        num_waypoints: int,
+        min_inter_dist: float,
+        is_free: IsFreeFn | None = None,
+        waypoint_source: WaypointSourceFn | None = None,
+    ) -> list[Point]:
+        """Produce ``num_waypoints`` non-overlapping waypoints from ``start`` to ``goal``.
+
+        The last element of the returned list is always ``goal``. Intermediate
+        waypoints come from ``waypoint_source`` (straight-line interpolation by
+        default); any that collide with an earlier waypoint (< ``min_inter_dist``)
+        or fail ``is_free`` are re-sampled via :meth:`sample_unused_position`
+        within a perturbation bubble around the original point.
+        """
+        if num_waypoints <= 0:
+            raise ValueError(f"num_waypoints must be >= 1, got {num_waypoints}")
+
+        source = waypoint_source if waypoint_source is not None else _straight_line_source
+        raw = list(source(start, goal, num_waypoints))
+        if len(raw) != num_waypoints:
+            raise ValueError(
+                f"waypoint_source returned {len(raw)} points, expected {num_waypoints}"
+            )
+
+        # Domain bounds derived from start/goal with a 2 m slack — enough for
+        # perturbation but keeps the allocator inside the env's -15..15 box.
+        pad = 2.0
+        bounds: Bounds = (
+            min(start[0], goal[0]) - pad,
+            max(start[0], goal[0]) + pad,
+            min(start[1], goal[1]) - pad,
+            max(start[1], goal[1]) + pad,
+        )
+
+        accepted: list[Point] = []
+        used: list[Point] = [start]
+        for idx, candidate in enumerate(raw):
+            is_last = idx == num_waypoints - 1
+            # Always snap the final waypoint to the global goal — callers rely on it.
+            if is_last:
+                accepted.append(goal)
+                used.append(goal)
+                continue
+
+            cand = candidate
+            if (
+                all(math.hypot(cand[0] - u[0], cand[1] - u[1]) >= min_inter_dist for u in used)
+                and (is_free is None or is_free(*cand))
+            ):
+                accepted.append(cand)
+                used.append(cand)
+                continue
+
+            # Re-sample inside a small bubble centred on the original candidate.
+            bubble: Bounds = (
+                max(cand[0] - 1.5, bounds[0]),
+                min(cand[0] + 1.5, bounds[1]),
+                max(cand[1] - 1.5, bounds[2]),
+                min(cand[1] + 1.5, bounds[3]),
+            )
+            replacement = self.sample_unused_position(
+                used_regions=used,
+                bounds=bubble,
+                min_dist=min_inter_dist,
+                is_free=is_free,
+            )
+            accepted.append(replacement)
+            used.append(replacement)
+
+        return accepted
