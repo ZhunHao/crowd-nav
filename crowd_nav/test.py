@@ -9,6 +9,8 @@ from crowd_nav.utils.explorer import Explorer
 from crowd_nav.policy.policy_factory import policy_factory
 from crowd_sim.envs.utils.robot import Robot
 from crowd_sim.envs.utils.seeding import seed_everything
+from crowd_sim.envs.utils.goal_allocator import GoalAllocator
+from crowd_sim.envs.utils.phase_config import PhaseConfig
 from crowd_sim.envs.policy.orca import ORCA
 
 
@@ -105,58 +107,78 @@ def main():
     robot.print_info()
     
     ob = env.reset(args.phase, args.test_case)
-    
-    # define the multiple local goals
-    start_point = [-11,-11]
-    goal_list = [[-5,-9], [0, -10], [6,-9], [10,-5], [5,0], [-2,-1], [-8,2], [-7,10], [0,11], [6,11]]
-    position_list = []
 
-    start_x,start_y,goal_x,goal_y = None,None,None,None
-    for goal_idx in range(len(goal_list)):
-        goal_x, goal_y = goal_list[goal_idx][0], goal_list[goal_idx][1]
+    # ------------------------------------------------------------------
+    # WP-2: allocate local goals non-overlapping between start and goal.
+    # ------------------------------------------------------------------
+    phase_cfg = PhaseConfig.from_configparser(env_config)
+    allocator = GoalAllocator(max_tries=phase_cfg.params.max_tries)
 
-        if start_x is None and start_y is None:
-            start_x, start_y = start_point[0], start_point[1]
-        else:
-            start_x, start_y = position_list[-1][0], position_list[-1][1]
-        print('start:', start_x,start_y, 'goal:', goal_x, goal_y)
+    start_point: tuple[float, float] = (env.robot_initx, env.robot_inity)
+    global_goal: tuple[float, float] = (env.robot_goalx, env.robot_goaly)
 
-        # set the local goal using the given list
+    # WP-3 (StaticMap) / WP-4 (Theta*) will swap these defaults later.
+    is_free = None  # None → GoalAllocator defaults to "always free".
+    waypoint_source = None  # None → straight-line interpolation.
+
+    waypoints: list[tuple[float, float]] = allocator.allocate_waypoints(
+        start=start_point,
+        goal=global_goal,
+        num_waypoints=phase_cfg.params.num_waypoints,
+        min_inter_dist=phase_cfg.params.min_inter_waypoint_dist,
+        is_free=is_free,
+        waypoint_source=waypoint_source,
+    )
+    logging.info(
+        "Allocated %d waypoints (start=%s goal=%s)",
+        len(waypoints), start_point, global_goal,
+    )
+
+    position_list: list[list[float]] = []
+    prev_x, prev_y = start_point
+    for goal_idx, (goal_x, goal_y) in enumerate(waypoints):
+        start_x, start_y = (prev_x, prev_y) if goal_idx == 0 else (
+            position_list[-1][0], position_list[-1][1]
+        )
+        logging.info("start: %.2f %.2f goal: %.2f %.2f", start_x, start_y, goal_x, goal_y)
+
+        # The env.light_reset seam (SYSTEM_DESIGN §5.4) expects these 4 writes.
         env.robot_goalx = goal_x
         env.robot_goaly = goal_y
         env.robot_initx = start_x
         env.robot_inity = start_y
-        
-        # env.robot.set(env.robot_initx, env.robot_inity, env.robot_goalx, env.robot_goaly, 0, 0, np.pi / 2)
 
         if args.visualize:
             env.local_goal = [goal_x, goal_y]
             ob = env.light_reset(args.phase, args.test_case)
             last_pos = np.array(robot.get_position())
-            print(last_pos)
             done = False
             while not done:
                 action = robot.act(ob)
                 ob, _, done, info = env.step(action)
                 current_pos = np.array(robot.get_position())
-                logging.debug('Speed: %.2f', np.linalg.norm(current_pos - last_pos) / robot.time_step)
+                logging.debug(
+                    "Speed: %.2f",
+                    np.linalg.norm(current_pos - last_pos) / robot.time_step,
+                )
                 last_pos = current_pos
                 position_list.append(last_pos.tolist())
-            # if args.traj:
-            #     env.render('traj', args.video_file)
-            # else:
-            #     env.render('video', args.video_file)
             env.curr_post = last_pos
 
-            logging.info('It takes %.2f seconds to finish. Final status is %s', env.global_time, info)
-            if robot.visible and info == 'reach goal':
+            logging.info(
+                "It takes %.2f seconds to finish. Final status is %s",
+                env.global_time, info,
+            )
+            if robot.visible and info == "reach goal":
                 human_times = env.get_human_times()
-                logging.info('Average time for humans to reach goal: %.2f', sum(human_times) / len(human_times))
+                logging.info(
+                    "Average time for humans to reach goal: %.2f",
+                    sum(human_times) / len(human_times),
+                )
         else:
             explorer.run_k_episodes(env.case_size[args.phase], args.phase, print_failure=True)
 
-        # break
-    env.render('video', goal_list, args.video_file)
+    env.render("video", [list(w) for w in waypoints], args.video_file)
 
         
 
