@@ -12,6 +12,7 @@ from crowd_sim.envs.utils.seeding import seed_everything
 from crowd_sim.envs.utils.goal_allocator import GoalAllocator
 from crowd_sim.envs.utils.phase_config import PhaseConfig
 from crowd_sim.envs.utils.static_map import StaticMap
+from crowd_nav.planner.theta_star import NoPathFound, ThetaStar
 from crowd_sim.envs.policy.orca import ORCA
 
 
@@ -146,16 +147,42 @@ def main():
         global_goal = projected
         env.robot_goalx, env.robot_goaly = projected
 
-    waypoint_source = None  # None → straight-line interpolation.
+    # WP-4: Theta* global planner. Falls back to straight-line when disabled,
+    # when no StaticMap is available, or when NoPathFound is raised at plan
+    # time (logged as a WARNING so the run still completes).
+    waypoint_source = None
+    if static_map is not None and phase_cfg.planner.enabled:
+        planner = ThetaStar(
+            static_map=static_map,
+            inflation=phase_cfg.planner.inflation_radius,
+            grid_resolution=phase_cfg.planner.grid_resolution,
+            bounds=phase_cfg.planner.bounds,
+            simplify=phase_cfg.planner.waypoint_simplify,
+        )
+        waypoint_source = planner.as_waypoint_source(phase_cfg.params.num_waypoints)
 
-    waypoints: list[tuple[float, float]] = allocator.allocate_waypoints(
-        start=start_point,
-        goal=global_goal,
-        num_waypoints=phase_cfg.params.num_waypoints,
-        min_inter_dist=phase_cfg.params.min_inter_waypoint_dist,
-        is_free=is_free,
-        waypoint_source=waypoint_source,
-    )
+    try:
+        waypoints: list[tuple[float, float]] = allocator.allocate_waypoints(
+            start=start_point,
+            goal=global_goal,
+            num_waypoints=phase_cfg.params.num_waypoints,
+            min_inter_dist=phase_cfg.params.min_inter_waypoint_dist,
+            is_free=is_free,
+            waypoint_source=waypoint_source,
+        )
+    except NoPathFound as exc:
+        logging.warning(
+            "Theta* found no path (%s); falling back to straight-line waypoints.",
+            exc,
+        )
+        waypoints = allocator.allocate_waypoints(
+            start=start_point,
+            goal=global_goal,
+            num_waypoints=phase_cfg.params.num_waypoints,
+            min_inter_dist=phase_cfg.params.min_inter_waypoint_dist,
+            is_free=is_free,
+            waypoint_source=None,
+        )
     logging.info(
         "Allocated %d waypoints (start=%s goal=%s)",
         len(waypoints), start_point, global_goal,
