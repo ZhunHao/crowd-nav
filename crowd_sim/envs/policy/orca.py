@@ -47,9 +47,10 @@ class ORCA(Policy):
 
         ORCA first uses neighborDist and maxNeighbors to find neighbors that need to be taken into account.
         Here set them to be large enough so that all agents will be considered as neighbors.
-        Time_horizon should be set that at least it's safe for one time step
+        Time_horizon should be set that at least it's safe for one time step.
 
-        In this work, obstacles are not considered. So the value of time_horizon_obst doesn't matter.
+        WP-3: static obstacles are honored via ``set_static_obstacles`` (CCW
+        polygons passed to ``sim.addObstacle`` + ``sim.processObstacles``).
 
         """
         super().__init__()
@@ -64,6 +65,14 @@ class ORCA(Policy):
         self.time_horizon_obst = 5
         self.radius = 0.3
         self.max_speed = 1
+        self.sim = None
+        # WP-3: CCW polygon vertex lists installed via set_static_obstacles.
+        self.static_obstacle_polygons: list[list[tuple[float, float]]] = []
+
+    def set_static_obstacles(self, polygons: list[list[tuple[float, float]]]) -> None:
+        """Install CCW polygon vertex lists. Invalidates ``self.sim`` so the next
+        ``predict()`` rebuilds it with ``addObstacle`` + ``processObstacles``."""
+        self.static_obstacle_polygons = [list(poly) for poly in polygons]
         self.sim = None
 
     def configure(self, config):
@@ -102,6 +111,11 @@ class ORCA(Policy):
             for human_state in state.human_states:
                 self.sim.addAgent(human_state.position, *params, human_state.radius + 0.01 + self.safety_space,
                                   self.max_speed, human_state.velocity)
+            # WP-3: install static obstacle polygons once per fresh sim.
+            for poly in self.static_obstacle_polygons:
+                self.sim.addObstacle(poly)
+            if self.static_obstacle_polygons:
+                self.sim.processObstacles()
         else:
             self.sim.setAgentPosition(0, self_state.position)
             self.sim.setAgentVelocity(0, self_state.velocity)

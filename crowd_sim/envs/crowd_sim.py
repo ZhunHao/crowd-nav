@@ -106,6 +106,22 @@ class CrowdSim(gym.Env):
     def set_robot(self, robot):
         self.robot = robot
 
+    def _install_static_obstacles_on_humans(self):
+        """WP-3: push CCW rect polygons from ``self.static_map`` to every ORCA
+        human policy. Circle obstacles are skipped (the hardcoded layout uses
+        rects only)."""
+        if self.static_map is None:
+            return
+        polys = [
+            rect_vertices_ccw(o) for o in self.static_map.obstacles if o.kind == "rect"
+        ]
+        if not polys:
+            return
+        for human in self.humans:
+            setter = getattr(human.policy, "set_static_obstacles", None)
+            if setter is not None:
+                setter(polys)
+
     def generate_static_human(self, static_post):
         human = Human(self.config, 'humans')
         if self.randomize_attributes:
@@ -401,6 +417,10 @@ class CrowdSim(gym.Env):
             agent.time_step = self.time_step
             agent.policy.time_step = self.time_step
 
+        # WP-3: hand CCW rect polygons to every ORCA-controlled human so they
+        # steer around walls instead of straight through them.
+        self._install_static_obstacles_on_humans()
+
         # self.states = list()
         if hasattr(self.robot.policy, 'action_values'):
             self.action_values = list()
@@ -505,6 +525,10 @@ class CrowdSim(gym.Env):
         for agent in [self.robot] + self.humans:
             agent.time_step = self.time_step
             agent.policy.time_step = self.time_step
+
+        # WP-3: hand CCW rect polygons to every ORCA-controlled human so they
+        # steer around walls instead of straight through them.
+        self._install_static_obstacles_on_humans()
 
         self.states = list()
         if hasattr(self.robot.policy, 'action_values'):
