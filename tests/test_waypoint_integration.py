@@ -96,3 +96,40 @@ def test_allocator_driven_baseline_produces_video(repo_root: Path, exports_dir: 
     assert "projected to (" in merged_log, (
         "expected 'projected to (...)' warning for infeasible global goal"
     )
+
+    # WP-4: verify that a Theta* plan computed offline from the same inputs
+    # produces a LoS-clear polyline under the same inflation. This confirms the
+    # planner wiring actually routed around the cordon — not just that
+    # allocator bubble-resampling happened to find free points.
+    import sys as _sys
+
+    _sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from _obstacle_fixture import hardcoded_static_obstacles  # type: ignore[import-not-found]
+    from crowd_nav.planner.theta_star import ThetaStar
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    phase_cfg = PhaseConfig.from_configparser(cp)
+    assert phase_cfg.planner.enabled, (
+        "env.config in output_trained must enable [planner] for WP-4"
+    )
+    sm_planner = StaticMap.from_static_obstacles(
+        hardcoded_static_obstacles(), margin=phase_cfg.static_map.margin
+    )
+    planner = ThetaStar(
+        static_map=sm_planner,
+        inflation=phase_cfg.planner.inflation_radius,
+        grid_resolution=phase_cfg.planner.grid_resolution,
+        bounds=phase_cfg.planner.bounds,
+        simplify=phase_cfg.planner.waypoint_simplify,
+    )
+    path = planner.plan(start=start, goal=goal)
+    for x, y in path:
+        assert sm_planner.is_free(
+            x, y, margin=phase_cfg.planner.inflation_radius
+        ), f"Theta* vertex ({x}, {y}) lands inside an inflated obstacle"
+    prev = start
+    for nxt in path:
+        assert planner.line_of_sight(
+            prev, nxt
+        ), f"Theta* segment {prev}->{nxt} enters an obstacle"
+        prev = nxt
