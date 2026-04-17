@@ -233,7 +233,8 @@ def test_phase_config_parses_checked_in_env_config_enables_planner() -> None:
     pc = PhaseConfig.from_configparser(cp)
     assert pc.planner.enabled is True
     assert pc.planner.algorithm == "theta_star"
-    assert pc.planner.inflation_radius == 0.5
+    # Buffer must exceed robot.radius (0.5) — see test_env_config_planner_buffer.
+    assert pc.planner.inflation_radius > 0.5
 
 
 @pytest.mark.unit

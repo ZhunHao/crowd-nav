@@ -133,16 +133,22 @@ def main():
     # WP-3 hotfix: if the user-supplied global goal is inside an obstacle,
     # project it to the nearest free point before the allocator pins the last
     # waypoint. Keeps env.robot_goal* in sync so the final light_reset uses
-    # the projected coord.
+    # the projected coord. Project under the *stricter* of the static_map
+    # margin and the planner's inflation so Theta* never falls back on a
+    # goal it can't reach (regression: inflation=1.0 but projection at 0.5
+    # silently routed us back to the straight-line source).
+    projection_margin = phase_cfg.static_map.margin
+    if phase_cfg.planner.enabled:
+        projection_margin = max(projection_margin, phase_cfg.planner.inflation_radius)
     if static_map is not None and not static_map.is_free(
-        *global_goal, margin=phase_cfg.static_map.margin
+        *global_goal, margin=projection_margin
     ):
         projected = static_map.project_to_free(
-            *global_goal, margin=phase_cfg.static_map.margin
+            *global_goal, margin=projection_margin
         )
         logging.warning(
-            "Global goal %s lies inside an obstacle; projected to %s",
-            global_goal, projected,
+            "Global goal %s lies inside an obstacle (margin=%.2f); projected to %s",
+            global_goal, projection_margin, projected,
         )
         global_goal = projected
         env.robot_goalx, env.robot_goaly = projected
