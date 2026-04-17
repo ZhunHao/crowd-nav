@@ -149,3 +149,72 @@ def test_phase_config_reads_explicit_static_map_section() -> None:
     pc = PhaseConfig.from_configparser(cp)
     assert pc.static_map.enabled is False
     assert pc.static_map.margin == 0.8
+
+
+@pytest.mark.unit
+def test_phase_config_planner_defaults_when_section_missing() -> None:
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    cp = _cfg(
+        """
+        [sim]
+        human_num = 5
+        """
+    )
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.planner.enabled is False
+    assert pc.planner.algorithm == "theta_star"
+    assert pc.planner.inflation_radius == 0.5
+    assert pc.planner.grid_resolution == 0.25
+    assert pc.planner.bounds == (-15.0, 15.0, -15.0, 15.0)
+    assert pc.planner.goal_tolerance == 0.3
+    assert pc.planner.waypoint_simplify is True
+
+
+@pytest.mark.unit
+def test_phase_config_reads_explicit_planner_section() -> None:
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    cp = _cfg(
+        """
+        [sim]
+        human_num = 5
+
+        [planner]
+        enabled = true
+        algorithm = theta_star
+        inflation_radius = 0.4
+        grid_resolution = 0.2
+        bounds_xmin = -10.0
+        bounds_xmax = 10.0
+        bounds_ymin = -10.0
+        bounds_ymax = 10.0
+        goal_tolerance = 0.25
+        waypoint_simplify = false
+        """
+    )
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.planner.enabled is True
+    assert pc.planner.inflation_radius == 0.4
+    assert pc.planner.grid_resolution == 0.2
+    assert pc.planner.bounds == (-10.0, 10.0, -10.0, 10.0)
+    assert pc.planner.goal_tolerance == 0.25
+    assert pc.planner.waypoint_simplify is False
+
+
+@pytest.mark.unit
+def test_phase_config_rejects_unknown_planner_algorithm() -> None:
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    cp = _cfg(
+        """
+        [sim]
+        human_num = 5
+
+        [planner]
+        enabled = true
+        algorithm = dijkstra
+        """
+    )
+    with pytest.raises(ValueError, match="algorithm"):
+        PhaseConfig.from_configparser(cp)
