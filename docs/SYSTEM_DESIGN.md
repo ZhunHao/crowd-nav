@@ -342,3 +342,28 @@ Short version: **we don't need to scale**. This is a demo app. But some knobs ma
 4. **Export format** — MP4 only, or MP4 + CSV + PNG trajectory overlay? *Proposal: all three — the CSV is cheap and makes debugging / reporting far easier.*
 
 These are all cheap to defer; none block WP-1 or WP-3.
+
+---
+
+## 8. Known Issues / Future Work
+
+### 8.1 Per-waypoint human reseeding creates pathological crowd blockages
+
+**Observed:** 2026-04-17, `python test.py --policy sarl --model_dir data/output_trained --phase test --visualize --test_case 0`. Robot gets stuck or times out on specific segments even when Theta* produces valid LoS-clear waypoints. Figure at t=53s on segment 3 shows all 3 humans clustered *on top of* the active waypoint, boxing out the invisible robot; robot detours sideways and cannot re-approach.
+
+**Root cause:** `CrowdSim.light_reset` → `generate_random_human_position` (`crowd_sim/envs/crowd_sim.py`) re-spawns *all* humans each segment using `GoalAllocator.allocate_human_positions(robot_start=curr_post, robot_goal=local_goal, ...)`. With `num_waypoints=4` each segment is only ~3 m long, so the padded bbox + midpoint-reflection places every human directly on the robot's short corridor. Was masked before WP-4 because straight-line waypoints put short segments in low-conflict zones; now exposed.
+
+**Proposed fix (sketch):**
+- Seed humans **once per episode** using the *global* start→goal corridor (not per-segment), and let ORCA carry them across.
+- Or: fix human positions at episode start and only reset their internal ORCA state on `light_reset`, leaving world positions untouched.
+- Either breaks the "every waypoint gets a fresh crossing crowd" invariant — need to confirm whether training assumed it.
+
+**Scope:** not a Theta* regression. Keep separate from WP-4 follow-up.
+
+### 8.2 Goal projection must match planner inflation
+
+`test.py` used to project the global goal under `static_map.margin` only; when the planner's `inflation_radius` was stricter (WP-4 tuning to give SARL a buffer), the projected goal was *still* blocked for Theta*, silently triggering the straight-line fallback. Fixed 2026-04-17 by projecting under `max(static_map.margin, planner.inflation_radius)`. Keep this invariant if either margin is tuned in future phases.
+
+### 8.3 `inflation_radius` must exceed `robot.radius`
+
+Pinned by `tests/test_env_config_planner_buffer.py`. When the two are equal, Theta* vertices sit exactly on the env's collision surface (`CrowdSim.step` checks `is_free(margin=robot.radius)`) and any SARL drift triggers immediate static_collision. Every shipped `env.config` with `[planner] enabled = true` must satisfy `inflation_radius > robot.radius`.
