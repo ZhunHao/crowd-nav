@@ -33,6 +33,7 @@ class SimController:
     start: Optional[Point] = None
     goal: Optional[Point] = None
     user_obstacles: list[dict] = field(default_factory=list)
+    last_waypoints: list[tuple[float, float]] = field(default_factory=list)
     _phase_cfg: Optional[PhaseConfig] = field(default=None, init=False, repr=False)
     _base_map: Optional[StaticMap] = field(default=None, init=False, repr=False)
 
@@ -77,6 +78,8 @@ class SimController:
                 policy_name, path,
             )
         self.policy = policy
+        self.policy.set_phase("test")
+        self.policy.set_device(torch.device("cpu"))
 
     def set_start(self, xy: Point) -> None:
         self._reject_if_blocked(xy, label="start")
@@ -115,7 +118,7 @@ class SimController:
                 raise ValueError(f"cannot run episode: {name} not set")
         from crowd_nav.gui.controllers._rollout import run_waypoint_rollout
 
-        return run_waypoint_rollout(
+        result = run_waypoint_rollout(
             env_config_path=self.env_config_path,
             static_map=self.static_map,
             policy=self.policy,
@@ -124,6 +127,8 @@ class SimController:
             user_obstacles=self.user_obstacles,
             frame_callback=frame_callback,
         )
+        self.last_waypoints = result["waypoints"]
+        return result["states"]
 
     # ---------- internals ----------
 

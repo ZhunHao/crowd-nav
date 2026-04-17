@@ -34,7 +34,7 @@ def test_rollout_returns_states_with_expected_schema(repo_root: Path) -> None:
     # Empty map - no static obstacles - should trivially reach.
     sm = StaticMap(obstacles=(), margin=0.5)
 
-    states = run_waypoint_rollout(
+    result = run_waypoint_rollout(
         env_config_path=env_cfg,
         static_map=sm,
         policy=policy,
@@ -42,6 +42,8 @@ def test_rollout_returns_states_with_expected_schema(repo_root: Path) -> None:
         goal=(3.0, 3.0),
         user_obstacles=[],
     )
+    states = result["states"]
+    assert "waypoints" in result and len(result["waypoints"]) > 0
     assert len(states) > 0
     s0 = states[0]
     assert {"t", "robot", "humans", "waypoint_idx", "reward"} <= set(s0)
@@ -77,7 +79,7 @@ def test_rollout_invokes_frame_callback_with_zero_indexed_steps(
     def _cb(idx: int, step: dict) -> None:
         received.append((idx, step["waypoint_idx"]))
 
-    states = run_waypoint_rollout(
+    result = run_waypoint_rollout(
         env_config_path=model_dir / "env.config",
         static_map=sm,
         policy=policy,
@@ -86,6 +88,7 @@ def test_rollout_invokes_frame_callback_with_zero_indexed_steps(
         user_obstacles=[],
         frame_callback=_cb,
     )
+    states = result["states"]
 
     assert len(received) == len(states)
     assert received[0][0] == 0

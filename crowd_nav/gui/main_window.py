@@ -127,7 +127,11 @@ class MainWindow(QMainWindow):
         try:
             from crowd_sim.envs.utils.export_writer import write_exports
 
-            write_exports(Path(dir_str), states=self._last_states, waypoints=[])
+            write_exports(
+                Path(dir_str),
+                states=self._last_states,
+                waypoints=self.controller.last_waypoints,
+            )
         except Exception as exc:
             show_error(self, f"Cannot export: {exc}")
 

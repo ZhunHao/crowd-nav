@@ -6,6 +6,10 @@ a single source of truth. Behaviour is identical; only the I/O surface differs.
 
 ``frame_callback(step_counter, step)`` receives 0-indexed global step counts
 across all waypoints in the episode (not waypoint-local).
+
+Returns a dict with:
+* ``"states"``: list of per-step telemetry dicts (same schema as before)
+* ``"waypoints"``: list of (x, y) waypoint tuples actually used for the rollout
 """
 
 from __future__ import annotations
@@ -39,7 +43,7 @@ def run_waypoint_rollout(
     goal: Point,
     user_obstacles: list[dict],
     frame_callback: Optional[Callable[[int, dict], None]] = None,
-) -> list[dict]:
+) -> dict:
     env_config = configparser.RawConfigParser()
     env_config.read(env_config_path)
     phase_cfg = PhaseConfig.from_configparser(env_config)
@@ -138,7 +142,8 @@ def run_waypoint_rollout(
                     frame_callback(step_counter, step)
                 step_counter += 1
             prev_x, prev_y = robot.px, robot.py
+            env.curr_post = [float(robot.px), float(robot.py)]
     finally:
         env.close()
 
-    return states
+    return {"states": states, "waypoints": [tuple(w) for w in waypoints]}

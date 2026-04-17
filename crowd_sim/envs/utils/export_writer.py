@@ -110,10 +110,12 @@ def _write_mp4(
         ax.set_aspect("equal")
         xs_all = [s["robot"][0] for s in states]
         ys_all = [s["robot"][1] for s in states]
-        lo = min(min(xs_all), min(ys_all)) - 1
-        hi = max(max(xs_all), max(ys_all)) + 1
-        ax.set_xlim(lo, hi)
-        ax.set_ylim(lo, hi)
+        x_lo = min(xs_all) - 1.0
+        x_hi = max(xs_all) + 1.0
+        y_lo = min(ys_all) - 1.0
+        y_hi = max(ys_all) + 1.0
+        ax.set_xlim(x_lo, x_hi)
+        ax.set_ylim(y_lo, y_hi)
         (robot_dot,) = ax.plot([], [], "yo", markersize=14)
 
         def _init():

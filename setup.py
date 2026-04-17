@@ -10,6 +10,7 @@ setup(
         'crowd_nav.gui',
         'crowd_nav.gui.controllers',
         'crowd_nav.gui.workers',
+        'crowd_nav.planner',
         'crowd_nav.policy',
         'crowd_nav.utils',
         'crowd_sim',

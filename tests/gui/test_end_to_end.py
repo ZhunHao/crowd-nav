@@ -21,7 +21,6 @@ pytestmark = [pytest.mark.gui, pytest.mark.integration, pytest.mark.slow]
 
 def test_gui_full_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) -> None:
     Image = pytest.importorskip("PIL.Image")
-    import torch
 
     from crowd_nav.gui.controllers.sim_controller import SimController
     from crowd_nav.gui.main_window import MainWindow
@@ -63,11 +62,6 @@ def test_gui_full_voyage(qtbot, repo_root: Path, tmp_path: Path, monkeypatch) ->
     w.on_set_goal()
     w.canvas.clicked.emit(3.0, 3.0)
     assert controller.goal == (3.0, 3.0)
-
-    # SimController.load_model deliberately doesn't set phase/device - those
-    # are policy-lifecycle concerns the caller owns (matches test.py pattern).
-    controller.policy.set_phase("test")
-    controller.policy.set_device(torch.device("cpu"))
 
     # Run rollout synchronously; SimWorker's thread plumbing is unit-tested.
     w._last_states = controller.run_episode()
