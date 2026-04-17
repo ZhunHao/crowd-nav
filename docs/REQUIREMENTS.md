@@ -23,7 +23,7 @@
 | **WP-3** Land map + rendering | R3 | WP-1 | Group A |
 | **WP-4** Theta\* global planner | R4 | WP-3 (`StaticMap`) | Group B |
 | **WP-5** PyQt GUI | R5 | WP-3, WP-4 | Group A |
-| **WP-6** Packaging + smoke tests | cross-cutting | WP-1…5 | Group C |
+| **WP-6** Packaging + smoke tests | cross-cutting (Implemented 2026-04-18) | WP-1…5 | Group C |
 | **WP-7** Literature, docs, presentation | R6 | WP-5 for demo clips | Group C |
 
 See the implementation plan for file-level details and the verification plan.
