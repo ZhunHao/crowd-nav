@@ -49,16 +49,12 @@ else
   popd >/dev/null
 fi
 
-# 3. crowd_sim + crowd_nav ----------------------------------------------------
-log "pip install -e . (crowdnav package, editable)"
-pip install --quiet -e .
+# 3. crowd_sim + crowd_nav + dev deps -----------------------------------------
+log "pip install -e .[test] (crowdnav package + PyQt5 + pytest-qt, editable)"
+pip install --quiet -e ".[test]"
 
 log "pinning gym==0.15.7 (newer versions break this env)"
 pip install --quiet "gym==0.15.7"
-
-# 4. Dev / test deps ----------------------------------------------------------
-log "installing pytest for smoke tests"
-pip install --quiet pytest
 
 # 5. ffmpeg sanity ------------------------------------------------------------
 if ! command -v ffmpeg >/dev/null; then
