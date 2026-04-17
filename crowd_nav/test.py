@@ -128,6 +128,24 @@ def main():
         else None
     )
     is_free = static_map.is_free if static_map is not None else None
+
+    # WP-3 hotfix: if the user-supplied global goal is inside an obstacle,
+    # project it to the nearest free point before the allocator pins the last
+    # waypoint. Keeps env.robot_goal* in sync so the final light_reset uses
+    # the projected coord.
+    if static_map is not None and not static_map.is_free(
+        *global_goal, margin=phase_cfg.static_map.margin
+    ):
+        projected = static_map.project_to_free(
+            *global_goal, margin=phase_cfg.static_map.margin
+        )
+        logging.warning(
+            "Global goal %s lies inside an obstacle; projected to %s",
+            global_goal, projected,
+        )
+        global_goal = projected
+        env.robot_goalx, env.robot_goaly = projected
+
     waypoint_source = None  # None → straight-line interpolation.
 
     waypoints: list[tuple[float, float]] = allocator.allocate_waypoints(

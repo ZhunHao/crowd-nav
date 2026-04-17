@@ -35,3 +35,13 @@ def test_test_py_allocate_waypoints_call_passes_is_free() -> None:
     assert pattern.search(body), (
         "allocate_waypoints(...) must receive an is_free= argument in test.py"
     )
+
+
+@pytest.mark.unit
+def test_test_py_projects_infeasible_global_goal() -> None:
+    """test.py must call StaticMap.project_to_free so an infeasible config
+    goal (e.g., one inside the cordon) is snapped before allocate_waypoints."""
+    body = TEST_PY.read_text()
+    assert "project_to_free(" in body, (
+        "test.py must call static_map.project_to_free(...) for an infeasible goal"
+    )
