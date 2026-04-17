@@ -67,4 +67,10 @@ if ! command -v ffmpeg >/dev/null; then
   echo "  macOS : brew install ffmpeg" >&2
 fi
 
+log "running preflight checks"
+if ! crowdnav-preflight; then
+  echo "preflight failed — see hints above" >&2
+  exit 1
+fi
+
 log "done. Activate with:  conda activate $ENV_NAME"

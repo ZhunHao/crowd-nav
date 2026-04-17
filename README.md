@@ -66,6 +66,18 @@ pip install "gym==0.15.7" pytest
 
 The repository is organized in two parts: `crowd_sim/` contains the simulation environment and `crowd_nav/` contains the training and testing code. Simulation framework details: [crowd_sim/README.md](crowd_sim/README.md). Commands below should be run from inside `crowd_nav/`.
 
+### One-line commands
+
+After `./scripts/setup_env.sh` completes:
+
+```bash
+crowdnav-preflight        # verify rvo2 / ffmpeg / gym / trained model
+crowdnav-gui              # launch the PyQt GUI (slide-14 demo)
+crowdnav-baseline         # reproduce R1 -> exports/baseline.mp4
+```
+
+Advanced flag-driven usage with `python test.py ...` is documented below.
+
 ### Visualize a test case
 
 ```bash
