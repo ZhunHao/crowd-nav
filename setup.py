@@ -43,4 +43,11 @@ setup(
             'pytest-qt',
         ],
     },
+    entry_points={
+        'console_scripts': [
+            'crowdnav-preflight = crowd_nav.cli.preflight:main',
+            'crowdnav-baseline = crowd_nav.cli.baseline:main',
+            'crowdnav-gui = crowd_nav.cli.gui:main',
+        ],
+    },
 )
