@@ -218,3 +218,34 @@ def test_phase_config_rejects_unknown_planner_algorithm() -> None:
     )
     with pytest.raises(ValueError, match="algorithm"):
         PhaseConfig.from_configparser(cp)
+
+
+@pytest.mark.unit
+def test_phase_config_parses_checked_in_env_config_enables_planner() -> None:
+    from pathlib import Path
+
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    repo = Path(__file__).resolve().parent.parent
+    cfg_path = repo / "crowd_nav" / "configs" / "env.config"
+    cp = configparser.RawConfigParser()
+    cp.read(cfg_path)
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.planner.enabled is True
+    assert pc.planner.algorithm == "theta_star"
+    assert pc.planner.inflation_radius == 0.5
+
+
+@pytest.mark.unit
+def test_phase_config_parses_output_trained_env_config_enables_planner() -> None:
+    from pathlib import Path
+
+    from crowd_sim.envs.utils.phase_config import PhaseConfig
+
+    repo = Path(__file__).resolve().parent.parent
+    cfg_path = repo / "crowd_nav" / "data" / "output_trained" / "env.config"
+    cp = configparser.RawConfigParser()
+    cp.read(cfg_path)
+    pc = PhaseConfig.from_configparser(cp)
+    assert pc.planner.enabled is True
+    assert pc.planner.algorithm == "theta_star"
