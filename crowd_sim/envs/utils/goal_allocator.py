@@ -159,3 +159,55 @@ class GoalAllocator:
             used.append(replacement)
 
         return accepted
+
+    def allocate_human_positions(
+        self,
+        robot_start: Point,
+        robot_goal: Point,
+        occupied: Sequence[Point],
+        human_num: int,
+        min_dist: float,
+        is_free: IsFreeFn | None = None,
+    ) -> list[tuple[Point, Point]]:
+        """Return ``human_num`` (start, goal) pairs for dynamic obstacles.
+
+        Starts are sampled non-overlapping with ``occupied`` (prior humans + robot
+        positions). Goals are placed on the opposite side of the midpoint so the
+        human crosses the robot's corridor — preserves the "circle_crossing"
+        intent from :meth:`CrowdSim.generate_random_human_position` while
+        eliminating the ``radius / 1`` bug and the overlap artefact.
+        """
+        if human_num < 0:
+            raise ValueError(f"human_num must be >= 0, got {human_num}")
+
+        mid = (
+            (robot_start[0] + robot_goal[0]) / 2.0,
+            (robot_start[1] + robot_goal[1]) / 2.0,
+        )
+        # Axis-aligned bounds around the robot's corridor + 2 m pad so humans
+        # don't spawn miles away.
+        pad = 2.0
+        bounds: Bounds = (
+            min(robot_start[0], robot_goal[0]) - pad,
+            max(robot_start[0], robot_goal[0]) + pad,
+            min(robot_start[1], robot_goal[1]) - pad,
+            max(robot_start[1], robot_goal[1]) + pad,
+        )
+
+        used: list[Point] = list(occupied)
+        pairs: list[tuple[Point, Point]] = []
+        for _ in range(human_num):
+            start = self.sample_unused_position(used, bounds, min_dist, is_free)
+            # Reflect through midpoint so the human walks across the corridor.
+            reflected: Point = (2 * mid[0] - start[0], 2 * mid[1] - start[1])
+            if all(
+                math.hypot(reflected[0] - u[0], reflected[1] - u[1]) >= min_dist
+                for u in used
+            ) and (is_free is None or is_free(*reflected)):
+                goal = reflected
+            else:
+                goal = self.sample_unused_position(used, bounds, min_dist, is_free)
+            pairs.append((start, goal))
+            used.append(start)
+            used.append(goal)
+        return pairs

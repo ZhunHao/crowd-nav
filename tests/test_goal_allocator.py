@@ -140,3 +140,56 @@ def test_allocate_waypoints_num_waypoints_must_be_positive() -> None:
         GoalAllocator().allocate_waypoints(
             start=(0.0, 0.0), goal=(1.0, 1.0), num_waypoints=0, min_inter_dist=0.1
         )
+
+
+@pytest.mark.unit
+def test_allocate_human_positions_returns_n_pairs() -> None:
+    from crowd_sim.envs.utils.goal_allocator import GoalAllocator
+
+    seed_everything(42)
+    pairs = GoalAllocator().allocate_human_positions(
+        robot_start=(-11.0, -11.0),
+        robot_goal=(6.0, 11.0),
+        occupied=[(-11.0, -11.0)],
+        human_num=5,
+        min_dist=0.8,
+    )
+    assert len(pairs) == 5
+    for start, goal in pairs:
+        assert isinstance(start, tuple) and len(start) == 2
+        assert isinstance(goal, tuple) and len(goal) == 2
+
+
+@pytest.mark.unit
+def test_allocate_human_positions_avoids_occupied() -> None:
+    from crowd_sim.envs.utils.goal_allocator import GoalAllocator
+
+    seed_everything(42)
+    occupied = [(0.0, 0.0)]
+    pairs = GoalAllocator().allocate_human_positions(
+        robot_start=(-3.0, -3.0),
+        robot_goal=(3.0, 3.0),
+        occupied=occupied,
+        human_num=3,
+        min_dist=1.2,
+    )
+    for start, goal in pairs:
+        assert math.hypot(start[0], start[1]) >= 1.2
+        assert math.hypot(goal[0], goal[1]) >= 1.2
+
+
+@pytest.mark.unit
+def test_allocate_human_positions_is_deterministic() -> None:
+    from crowd_sim.envs.utils.goal_allocator import GoalAllocator
+
+    def run() -> list[tuple[tuple[float, float], tuple[float, float]]]:
+        seed_everything(42)
+        return GoalAllocator().allocate_human_positions(
+            robot_start=(-3.0, -3.0),
+            robot_goal=(3.0, 3.0),
+            occupied=[],
+            human_num=4,
+            min_dist=0.5,
+        )
+
+    assert run() == run()
