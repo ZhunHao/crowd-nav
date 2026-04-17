@@ -363,6 +363,13 @@ class CrowdSim(gym.Env):
         if not self.robot.policy.multiagent_training:
             self.train_val_sim = 'circle_crossing'
 
+        # WP-3: keep StaticMap consistent with (possibly pre-existing) obstacles.
+        self.static_map = (
+            StaticMap.from_static_obstacles(self.static_obstacles, margin=0.0)
+            if self.static_obs_cfg and self.static_obstacles
+            else None
+        )
+
         if self.config.get('humans', 'policy') == 'trajnet':
             raise NotImplementedError
         else:
@@ -459,6 +466,14 @@ class CrowdSim(gym.Env):
                 cx = 15 - obs_idx*h
                 cy = 5
                 self.static_obstacles.append({'type':'rect', 'cx':cx, 'cy':cy, 'w':w, 'h':h})
+
+        # WP-3: Build StaticMap before generating humans so the allocator's
+        # is_free predicate uses the real obstacle layout.
+        self.static_map = (
+            StaticMap.from_static_obstacles(self.static_obstacles, margin=0.0)
+            if self.static_obs_cfg and self.static_obstacles
+            else None
+        )
 
         if self.config.get('humans', 'policy') == 'trajnet':
             raise NotImplementedError
@@ -559,11 +574,18 @@ class CrowdSim(gym.Env):
         end_position = np.array(self.robot.compute_position(action, self.time_step))
         reaching_goal = norm(end_position - np.array(self.robot.get_goal_position())) < self.robot.radius
 
+        # WP-3 Tier B: robot vs static obstacle collision.
+        static_collision = False
+        if self.static_map is not None and not self.static_map.is_free(
+            float(end_position[0]), float(end_position[1]), margin=self.robot.radius,
+        ):
+            static_collision = True
+
         if self.global_time >= self.time_limit - 1:
             reward = 0
             done = True
             info = Timeout()
-        elif collision:
+        elif collision or static_collision:
             reward = self.collision_penalty
             done = True
             info = Collision()
