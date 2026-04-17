@@ -11,6 +11,7 @@ from crowd_sim.envs.utils.robot import Robot
 from crowd_sim.envs.utils.seeding import seed_everything
 from crowd_sim.envs.utils.goal_allocator import GoalAllocator
 from crowd_sim.envs.utils.phase_config import PhaseConfig
+from crowd_sim.envs.utils.static_map import StaticMap
 from crowd_sim.envs.policy.orca import ORCA
 
 
@@ -117,8 +118,16 @@ def main():
     start_point: tuple[float, float] = (env.robot_initx, env.robot_inity)
     global_goal: tuple[float, float] = (env.robot_goalx, env.robot_goaly)
 
-    # WP-3 (StaticMap) / WP-4 (Theta*) will swap these defaults later.
-    is_free = None  # None → GoalAllocator defaults to "always free".
+    # WP-3: wire StaticMap.is_free so waypoints avoid obstacles. WP-4 will
+    # also inject Theta* as waypoint_source.
+    static_map: StaticMap | None = (
+        StaticMap.from_static_obstacles(
+            env.static_obstacles, margin=phase_cfg.static_map.margin
+        )
+        if phase_cfg.static_map.enabled and getattr(env, "static_obstacles", None)
+        else None
+    )
+    is_free = static_map.is_free if static_map is not None else None
     waypoint_source = None  # None → straight-line interpolation.
 
     waypoints: list[tuple[float, float]] = allocator.allocate_waypoints(
