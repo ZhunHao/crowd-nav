@@ -200,9 +200,12 @@ class CrowdSim(gym.Env):
         # Use half of rectangle’s diagonal as the "circle radius"
         center_x = (min_x + max_x) / 2
         center_y = (min_y + max_y) / 2
-        # Half-extent of the bounding box — original used "/ 1" (no-op divide).
-        radius_x = (max_x - min_x) / 2
-        radius_y = (max_y - min_y) / 2
+        # Full extent of the bounding box as the "circle radius" — spreads
+        # sampled humans over a 2x corridor-sized area so they don't cluster
+        # onto the robot's direct path between consecutive short waypoints.
+        # (R1 baseline was calibrated for this placement.)
+        radius_x = (max_x - min_x)
+        radius_y = (max_y - min_y)
 
         while True:
             angle = np.random.random() * np.pi * 2
