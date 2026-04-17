@@ -4,8 +4,10 @@ from setuptools import setup
 setup(
     name='crowdnav',
     version='0.0.1',
+    python_requires='>=3.10,<3.11',
     packages=[
         'crowd_nav',
+        'crowd_nav.cli',
         'crowd_nav.configs',
         'crowd_nav.gui',
         'crowd_nav.gui.controllers',
@@ -19,8 +21,9 @@ setup(
         'crowd_sim.envs.utils',
     ],
     install_requires=[
+        'cython<3',
         'gitpython',
-        'gym',
+        'gym==0.15.7',
         'matplotlib',
         'numpy',
         'scipy',
