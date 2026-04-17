@@ -29,16 +29,14 @@ def test_check_rvo2_ok_when_module_importable(monkeypatch):
 
 
 def test_check_rvo2_fail_when_import_errors(monkeypatch):
-    import builtins
+    from crowd_nav.utils import preflight
 
-    real_import = builtins.__import__
-
-    def fake_import(name, *args, **kwargs):
+    def fake_import_module(name):
         if name == "rvo2":
             raise ImportError("not built")
-        return real_import(name, *args, **kwargs)
+        raise RuntimeError(f"unexpected import: {name}")
 
-    monkeypatch.setattr(builtins, "__import__", fake_import)
+    monkeypatch.setattr(preflight.importlib, "import_module", fake_import_module)
     result = check_rvo2()
     assert result.ok is False
     assert "Python-RVO2" in result.hint
