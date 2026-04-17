@@ -57,6 +57,34 @@ class StaticMap:
                 raise ValueError(f"unknown obstacle kind: {obs.kind!r}")
         return True
 
+    def project_to_free(
+        self,
+        x: float,
+        y: float,
+        margin: float | None = None,
+        step: float = 0.1,
+        max_radius: float = 10.0,
+    ) -> tuple[float, float]:
+        """Return ``(x, y)`` when already free, else the nearest free point
+        found via ring-spiral search outward. Raises ``RuntimeError`` if no
+        free point exists within ``max_radius``.
+        """
+        if self.is_free(x, y, margin=margin):
+            return (float(x), float(y))
+        r = step
+        while r <= max_radius + 1e-9:
+            n = max(8, int(2.0 * math.pi * r / step))
+            for i in range(n):
+                angle = 2.0 * math.pi * i / n
+                px = x + r * math.cos(angle)
+                py = y + r * math.sin(angle)
+                if self.is_free(px, py, margin=margin):
+                    return (float(px), float(py))
+            r += step
+        raise RuntimeError(
+            f"could not project ({x}, {y}) to free point within r={max_radius}"
+        )
+
     @classmethod
     def from_static_obstacles(
         cls,

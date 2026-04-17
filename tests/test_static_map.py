@@ -145,3 +145,86 @@ def test_from_static_obstacles_empty_list() -> None:
     assert sm.obstacles == ()
     assert sm.margin == 0.3
     assert math.isfinite(sm.margin)
+
+
+@pytest.mark.unit
+def test_project_to_free_returns_input_when_already_free() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="rect", cx=0.0, cy=0.0, w=2.0, h=2.0),),
+        margin=0.0,
+    )
+    # (5, 5) is far outside the rect — should pass through unchanged.
+    assert sm.project_to_free(5.0, 5.0) == (5.0, 5.0)
+
+
+@pytest.mark.unit
+def test_project_to_free_snaps_out_of_rect() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="rect", cx=0.0, cy=0.0, w=4.0, h=2.0),),
+        margin=0.0,
+    )
+    # (0, 0) is at the rect center — projection should land outside.
+    projected = sm.project_to_free(0.0, 0.0, margin=0.1)
+    assert sm.is_free(*projected, margin=0.1)
+    # The projection can't be farther than the max search radius.
+    assert math.hypot(projected[0], projected[1]) <= 10.0
+
+
+@pytest.mark.unit
+def test_project_to_free_snaps_out_of_circle() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="circle", cx=0.0, cy=0.0, w=0.0, h=0.0, r=1.5),),
+        margin=0.0,
+    )
+    projected = sm.project_to_free(0.3, 0.2)
+    assert sm.is_free(*projected)
+
+
+@pytest.mark.unit
+def test_project_to_free_respects_default_margin_when_none() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    # Rect at origin, default margin 0.5 inflates it substantially.
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="rect", cx=0.0, cy=0.0, w=2.0, h=2.0),),
+        margin=0.5,
+    )
+    # (1.2, 0) is outside the bare rect (half-width 1.0) but inside the
+    # margin-inflated one (half-width 1.5). Projection with margin=None
+    # (default) must keep that margin.
+    projected = sm.project_to_free(1.2, 0.0)
+    assert sm.is_free(*projected)  # default margin
+    # Confirm we actually moved — the input point was not free under the default margin.
+    assert projected != (1.2, 0.0)
+
+
+@pytest.mark.unit
+def test_project_to_free_raises_when_max_radius_exhausted() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    # A huge rect that covers the entire search area.
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="rect", cx=0.0, cy=0.0, w=100.0, h=100.0),),
+        margin=0.0,
+    )
+    with pytest.raises(RuntimeError, match="could not project"):
+        sm.project_to_free(0.0, 0.0, max_radius=5.0)
+
+
+@pytest.mark.unit
+def test_project_to_free_distance_bounded_by_max_radius() -> None:
+    from crowd_sim.envs.utils.static_map import Obstacle, StaticMap
+
+    sm = StaticMap(
+        obstacles=(Obstacle(kind="rect", cx=0.0, cy=0.0, w=3.0, h=3.0),),
+        margin=0.0,
+    )
+    x0, y0 = 0.5, 0.5
+    projected = sm.project_to_free(x0, y0, max_radius=5.0)
+    assert math.hypot(projected[0] - x0, projected[1] - y0) <= 5.0 + 1e-6
