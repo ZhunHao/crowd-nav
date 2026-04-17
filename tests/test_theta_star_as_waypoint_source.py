@@ -70,3 +70,63 @@ def test_theta_star_waypoint_source_rejects_mismatched_n() -> None:
     source = planner.as_waypoint_source(n=10)
     with pytest.raises(ValueError, match="bound to n=10"):
         source((-5.0, 0.0), (5.0, 0.0), 11)
+
+
+@pytest.mark.unit
+def test_theta_star_waypoint_source_preserves_line_of_sight() -> None:
+    """Regression: arc-length resampling used to drop the detour vertex, so
+    the chord between two consecutive waypoints could cut the corner through
+    an inflated obstacle even when each waypoint was individually free. Every
+    chord (start to wp[0], wp[i] to wp[i+1]) must be LoS-clear under the
+    planner's own inflation.
+    """
+    from crowd_nav.planner.theta_star import ThetaStar
+
+    seed_everything(42)
+    inflation = 0.5
+    planner = ThetaStar(
+        static_map=_map_with_centre_rect(),
+        inflation=inflation,
+        grid_resolution=0.25,
+        bounds=(-8.0, 8.0, -8.0, 8.0),
+    )
+    start = (-5.0, 0.0)
+    goal = (5.0, 0.0)
+    source = planner.as_waypoint_source(n=4)
+    wps = source(start, goal, 4)
+
+    assert len(wps) == 4
+    assert wps[-1] == pytest.approx(goal, abs=1e-6)
+
+    prev = start
+    for nxt in wps:
+        assert planner.line_of_sight(prev, nxt), (
+            f"chord {prev} -> {nxt} cuts through an inflated obstacle"
+        )
+        prev = nxt
+
+
+@pytest.mark.unit
+def test_theta_star_waypoint_source_pads_when_path_short() -> None:
+    """Only 2-3 Theta* vertices but n=6 waypoints requested - fitter must
+    subdivide LoS-clear segments rather than dropping vertices.
+    """
+    from crowd_nav.planner.theta_star import ThetaStar
+
+    seed_everything(42)
+    planner = ThetaStar(
+        static_map=_map_with_centre_rect(),
+        inflation=0.5,
+        grid_resolution=0.25,
+        bounds=(-8.0, 8.0, -8.0, 8.0),
+    )
+    start = (-5.0, 0.0)
+    goal = (5.0, 0.0)
+    wps = planner.as_waypoint_source(n=6)(start, goal, 6)
+
+    assert len(wps) == 6
+    assert wps[-1] == pytest.approx(goal, abs=1e-6)
+    prev = start
+    for nxt in wps:
+        assert planner.line_of_sight(prev, nxt)
+        prev = nxt

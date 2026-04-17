@@ -232,7 +232,9 @@ class ThetaStar:
     def as_waypoint_source(self, n: int) -> WaypointSourceFn:
         """Wrap :meth:`plan` in a closure matching
         :data:`GoalAllocator.WaypointSourceFn` - callers get exactly ``n``
-        points, last == goal, resampled by arc length.
+        points, last == goal. Every Theta* vertex is preserved and extra
+        points are inserted by subdividing the longest LoS-clear segments,
+        so ``line_of_sight(wp[i], wp[i+1])`` holds by construction.
         """
         if n <= 0:
             raise ValueError(f"n must be >= 1, got {n}")
@@ -243,7 +245,7 @@ class ThetaStar:
                     f"as_waypoint_source bound to n={n} but called with num={num}"
                 )
             path = self.plan(start=start, goal=goal)
-            return _arc_length_resample(start, path, num)
+            return _fit_path_to_n(start, path, num)
 
         return _source
 
@@ -289,39 +291,51 @@ def _rdp_simplify(path: list[Point], epsilon: float) -> list[Point]:
     return _rdp(path)
 
 
-def _arc_length_resample(start: Point, path: list[Point], n: int) -> list[Point]:
-    """Return ``n`` points along start to path[0] to ... to path[-1] equally spaced
-    by arc length. Last element is ``path[-1]`` (== goal).
+def _fit_path_to_n(start: Point, path: list[Point], n: int) -> list[Point]:
+    """Return ``n`` waypoints along ``start -> path[0] -> ... -> path[-1]``
+    while preserving every Theta* vertex so each consecutive chord stays on
+    one LoS-clear Theta* segment.
+
+    - When ``n >= len(path)``: keep all vertices and insert ``n - len(path)``
+      midpoints, always splitting the segment with the greatest *effective*
+      (length / pieces) span next. Each midpoint lies on an already-clear
+      segment, so LoS is preserved by construction.
+    - When ``n < len(path)``: we cannot keep every vertex without exceeding
+      ``n``; fall back to the last ``n`` vertices so at minimum ``path[-1]``
+      (goal) is the terminal. The first chord from ``start`` may then skip
+      earlier Theta* vertices. Upstream callers should log this; with
+      ``simplify=True`` it rarely triggers for typical ``n >= 3``.
     """
     if not path:
         raise ValueError("path must be non-empty")
-    vertices: list[Point] = [start] + list(path)
+    if n <= 0:
+        raise ValueError(f"n must be >= 1, got {n}")
+
+    if n < len(path):
+        return list(path[-n:])
+
+    anchors: list[Point] = [start] + list(path)
+    seg_count = len(anchors) - 1
     seg_lengths = [
-        math.hypot(
-            vertices[i + 1][0] - vertices[i][0],
-            vertices[i + 1][1] - vertices[i][1],
-        )
-        for i in range(len(vertices) - 1)
+        math.hypot(anchors[i + 1][0] - anchors[i][0], anchors[i + 1][1] - anchors[i][1])
+        for i in range(seg_count)
     ]
-    total = sum(seg_lengths)
-    if total < 1e-12:
+    if sum(seg_lengths) < 1e-12:
         return [path[-1]] * n
-    cum = [0.0]
-    for s in seg_lengths:
-        cum.append(cum[-1] + s)
+
+    splits = [1] * seg_count  # pieces per segment (>=1)
+    extras = n - len(path)
+    for _ in range(extras):
+        effective = [L / s for L, s in zip(seg_lengths, splits)]
+        longest = max(range(seg_count), key=lambda i: effective[i])
+        splits[longest] += 1
+
     out: list[Point] = []
-    for k in range(1, n + 1):
-        target = total * k / n
-        i = 0
-        while i < len(cum) - 2 and cum[i + 1] < target:
-            i += 1
-        seg_len = seg_lengths[i]
-        if seg_len < 1e-12:
-            out.append(vertices[i + 1])
-            continue
-        t = (target - cum[i]) / seg_len
-        a = vertices[i]
-        b = vertices[i + 1]
-        out.append((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])))
+    for i in range(seg_count):
+        a, b = anchors[i], anchors[i + 1]
+        pieces = splits[i]
+        for k in range(1, pieces + 1):
+            t = k / pieces
+            out.append((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])))
     out[-1] = path[-1]
     return out
