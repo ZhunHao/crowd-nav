@@ -10,7 +10,7 @@
 | R2 | Non-overlapping local goals; per-phase dynamic-obstacle distribution | 13 | Not implemented |
 | R3 | Land map loaded + rendered as static obstacles | 13 | Scaffolded but disabled (`static_obs=false`) |
 | R4 | Global path planner (Theta\*) emits local goals | 13 | Not implemented |
-| R5 | GUI demo with 7 buttons (slide 14) | 14 | Not implemented |
+| R5 | GUI demo with 7 buttons (slide 14) | 14 | Implemented (WP-5) |
 | R6 | Literature reading, final report, final presentation | 15 | Out of scope for code plan |
 | R7 | Support existing trained model without retraining | 9–11 | Model at [crowd_nav/data/output_trained/](../crowd_nav/data/output_trained) |
 
