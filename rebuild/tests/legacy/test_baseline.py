@@ -4,7 +4,10 @@ import pytest
 import torch
 from shipnav.baseline import build_baseline, load_policy
 
-MODEL = Path(__file__).resolve().parents[2] / 'CrowdNav-20250813-DIP/crowd_nav/data/output_trained'
+pytestmark = pytest.mark.legacy
+
+
+MODEL = Path(__file__).resolve().parents[3] / 'CrowdNav-20250813-DIP/crowd_nav/data/output_trained'
 
 
 def test_missing_model_is_explicit(tmp_path):

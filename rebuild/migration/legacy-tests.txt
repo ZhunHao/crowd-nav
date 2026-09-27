@@ -1,0 +1,22 @@
+....                                                                     [100%]
+=============================== warnings summary ===============================
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+  /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+  /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 12 warnings in 1.83s

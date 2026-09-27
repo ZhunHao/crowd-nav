@@ -1,16 +1,22 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "shipnav-rebuild"
-version = "0.1.0"
-requires-python = ">=3.10,<3.11"
-dependencies = ["numpy>=1.24,<2", "matplotlib>=3.7,<3.9", "torch>=2.2,<2.3", "scipy", "gym==0.15.7"]
+version = "0.2.0"
+requires-python = ">=3.14,<3.15"
+dependencies = ["numpy==2.5.3", "torch==2.14.0", "gymnasium==1.3.0"]
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "pytest-qt>=4,<5"]
-gui = ["PySide6>=6.6,<6.8"]
+gui = ["PySide6==6.11.2", "matplotlib==3.11.2"]
+train = ["stable-baselines3==2.9.0"]
+[dependency-groups]
+dev = ["pytest==9.1.1", "pytest-qt==4.5.0"]
 [tool.setuptools.packages.find]
 where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: requires supplied checkpoint and native RVO2", "video: requires FFmpeg"]
+norecursedirs = ["tests/legacy"]
+markers = ["integration: checkpoint/native dependency", "legacy: original baseline interpreter", "external: upstream maritime tools", "video: FFmpeg"]
+[tool.uv]
+environments = ["sys_platform == 'darwin' and platform_machine == 'arm64'", "sys_platform == 'linux' and platform_machine == 'x86_64'"]
+required-environments = ["sys_platform == 'darwin' and platform_machine == 'arm64'", "sys_platform == 'linux' and platform_machine == 'x86_64'"]

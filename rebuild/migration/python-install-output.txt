@@ -1,0 +1,7 @@
+$ uv python install 3.14.7
+error: No download found for request: cpython-3.14.7-macos-aarch64-none
+$ uv python pin 3.14.7
+Pinned `.python-version` to `3.14.7`
+$ uv venv --python 3.14.7 .venv-modern
+Using CPython 3.14.7
+Creating virtual environment at: .venv-modern
