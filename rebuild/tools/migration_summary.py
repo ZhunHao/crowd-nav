@@ -2,7 +2,12 @@
 from pathlib import Path
 import json
 import numpy as np
-from reference_manifest import manifest
+from hashlib import sha256
+
+def manifest(root):
+    return {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest()
+            for p in sorted(root.rglob("*")) if p.is_file()
+            and "__pycache__" not in p.parts and p.suffix != ".pyc"}
 
 ROOT = Path(__file__).resolve().parents[1]
 

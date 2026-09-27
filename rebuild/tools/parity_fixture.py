@@ -1,16 +1,11 @@
 from pathlib import Path
-import argparse, importlib, json
+import argparse, json
 import torch
 
 
-def capture(modern, model_dir):
-    if modern:
-        from shipnav.model import load_policy
-        prefix = 'shipnav.compat.'
-    else:
-        from shipnav.baseline import load_policy
-        prefix = ''
-    states = importlib.import_module(prefix+'crowd_sim.envs.utils.state')
+def capture(model_dir):
+    from shipnav.model import load_policy
+    from shipnav.compat.crowd_sim.envs.utils import state as states
     policy = load_policy(model_dir)
     policy.query_env = False
     policy.time_step = .25
@@ -32,9 +27,8 @@ def capture(modern, model_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--modern', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    rows = capture(args.modern, Path('../CrowdNav-20250813-DIP/crowd_nav/data/output_trained'))
+    rows = capture(Path('../CrowdNav-20250813-DIP/crowd_nav/data/output_trained'))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(rows, allow_nan=False))

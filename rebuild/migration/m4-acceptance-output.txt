@@ -1,0 +1,1 @@
+Accepted modern macOS arm64 CPU; original source unchanged; retired paths and imports absent.

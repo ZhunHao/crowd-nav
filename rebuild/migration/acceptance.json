@@ -1,0 +1,341 @@
+{
+  "accepted_platform": "macOS arm64 CPU",
+  "python": "3.14.7 (main, Sep  1 2026, 14:05:28) [Clang 22.1.3 ]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "executable": "/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/bin/python",
+  "versions": {
+    "numpy": "2.5.3",
+    "torch": "2.14.0",
+    "gymnasium": "1.3.0",
+    "PySide6": "6.11.2",
+    "matplotlib": "3.11.2",
+    "stable-baselines3": "2.9.0",
+    "pytest": "9.1.1",
+    "pyrvo2": "0.0.0"
+  },
+  "clean_environment": {
+    "recreated_from": "uv.lock",
+    "pythonpath": null,
+    "sys_path": [
+      "/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/tools",
+      "/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/lib/python314.zip",
+      "/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/lib/python3.14",
+      "/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/lib/python3.14/lib-dynload",
+      "/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/lib/python3.14/site-packages",
+      "/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/src"
+    ],
+    "original_path_absent": true
+  },
+  "retired_paths_absent": {
+    ".venv-legacy": true,
+    "legacy": true,
+    "locks/legacy.txt": true,
+    "src/shipnav/baseline.py": true,
+    "tests/legacy": true,
+    "tools/reference_manifest.py": true,
+    "tools/capture_reference.py": true
+  },
+  "unavailable_original_imports": {
+    "shipnav.baseline": true,
+    "crowd_nav": true,
+    "crowd_sim": true,
+    "gym": true
+  },
+  "source_unchanged": true,
+  "source_sha256": {
+    ".DS_Store": "4522660fb7108730fe774f0910e5ad270b731c95c558aaa19728f7c1365fecfa",
+    "Python-RVO2-main/.DS_Store": "711b7348b2e33699aea8a5e17203668bbce2e839845f213c1820e80ab5a119bc",
+    "Python-RVO2-main/.editorconfig": "c3843ae82764bf27e3402b5c1235827d910e8fb40f4b990c369d82e8e9b85ca2",
+    "Python-RVO2-main/.gitignore": "ef5f6ddf0abb4d89f7c7db61005ba70c7b111962b91fd933592f33ade7c99a40",
+    "Python-RVO2-main/.travis.yml": "f2e2308dd0f93bda7e7dcb9adb7b4c803c605dddf500240d9c27fefb735f3f22",
+    "Python-RVO2-main/CMakeLists.txt": "2d5c705678e809868875ec982fb9929fa7d2402113c3c8db0e60388c90a6a130",
+    "Python-RVO2-main/CTestConfig.cmake": "1e70ab4dd144705358f0aa011b11330b9bde7b2cd2959fa4f7d832a7b3baf38b",
+    "Python-RVO2-main/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Python-RVO2-main/README.md": "a245c05ddc16c3ddd3c367ff619143c1129a142d7da9b7185451ef1714fa28fe",
+    "Python-RVO2-main/appveyor.yml": "f7d1d44ca3b5bc68d3c27b62c3ff97e4f8f4e5f29637457d9123b39f2ad460ee",
+    "Python-RVO2-main/doc/Doxyfile": "9d846a20df5c4f7039ae4720508781388b60e42d97e5778a45a7f733141ee8fc",
+    "Python-RVO2-main/doc/footer.html": "173a86ef18d3c63a259c3362f4e5b848e6d560c4a0f4c639a4a0124483dd0d5f",
+    "Python-RVO2-main/doc/header.html": "5bf5096e10a5742452e2002520792360041325b4a2429588c552386e8cdda218",
+    "Python-RVO2-main/doc/stylesheet.css": "d6392935126ab50f35d67eb2a18f11a8bf433b9e58aaa186c874515cc4806eb0",
+    "Python-RVO2-main/example.py": "824f4eb85cd7fa0dbaf1e103ce269849ec120cac08ea0e207424ebc71f5db1cd",
+    "Python-RVO2-main/examples/Blocks.cpp": "517406c2372f9345fe14ed6b1e58d1043a88e7543f48e3e69117d40cb85a0724",
+    "Python-RVO2-main/examples/CMakeLists.txt": "5d7c87635956119e9f3174c388d8f005ae3aa59c8e79ec568eaea0a3ebbd0480",
+    "Python-RVO2-main/examples/Circle.cpp": "b8f1f1602d258301aebe98ffabdd4d1cdda8637d804d0dcdc06b11d643e3b1a1",
+    "Python-RVO2-main/examples/Roadmap.cpp": "f58f4903a5a30505f42084f89bfac0cb9da0b7178681ce2fd3d7e14179118c1a",
+    "Python-RVO2-main/requirements.txt": "9f7d53572be20e3419f74ad4a30973ba9a1fcf14d6b316b5a5dd06204bc39cf2",
+    "Python-RVO2-main/rvo2-navmesh-test.blend": "83628a51f74e0726f375581cfdaab6f5f0127801a0dfa1032a5282eaf5c00ee4",
+    "Python-RVO2-main/setup.py": "e72a8f8424a6653b409e4c8cd01ce6fa0ff075d97296288d2259486c40e38f8a",
+    "Python-RVO2-main/src/Agent.cpp": "5907734946eb350ee8e603795d9c62f9ca5534263cc938841a6b67ea7027ac4c",
+    "Python-RVO2-main/src/Agent.h": "12f6018b62356edce2cd6191a520420de96b99a090f35ebba0c0b98cc405c529",
+    "Python-RVO2-main/src/CMakeLists.txt": "39d3502a13ea63913989d62b2a2b8a64f50c441fec6d5040ff85ace097c3813b",
+    "Python-RVO2-main/src/Definitions.h": "09fd40b414a38ca34a076436f89cb04d122747c31a023d679b54562983d06321",
+    "Python-RVO2-main/src/KdTree.cpp": "7588cbe082757101a499379b8c991df6e1f3b0a9ca3a2a2f0e08f26152b41f06",
+    "Python-RVO2-main/src/KdTree.h": "bb7cfd1159540831c08cb69c7ffad42f601fdc7a5ef351014d4b6dc152e0a765",
+    "Python-RVO2-main/src/Obstacle.cpp": "f59bcd473b60e20fd7cd3e86950327e2e282e861c5a5b5ad7b9f4417859b5cc9",
+    "Python-RVO2-main/src/Obstacle.h": "50effb9747913b11d7cc97425b551fa73ddb2684328dfe135528b85f40e1f9fc",
+    "Python-RVO2-main/src/RVO.h": "58404677263716fbed5453948b38ca27d265a0b4b5f730226b0e31586b83a87f",
+    "Python-RVO2-main/src/RVOSimulator.cpp": "eb95f0449bf95d21395e4a693af380fbbb966300b283c11ee726acb7b9ed1929",
+    "Python-RVO2-main/src/RVOSimulator.h": "50faf12910010b7e7047207dde76330fd9fce76ebec0660f7773349479967847",
+    "Python-RVO2-main/src/Vector2.h": "f0011aae6fbcdc14a777cabbc19b30f547af08858a4b485fcfcae6b1602a8738",
+    "Python-RVO2-main/src/rvo2.pyx": "5d44ff219c1f2e2df2c52e423a85bb252898a39b0cff135b9bf0b8075aa1b4aa",
+    "README.md": "43e62fd18d83aa60c68e311956ab118bdb867fe29fb25bcc20290cb204bf4d12",
+    "crowd_nav/.DS_Store": "1e482708e81f4778354af8ff191de118c8fe5741849d7a1d018f664cc8e61109",
+    "crowd_nav/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "crowd_nav/configs/env.config": "05b84f6af5ed53b7906dc321aa8b8d37d996c15d506c2cdc83cdb2120ad27a0f",
+    "crowd_nav/configs/policy.config": "f4c1eaf0ead93f7d218605aa518c44b95c19fb7992b217117eba968b3baf13ac",
+    "crowd_nav/configs/train.config": "face7d0011977ba8b75418f474cc5c9271acd70acda1155534ed2db148fb3121",
+    "crowd_nav/data/output_trained/env.config": "42a6a330f42c5792d85eac012dfdd257f91238b9c5a2dad5dfa44af6f4c1136b",
+    "crowd_nav/data/output_trained/il_model.pth": "e5f5d0f3bb9e9d7f48ba2688750eb3694bc63fea924e4eb8f1f783bc84e701f4",
+    "crowd_nav/data/output_trained/output.log": "45a1666db5484c76de549355384e363a904734ce853bf10956704bae2174ea7a",
+    "crowd_nav/data/output_trained/policy.config": "f4c1eaf0ead93f7d218605aa518c44b95c19fb7992b217117eba968b3baf13ac",
+    "crowd_nav/data/output_trained/rl_model.pth": "728cf759d3acf11990ed0b46f7dfe22beefffc6e8912b606d850ee5999608044",
+    "crowd_nav/data/output_trained/train.config": "face7d0011977ba8b75418f474cc5c9271acd70acda1155534ed2db148fb3121",
+    "crowd_nav/policy/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "crowd_nav/policy/cadrl.py": "69491c9ee0f9271421adccafe07872e041ba718c9279e172afeef860c9d135ea",
+    "crowd_nav/policy/lstm_rl.py": "3202e19d756c1789967d3d0c7c090d7d0ff892339c7e81683e8345588d4994ee",
+    "crowd_nav/policy/multi_human_rl.py": "f8cc34ba50458c12527b4189676e5641171d2151b10b342795caf2dd80102e43",
+    "crowd_nav/policy/policy_factory.py": "18236cd73ffb5a273a227ee867cea5ecf8d9443914fc8a0c56ccb4ca8f877b43",
+    "crowd_nav/policy/sarl.py": "3008ed82dcc195ab5067153932c2280409547399902dd8269ff5fb6b126ccdac",
+    "crowd_nav/test.py": "5d06b53310b96ab7ab9e8a4945ad6dd846aaef30a83ef79abcdd9be0af825f6c",
+    "crowd_nav/train.py": "9c85194830ed1af8f8e77ca0279b226cdeb5bdd623ae10e6c05200bfa6926c57",
+    "crowd_nav/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "crowd_nav/utils/explorer.py": "adfcf4b94dde746c20a915987fddde0772a80af58311bdba005a7c22a68e475c",
+    "crowd_nav/utils/memory.py": "8e8cd27866fc2096066da99b97e61bc0c4b9ec8d7027a9009060b2ec405e3a2e",
+    "crowd_nav/utils/plot.py": "7c251dc2581bc9d465d3d5cf0686c3cba85ce77fa546d8ef868feaa32e680400",
+    "crowd_nav/utils/trainer.py": "102a7e284c284e1d442c1b257d5513d3277d753040acd6061244f2cfb1a3a583",
+    "crowd_sim/README.md": "d4aabe833e27e10abcc3656bb6e3c2d75421e19a2a7c0bfa927c26e83e49cc72",
+    "crowd_sim/__init__.py": "9c6a00c6e206e545ee6f675865d4ad4b1f3f93bd07ccc23591858b44c849fc71",
+    "crowd_sim/envs/__init__.py": "310f9f399e8aaabdba0865ab5015f2b840ca74d4bc4084f27e5db9524d03e482",
+    "crowd_sim/envs/crowd_sim.py": "78983a365c8a15b1f1c4e958b26f80735f1dfdf856067ccadaedf8941699100a",
+    "crowd_sim/envs/policy/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "crowd_sim/envs/policy/linear.py": "c2fa186b7b6ad03a60a6015de39dc6391d5a21f8deb44fc26bd3e651dd02c07e",
+    "crowd_sim/envs/policy/orca.py": "1c3b1963ce840f5985babc3b2b94b64e57896c97f40d57adaff483afe09562cd",
+    "crowd_sim/envs/policy/policy.py": "828b2fd76d0e6576effc63af72143fc353d8d424bdac8f207982a2824784b0af",
+    "crowd_sim/envs/policy/policy_factory.py": "52a7243cbc11bffb9835d33ec468a6b72afa8a716bc0dcc027c767720d5560d9",
+    "crowd_sim/envs/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "crowd_sim/envs/utils/action.py": "12ea332d158128a34b36ddced1eaf092c956a1f7e249c3b8caab9b60cb36b8e3",
+    "crowd_sim/envs/utils/agent.py": "d6fdfbd403a90b6c9697dc27a6ab59461d656844308c90d344c8f5785aa817bd",
+    "crowd_sim/envs/utils/human.py": "5baabdea1ae394f6de54c08b7592f914065e7d53962416c9a68e98c3b344fa59",
+    "crowd_sim/envs/utils/info.py": "e6430c69017f49548467abb1580fc8b6e10df4edcb3c2cfab55ae4a7ac339500",
+    "crowd_sim/envs/utils/robot.py": "80f04bf21e7dc5057e3cf5c457161c8ca36c0de25f334969fd9ae9db55884a58",
+    "crowd_sim/envs/utils/state.py": "48933cf8843a3be3c3b7f9e1b923deb2359124974b5d0d7e166af4466d08d487",
+    "crowd_sim/envs/utils/utils.py": "30bf2ca01a19914e4f9acc6ab95b973795be9cc241c0291ce06a0db70099f40d",
+    "setup.py": "cb3f9e825da99eddcf6b8ba0caf95ad55dbbda10644d27330d25dd461eeb9833"
+  },
+  "modern_source_sha256": {
+    "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/LICENSE": "7cdb8444870153776a3ca245a717e662353afca4e8f7e2166d551b90fe86170d",
+    "compat/PORT_NOTES.md": "577679f7de4a7332cb654d939ff44524622a5676f26bfdb16a9da7f8f68922db",
+    "compat/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_nav/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_nav/policy/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_nav/policy/cadrl.py": "342a376ff0e7e2e4558928bb315f165cedbdf8f6ea0545c81b29bf5327d30e70",
+    "compat/crowd_nav/policy/multi_human_rl.py": "91695e78ea0421aba1518c2ab881d924123f288938dc6a3285f015c5178a50c0",
+    "compat/crowd_nav/policy/sarl.py": "4eedacf394775ce256275e49a427024176147dfc40b8afa746418d3bd3422a51",
+    "compat/crowd_sim/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_sim/envs/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_sim/envs/policy/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_sim/envs/policy/orca.py": "92e04f1118ea99d935aacaa5b8d48cb269bc0d447459ed82e7cc1828636b0f3f",
+    "compat/crowd_sim/envs/policy/policy.py": "4cb90a9397a19ddf611724daf5cc66b6d170d441a4f6ba8e6a1313eee9ad4314",
+    "compat/crowd_sim/envs/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compat/crowd_sim/envs/utils/action.py": "643a2ebf410f503e8d667baa154d12254eaa9efcbbb45cd1ab265fb31887ed5b",
+    "compat/crowd_sim/envs/utils/state.py": "271274f00b1e0f91d884e5d57328625b2667a66688e9f635ad372e956717ecc7",
+    "model.py": "0749bff9507b5f4edbafc3affa263709ad992c4a13705e6734a567947161c5d9",
+    "replay.py": "359b47fcb144816dd87f7584fc904a6ded9bfc7bfd98be67ba3f8a632ddd88f8"
+  },
+  "frozen_reference_sha256": {
+    "acceptance.json": "5de0584efecb9d295c17a398e5a2fe4e2a077e527d011342284937e7e130b594",
+    "determinism.json": "bbda492b457a91fea6fecf4ade0cddb8597c7b95c242bce25413ab6f734b6cf8",
+    "episodes/seed-0-baseline.json": "9b90e57f1b0e96e4350911009e96a9c9c5b88f3773def816e7c4a7ec989a2434",
+    "episodes/seed-0-trace.json": "d89146c08dfb582a762fb3ce1a7e5d0b53d2362b0ec18033fd8eb3aa4db5acf2",
+    "episodes/seed-1-baseline.json": "aeb42b89ce3307c3414579522898d2adfbabeca03a290bf7e3bca79cedf77d98",
+    "episodes/seed-1-trace.json": "bb473fbf188d3578c7e9ee0440469b4265c80eeb7ae357827c90275371aac951",
+    "episodes/seed-2-baseline.json": "cf376c1f79c7fbbf8ba411daab5ed8d59fdf88bec60cfa93216eb579711af1a0",
+    "episodes/seed-2-trace.json": "0b82b69cb80a3676c40495f796e9aca1765cf92f8da0f47585050d4ea6d5793a",
+    "inference.json": "799bddca2a364e42fd888124ebc96263a4e2346503c29dcf649972db17f82179",
+    "manifest.json": "06ac02fccf38f5d83ed34d1fbe90eebe44ad3129935d3333f3eb3a917b93f679",
+    "source-after.json": "c1ec16422cfaa71e9f267cd1eae1b423239928bb86f6623d7954a8f6cdb8f94c",
+    "source-before.json": "c1ec16422cfaa71e9f267cd1eae1b423239928bb86f6623d7954a8f6cdb8f94c",
+    "test-final.txt": "b95a443325bbd8c010416ee6be0b44ac181640f043a32f5da2f6ccd9963740e0",
+    "test-green.txt": "87030640d0acc0491018eb80804d2a94d1435ac38e7af221b4a31b5eb91625bc",
+    "test-red.txt": "b714f2bea4d817dea6ae60b47cd3334427d552d3548db45fc7c2b5427b03c3b7"
+  },
+  "frozen_comparison_sha256": {
+    "replay-legacy.json": "dd0d1623a940df5a15e6751c0c4e8d50f0dfd3406369b3a36a5a77808d149fb9",
+    "expanded-legacy.json": "8d38ba8f7a7abb6653183d8ee66ddf1be65dcd51af21df12a0c6f81bbc3bd267",
+    "expanded-inputs.json": "8bfcc8ca453707bf0cde83636d857934f245c4c0f715c036893596621f52cf75"
+  },
+  "lock_sha256": "0d212a65c423c9d0a86f17d64fd999c6a90de3818741d8a898ab5e4ac66840c9",
+  "checkpoint_sha256": {
+    "crowd_nav/configs/env.config": "05b84f6af5ed53b7906dc321aa8b8d37d996c15d506c2cdc83cdb2120ad27a0f",
+    "crowd_nav/configs/policy.config": "f4c1eaf0ead93f7d218605aa518c44b95c19fb7992b217117eba968b3baf13ac",
+    "crowd_nav/configs/train.config": "face7d0011977ba8b75418f474cc5c9271acd70acda1155534ed2db148fb3121",
+    "crowd_nav/data/output_trained/env.config": "42a6a330f42c5792d85eac012dfdd257f91238b9c5a2dad5dfa44af6f4c1136b",
+    "crowd_nav/data/output_trained/il_model.pth": "e5f5d0f3bb9e9d7f48ba2688750eb3694bc63fea924e4eb8f1f783bc84e701f4",
+    "crowd_nav/data/output_trained/policy.config": "f4c1eaf0ead93f7d218605aa518c44b95c19fb7992b217117eba968b3baf13ac",
+    "crowd_nav/data/output_trained/rl_model.pth": "728cf759d3acf11990ed0b46f7dfe22beefffc6e8912b606d850ee5999608044",
+    "crowd_nav/data/output_trained/train.config": "face7d0011977ba8b75418f474cc5c9271acd70acda1155534ed2db148fb3121"
+  },
+  "native_wheels": {
+    "pyrvo2-0.0.0-cp314-cp314-macosx_11_0_arm64.whl": "27f5d09164c0751a976040123acd555e9724ad22fa3250702c84014be0ae8e71"
+  },
+  "evidence_sha256": {
+    "m4-clean-sync.txt": "3e4992ef6b6e0b1a34bf37becc47af04cfc5f50ec7328bb63cfeed5bd73955ab",
+    "m4-native-install.txt": "ed718d780e72112dc70392b6659a21c512457d7e5ecd93f5a806520150316ec4",
+    "m4-pre-retirement-tests.txt": "2ab9551a6935a49cdac0dadb98b74b6a26bc4103b6dc14f08b4f1ab15614248c",
+    "m4-pre-retirement-parity.txt": "da688f9dc366453fbd421f070e6fb6c33e873814016d51b7a975dedaea98a14c",
+    "m4-pre-retirement-smoke.txt": "90984289bc9f6f44fdc3e0fdab1a665acb90b53c65cd223a499601530f4e52a0",
+    "m4-post-retirement-tests.txt": "5d47138aadf0cc03c3165cdbccf07a7cfa9752d52110026a10f16bd70251f394",
+    "m4-post-retirement-smoke.txt": "90984289bc9f6f44fdc3e0fdab1a665acb90b53c65cd223a499601530f4e52a0",
+    "m4-retirement-red.txt": "2a8af46f44c5eac6da1fb7cddbce3345f79c140f41ebd2801e2a179a26d83e3e",
+    "m4-retirement-green.txt": "224a89eacef8d510a0aa5cf9200b0b582e23b54815eb8c7f083da51589eacc1d",
+    "m4-summary-output.txt": "65a7259c2cf154d6be698de756bf362f78e5bbb094b904f391b972f4576d7bfe"
+  },
+  "smoke": {
+    "python": "3.14.7 (main, Sep  1 2026, 14:05:28) [Clang 22.1.3 ]",
+    "executable": "/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/bin/python",
+    "base_executable": "/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/bin/python3.14",
+    "gil_disabled": 0,
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "versions": {
+      "torch": "2.14.0",
+      "numpy": "2.5.3",
+      "gymnasium": "1.3.0",
+      "PySide6": "6.11.2",
+      "matplotlib": "3.11.2"
+    },
+    "tensor_backward": [
+      2.0,
+      4.0,
+      6.0
+    ],
+    "qt_platform": "cocoa",
+    "qt_visible": true,
+    "torch_cuda_build": null,
+    "cuda_available": false,
+    "mps_available": true,
+    "mps_validated": false,
+    "ffmpeg": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "uv": "uv 0.11.25 (1fc7de7c4 2026-06-26 aarch64-apple-darwin)"
+  },
+  "video_probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "r_frame_rate": "2/1",
+        "duration": "2.000000",
+        "nb_frames": "4"
+      }
+    ]
+  },
+  "parity_and_replay": {
+    "expanded": [
+      {
+        "id": "episode-0-frame-0",
+        "legacy_margin": 0.002515819808920655,
+        "modern_margin": 0.002515819808920655,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 5.8055147328373025e-08
+      },
+      {
+        "id": "episode-1-frame-0",
+        "legacy_margin": 0.0010085340191662573,
+        "modern_margin": 0.0010085630467399076,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 4.3541360489340875e-08
+      },
+      {
+        "id": "episode-2-frame-0",
+        "legacy_margin": 0.0023459214203016,
+        "modern_margin": 0.0023458923927279496,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 7.25689341396496e-08
+      },
+      {
+        "id": "episode-1-frame-3",
+        "legacy_margin": 3.076922807726534e-05,
+        "modern_margin": 3.082728322456596e-05,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 8.708272097868175e-08
+      },
+      {
+        "id": "episode-0-frame-13",
+        "legacy_margin": 3.402031632693259e-05,
+        "modern_margin": 3.402031632693259e-05,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 5.80551473561286e-08
+      },
+      {
+        "id": "episode-0-frame-7",
+        "legacy_margin": 4.624092483684894e-05,
+        "modern_margin": 4.624092483684894e-05,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 5.805514730061745e-08
+      },
+      {
+        "id": "neighbours-1",
+        "legacy_margin": 0.0012154425641989763,
+        "modern_margin": 0.0012154425641989763,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 5.8055147328373025e-08
+      },
+      {
+        "id": "neighbours-2",
+        "legacy_margin": 0.0005454861641771835,
+        "modern_margin": 0.0005454861641771835,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 7.25689341396496e-08
+      },
+      {
+        "id": "neighbours-8",
+        "legacy_margin": 0.00041824379504826203,
+        "modern_margin": 0.00041825830883510107,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 1.1611029462899047e-07
+      },
+      {
+        "id": "neighbours-24",
+        "legacy_margin": 0.0027910302347701477,
+        "modern_margin": 0.0027910302347701477,
+        "action_equal_1e_7": true,
+        "max_candidate_value_delta": 5.8055147328373025e-08
+      }
+    ],
+    "controller": [
+      {
+        "id": "episode-0-frame-0",
+        "legacy_status": "timeout",
+        "modern_status": "timeout",
+        "legacy_steps": 64,
+        "modern_steps": 64,
+        "exact_trace_equal": true
+      },
+      {
+        "id": "episode-1-frame-0",
+        "legacy_status": "timeout",
+        "modern_status": "timeout",
+        "legacy_steps": 64,
+        "modern_steps": 64,
+        "exact_trace_equal": true
+      },
+      {
+        "id": "episode-2-frame-0",
+        "legacy_status": "timeout",
+        "modern_status": "timeout",
+        "legacy_steps": 64,
+        "modern_steps": 64,
+        "exact_trace_equal": true
+      }
+    ],
+    "source_unchanged": true,
+    "scope": "CPU. Controller uses fixed constant-velocity neighbours and a 64-step bound; it is not original simulator trajectory reproduction. Timeout is a bounded failure, not success."
+  },
+  "deferred": [
+    "Linux execution",
+    "CUDA",
+    "MPS parity",
+    "Native wheel macOS deployment-target portability"
+  ]
+}
