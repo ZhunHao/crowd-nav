@@ -32,6 +32,58 @@ class Traffic:
                   for a, b in zip(self.start, self.goal))
         return p, v, self.radius
 
+    def breakpoints(self, t0: float, t1: float) -> list[float]:
+        return [self.arrival] if t0 < self.arrival < t1 else []
+
+
+@dataclass(frozen=True)
+class CourseChangeTraffic:
+    """Scripted, deterministic course-change traffic: linear interpolation
+    between a fixed, immutable list of (time, position) waypoints. Velocity
+    is the constant segment velocity between consecutive waypoints and zero
+    after the last one. Not a reactive target -- see `ReactiveTraffic` in
+    `shipnav.reactive` for collision-responsive heading changes.
+    """
+    waypoints: tuple[tuple[float, Point], ...]
+    radius: float = .6
+
+    def __post_init__(self):
+        times = [t for t, _ in self.waypoints]
+        if len(self.waypoints) < 2:
+            raise ValueError('CourseChangeTraffic requires at least two waypoints')
+        if not all(isfinite(t) for t in times) or times != sorted(set(times)) or len(set(times)) != len(times):
+            raise ValueError('CourseChangeTraffic waypoint times must be finite and strictly increasing')
+        if not all(len(p) == 2 and all(isfinite(v) for v in p) for _, p in self.waypoints):
+            raise ValueError('CourseChangeTraffic waypoint positions must be finite 2D points')
+        if not isfinite(self.radius) or self.radius <= 0:
+            raise ValueError('CourseChangeTraffic requires a positive finite radius')
+
+    @property
+    def start(self) -> Point:
+        return self.waypoints[0][1]
+
+    @property
+    def goal(self) -> Point:
+        return self.waypoints[-1][1]
+
+    @property
+    def arrival(self) -> float:
+        return self.waypoints[-1][0]
+
+    def at(self, time: float) -> Neighbour:
+        if time <= self.waypoints[0][0]:
+            return self.waypoints[0][1], (0.0, 0.0), self.radius
+        for (ta, pa), (tb, pb) in zip(self.waypoints, self.waypoints[1:]):
+            if ta <= time < tb:
+                fraction = (time-ta)/(tb-ta)
+                p = tuple(a+fraction*(b-a) for a, b in zip(pa, pb))
+                v = tuple((b-a)/(tb-ta) for a, b in zip(pa, pb))
+                return p, v, self.radius
+        return self.goal, (0.0, 0.0), self.radius
+
+    def breakpoints(self, t0: float, t1: float) -> list[float]:
+        return [t for t, _ in self.waypoints if t0 < t < t1]
+
 
 def segment_distance(a: Point, b: Point) -> float:
     delta = (b[0]-a[0], b[1]-a[1])
@@ -41,7 +93,9 @@ def segment_distance(a: Point, b: Point) -> float:
 
 
 def swept_clearance(a: Point, b: Point, ship: Traffic, time: float, dt: float, radius: float) -> float:
-    cuts = sorted({time, time+dt, min(time+dt, max(time, ship.arrival))})
+    end = time+dt
+    clipped = (min(end, max(time, breakpoint)) for breakpoint in ship.breakpoints(time, end))
+    cuts = sorted({time, end, *clipped})
     values = []
     for left, right in zip(cuts, cuts[1:]):
         relative = []
@@ -140,6 +194,17 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         collision = ship_hit or land_hit
         diagnostics[-1].update(land_collision=land_hit, ship_collision=ship_hit, actual_velocity=velocity,
                                clearance=clearance if isfinite(clearance) else None)
+        # Target/target and target/land validity is scored separately from ego
+        # performance: it reflects the scenario's traffic realism, not a
+        # safety intervention or collision attributable to the ego's policy.
+        target_states = [ship.at(time+step) for ship in traffic]
+        target_positions = [p for p, _, _ in target_states]
+        target_radii = [r for _, _, r in target_states]
+        target_land_invalid = any(not sea.clear(p, p, r) for p, r in zip(target_positions, target_radii))
+        pair_clearances = [dist(target_positions[i], target_positions[j])-target_radii[i]-target_radii[j]
+                           for i in range(len(target_positions)) for j in range(i+1, len(target_positions))]
+        diagnostics[-1].update(target_land_invalid=target_land_invalid,
+                               target_target_min_clearance=min(pair_clearances) if pair_clearances else None)
         travelled += dist(position, next_position)
         position, time = next_position, time+step
         if collision:

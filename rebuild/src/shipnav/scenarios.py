@@ -3,7 +3,7 @@ from hashlib import sha256
 from random import Random
 from math import dist
 import json
-from shipnav.simulation import Traffic
+from shipnav.simulation import CourseChangeTraffic, Traffic
 
 
 def scenario_hash(data):
@@ -33,5 +33,24 @@ def make_scenario(sea, start, goal, count, seed):
             'traffic_mode': 'scripted', 'family': 'random', 'split': 'smoke'}
 
 
+def traffic_to_dict(ship):
+    """Serialise a Traffic-like object into a scenario JSON traffic entry.
+    Plain fixed-voyage `Traffic` uses its dataclass fields as-is; scripted
+    `CourseChangeTraffic` serialises its waypoint list under `kind:
+    'course_change'` so `load_traffic` can tell them apart."""
+    if isinstance(ship, CourseChangeTraffic):
+        return {'kind': 'course_change',
+                'waypoints': [[t, list(p)] for t, p in ship.waypoints],
+                'radius': ship.radius}
+    return asdict(ship)
+
+
 def load_traffic(data):
-    return [Traffic(tuple(s['start']), tuple(s['goal']), s['speed'], s['radius']) for s in data['traffic']]
+    ships = []
+    for entry in data['traffic']:
+        if entry.get('kind') == 'course_change':
+            waypoints = tuple((float(t), tuple(p)) for t, p in entry['waypoints'])
+            ships.append(CourseChangeTraffic(waypoints, entry['radius']))
+        else:
+            ships.append(Traffic(tuple(entry['start']), tuple(entry['goal']), entry['speed'], entry['radius']))
+    return ships

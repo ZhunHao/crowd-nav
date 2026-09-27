@@ -11,20 +11,19 @@ Run as a script (`python tools/freeze_scenarios.py`) to (re)write
 `generate(output_dir)` is the reusable entry point: it is deterministic, so
 calling it twice into different directories reproduces identical bytes.
 """
-from dataclasses import asdict
 from hashlib import sha256
 from math import dist
 from pathlib import Path
 
 from shipnav.maps import SeaMap, canonical_json
-from shipnav.scenarios import load_traffic, make_scenario, scenario_hash
-from shipnav.simulation import Traffic
+from shipnav.scenarios import load_traffic, make_scenario, scenario_hash, traffic_to_dict
+from shipnav.simulation import CourseChangeTraffic, Traffic
 
 ROOT = Path(__file__).resolve().parents[1]
 
 CANONICAL_FAMILIES = ('head_on', 'crossing', 'crossing_mirrored', 'overtake',
                       'narrow_passage', 'detour_harbour', 'unreachable',
-                      'shore_goal', 'multi_conflict')
+                      'shore_goal', 'multi_conflict', 'course_change', 'reactive')
 
 EGO_START, EGO_GOAL = (3., 12.), (21., 12.)
 
@@ -39,10 +38,10 @@ SEEDED_SPLITS = (
 )
 
 
-def _scenario(sea, start, goal, traffic, family, split, seed=0):
+def _scenario(sea, start, goal, traffic, family, split, seed=0, traffic_mode='scripted'):
     return {'schema': 1, 'seed': seed, 'map': sea.to_dict(), 'start': list(start),
-            'goal': list(goal), 'traffic': [asdict(s) for s in traffic],
-            'traffic_mode': 'scripted', 'family': family, 'split': split}
+            'goal': list(goal), 'traffic': [traffic_to_dict(s) for s in traffic],
+            'traffic_mode': traffic_mode, 'family': family, 'split': split}
 
 
 def validate(scenario, radius=.5):
@@ -117,7 +116,23 @@ def canonical_scenarios() -> dict:
     scenarios['shore_goal'] = _scenario(shore_map, EGO_START, (22.9, 12.), [],
                                         'shore_goal', 'test')
 
-    assert set(scenarios) == set(CANONICAL_FAMILIES)
+    # Scripted course-change target: a genuine L-shaped turn (north along
+    # x=12, then east) that crosses the ego's straight east-west route at
+    # the turn itself -- this is deterministic, waypoint-scripted motion
+    # (`CourseChangeTraffic`), not the reactive rule below.
+    scenarios['course_change'] = _scenario(open_map, EGO_START, EGO_GOAL,
+        [CourseChangeTraffic(((0., (12., 3.)), (30., (12., 12.)), (60., (20., 12.))))],
+        'course_change', 'test')
+
+    # Non-cooperative reactive target: a fixed initial voyage frozen exactly
+    # like any other `Traffic`, but tagged `traffic_mode: 'reactive'` so the
+    # service (a later task) wraps it in `ReactiveTraffic` at run time. The
+    # frozen scenario itself never realizes the reactive path -- only the
+    # initial conditions the reaction starts from.
+    scenarios['noncooperative_reactive'] = _scenario(open_map, EGO_START, EGO_GOAL,
+        [Traffic((14., 3.), (14., 21.))], 'reactive', 'test', traffic_mode='reactive')
+
+    assert {scenario['family'] for scenario in scenarios.values()} == set(CANONICAL_FAMILIES)
     return scenarios
 
 
