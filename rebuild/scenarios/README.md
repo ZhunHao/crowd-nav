@@ -3,16 +3,21 @@
 Generated deterministically by `tools/freeze_scenarios.py`; do not hand-edit
 the JSON files here. Each `<name>.json` is a complete scenario in the
 `shipnav.scenarios.make_scenario` schema (full map, `start`, `goal`, a
-`traffic` list of `Traffic` fields, `traffic_mode: "scripted"`, `family`,
-`split`, `seed`) -- a self-contained initial condition, not a seed recipe
-that a planner or a future version of the generator has to reproduce.
+`traffic` list, `traffic_mode`, `family`, `split`, `seed`) -- a
+self-contained initial condition, not a seed recipe that a planner or a
+future version of the generator has to reproduce. Most `traffic` entries are
+plain `Traffic` fields with `traffic_mode: "scripted"`; the `course_change`
+family instead carries a `kind: "course_change"` entry with a `waypoints`
+list (`CourseChangeTraffic`), and the `reactive` family carries plain
+`Traffic` fields but `traffic_mode: "reactive"` (the fixed initial voyage the
+service wraps in `ReactiveTraffic` at run time).
 `splits.json` records, per split, each file's name, its SHA-256 (over the
 canonical-JSON bytes) and its `scenario_hash` (over the parsed scenario
 dict), plus `withheld_families` and any `failures`.
 
 ## Families
 
-Nine canonical encounter families, all in the `test` split, each on a 24x24
+Eleven canonical encounter families, all in the `test` split, each on a 24x24
 map unless noted, ego `(3,12)->(21,12)` unless noted, default `Traffic`
 speed `.3` and radius `.6` unless noted:
 
@@ -40,10 +45,23 @@ speed `.3` and radius `.6` unless noted:
   family; endpoints are not tuned to make planning easy.
 - `multi_conflict` -- two nonoverlapping crossings, `(8,3)->(8,21)` and
   `(16,21)->(16,3)`.
+- `course_change` -- scripted, deterministic `CourseChangeTraffic` (not
+  reactive) with waypoints `(0,(12,3)) -> (30,(12,12)) -> (60,(20,12))`: an
+  actual L-shaped turn that crosses the ego's straight route exactly at the
+  turn point `(12,12)`. `traffic_mode: "scripted"`.
+- `reactive` (frozen file `noncooperative_reactive.json`) -- a plain fixed
+  `Traffic((14,3),(14,21))` voyage crossing the ego's route, tagged
+  `traffic_mode: "reactive"`. The frozen scenario stores only the initial
+  voyage; wrapping it in `ReactiveTraffic` (a handcrafted, controlled-test
+  collision-responsive heading change -- not COLREGs-compliant, not
+  ORCA/reciprocal-velocity-obstacle) happens in the service at run time, not
+  here. Because the realized path depends on which ego it faces, a paired
+  comparison across ego policies is expected to produce different realized
+  target paths for this family, not identical ones.
 
 ## Split construction
 
-- `test` -- the nine canonical families above, one scenario each, `seed: 0`.
+- `test` -- the eleven canonical families above, one scenario each, `seed: 0`.
 - `train` -- `make_scenario` draws on an open 24x24 map, seeds `1000..1009`
   (10 scenarios), 4 traffic ships each, ego `(2,2)->(22,22)`.
 - `dev` -- `make_scenario` draws on a 24x24 map with land `(4,14,10,20)` and
@@ -67,7 +85,7 @@ adjusted.
 
 ## Generalization note
 
-`withheld_families` in `splits.json` lists the nine canonical encounter
+`withheld_families` in `splits.json` lists the eleven canonical encounter
 families. They appear only in `test` and never in `train`, `dev` or
 `calibration` -- those splits only ever see `family: "random"` scenarios.
 A policy or planner that only sees random encounters during training or

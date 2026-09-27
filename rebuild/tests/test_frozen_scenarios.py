@@ -87,6 +87,20 @@ def test_generalization_report_families_match_withheld_families():
     assert set(data['withheld_families']) == set(module.CANONICAL_FAMILIES)
 
 
+def test_readme_families_match_withheld_families():
+    # scenarios/README.md documents the same canonical families by hand
+    # (unlike splits.json, which is generated); it drifted out of sync once
+    # (still said "nine" after course_change/reactive were added), so this
+    # test pins README.md to the same source of truth as splits.json and
+    # generalization.md so that drift can't recur silently.
+    module = _load_freeze_scenarios()
+    data = _splits()
+    text = (ROOT / 'scenarios/README.md').read_text()
+    for family in module.CANONICAL_FAMILIES:
+        assert family in text
+    assert set(data['withheld_families']) == set(module.CANONICAL_FAMILIES)
+
+
 def test_regenerating_reproduces_identical_bytes(tmp_path):
     module = _load_freeze_scenarios()
     module.generate(tmp_path)
