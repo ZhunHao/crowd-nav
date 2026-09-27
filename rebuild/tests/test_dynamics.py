@@ -4,7 +4,6 @@ from shipnav.dynamics import Vessel, advance, motion_from
 from shipnav.maps import SeaMap
 from shipnav.simulation import run_episode
 from shipnav.policies import Direct
-from shipnav.safety import choose
 
 
 def test_heading_and_acceleration_cannot_jump():
@@ -33,13 +32,13 @@ def test_near_shore_braking_filtered_avoids_land_unfiltered_collides():
     assert any(d['land_collision'] for d in unfiltered['diagnostics'])
 
     filtered = run_episode(sea, route, [], Direct(), dynamics='marine', limit=6, filtered=True)
+    # This fixture is deterministic: with this much stopping distance, the filter always
+    # finds a feasible avoiding command (never reports no_feasible_action) and never lets
+    # the vessel touch land. Assert that actual outcome directly rather than a permissive
+    # either/or — a masked collision would fail these, not slip through.
+    assert not any(d['no_feasible_action'] for d in filtered['diagnostics'])
     assert not any(d['land_collision'] for d in filtered['diagnostics'])
-    # Either the filter avoided land entirely, or it honestly reports no feasible action —
-    # never a masked collision.
-    if any(d['no_feasible_action'] for d in filtered['diagnostics']):
-        assert filtered['status'] in ('timeout', 'collision', 'success')
-    else:
-        assert filtered['status'] != 'collision'
+    assert filtered['status'] != 'collision'
 
 
 def test_filter_candidate_rollout_uses_motion_from_not_instant_stop():

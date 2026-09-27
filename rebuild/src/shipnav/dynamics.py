@@ -11,8 +11,9 @@ This is a first-order, single-step scheme — not a curved/RK integrator — so 
 change within a step is applied as if it happened instantaneously at the step's end
 before the position update. Callers that need tighter curved-path fidelity should take
 smaller `dt` (substeps) rather than relying on chord accuracy at coarse steps; see
-`tests/test_dynamics.py::test_timestep_refinement_agrees_within_tolerance` for the
-substep/tolerance comparison used to validate this.
+`tests/test_dynamics.py::test_timestep_refinement_unfiltered_integration_agrees_closely`
+and `tests/test_dynamics.py::test_timestep_refinement_filtered_status_agrees_but_horizon_shifts_trajectory`
+for the substep/tolerance comparisons used to validate this.
 
 Demo parameter caveat: `acceleration=0.2` m/s^2 and `yaw_rate=0.35` rad/s are placeholder
 demo limits sized for a 24 m synthetic test scene. They are NOT calibrated ship data and
