@@ -1,0 +1,872 @@
+Using Python 3.10.20 environment at: .venv-commonocean
+Resolved 160 packages in 5.22s
+Downloading jedi (4.7MiB)
+Downloading debugpy (5.1MiB)
+Downloading jupyterlab (16.4MiB)
+Downloading sphinx-rtd-theme (7.3MiB)
+Downloading fonttools (3.0MiB)
+Downloading lxml (8.2MiB)
+Downloading imageio (3.2MiB)
+Downloading widgetsnbextension (2.1MiB)
+Downloading pillow (4.6MiB)
+Downloading networkx (1.6MiB)
+Downloading notebook (5.3MiB)
+Downloading pyzmq (1.4MiB)
+Downloading sphinx (3.3MiB)
+Downloading babel (9.7MiB)
+Downloading numpy (13.2MiB)
+Downloading shapely (1.6MiB)
+Downloading triangle (1.4MiB)
+Downloading bezier (1.2MiB)
+Downloading matplotlib (6.9MiB)
+Downloading commonroad-io (3.6MiB)
+   Building antlr4-python3-runtime==4.9.3
+   Building parsimonious==0.9.0
+   Building polygon3==3.0.9.1
+   Building pandoc==2.4
+      Built pandoc==2.4
+      Built parsimonious==0.9.0
+      Built antlr4-python3-runtime==4.9.3
+      Built polygon3==3.0.9.1
+ Downloaded bezier
+ Downloaded pyzmq
+ Downloaded triangle
+ Downloaded shapely
+ Downloaded networkx
+   Building commonroad-drivability-checker==2023.1
+ Downloaded widgetsnbextension
+  × Failed to build `commonroad-drivability-checker==2023.1`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `setuptools.build_meta:__legacy__.build_wheel` failed (exit
+      status: 1)
+
+      [stdout]
+      running bdist_wheel
+      running build
+      running build_py
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc
+      copying commonroad_dc/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc
+      copying commonroad_dc/__version__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc
+      running egg_info
+      writing commonroad_drivability_checker.egg-info/PKG-INFO
+      writing dependency_links to
+      commonroad_drivability_checker.egg-info/dependency_links.txt
+      writing requirements to
+      commonroad_drivability_checker.egg-info/requires.txt
+      writing top-level names to
+      commonroad_drivability_checker.egg-info/top_level.txt
+      reading manifest file
+      'commonroad_drivability_checker.egg-info/SOURCES.txt'
+      reading manifest template 'MANIFEST.in'
+      adding license file 'LICENSE'
+      writing manifest file
+      'commonroad_drivability_checker.egg-info/SOURCES.txt'
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/__pycache__
+      copying commonroad_dc/__pycache__/__init__.cpython-310.pyc ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/__pycache__
+      copying commonroad_dc/__pycache__/__init__.cpython-39.pyc ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/__pycache__
+      copying commonroad_dc/__pycache__/__version__.cpython-310.pyc ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/__pycache__
+      copying commonroad_dc/__pycache__/__version__.cpython-39.pyc ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/__pycache__
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/boundary.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/construction.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/lanelet_bounds.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/rectangle_builder.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/scenario_bounds.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      copying commonroad_dc/boundary/triangle_builder.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/boundary
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision
+      copying commonroad_dc/collision/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision
+      creating
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/collision_detection
+      copying commonroad_dc/collision/collision_detection/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/collision_detection
+      copying commonroad_dc/collision/collision_detection/minkowski_sum.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/collision_detection
+      copying
+      commonroad_dc/collision/collision_detection/pycrcc_collision_dispatch.py
+      ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/collision_detection
+      copying commonroad_dc/collision/collision_detection/scenario.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/collision_detection
+      creating
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/trajectory_queries
+      copying
+      commonroad_dc/collision/trajectory_queries/trajectory_queries.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/trajectory_queries
+      copying
+      commonroad_dc/collision/trajectory_queries/trajectory_queries_specialized.py
+      ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/trajectory_queries
+      creating
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/visualization
+      copying commonroad_dc/collision/visualization/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/visualization
+      copying commonroad_dc/collision/visualization/drawing.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/collision/visualization
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/costs
+      copying commonroad_dc/costs/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/costs
+      copying commonroad_dc/costs/evaluation.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/costs
+      copying commonroad_dc/costs/partial_cost_functions.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/costs
+      copying commonroad_dc/costs/route_matcher.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/costs
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/feasibility
+      copying commonroad_dc/feasibility/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/feasibility
+      copying commonroad_dc/feasibility/feasibility_checker.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/feasibility
+      copying commonroad_dc/feasibility/solution_checker.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/feasibility
+      copying commonroad_dc/feasibility/vehicle_dynamics.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/feasibility
+      creating build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/geometry
+      copying commonroad_dc/geometry/__init__.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/geometry
+      copying commonroad_dc/geometry/geometry.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/geometry
+      copying commonroad_dc/geometry/lanelet_ccosy.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/geometry
+      copying commonroad_dc/geometry/util.py ->
+      build/lib.macosx-11.0-arm64-cpython-310/commonroad_dc/geometry
+      running build_ext
+      -- The C compiler identification is AppleClang 21.0.0.21000101
+      -- The CXX compiler identification is AppleClang 21.0.0.21000101
+      -- Detecting C compiler ABI info
+      -- Detecting C compiler ABI info - done
+      -- Check for working C compiler: /usr/bin/cc - skipped
+      -- Detecting C compile features
+      -- Detecting C compile features - done
+      -- Detecting CXX compiler ABI info
+      -- Detecting CXX compiler ABI info - done
+      -- Check for working CXX compiler: /usr/bin/c++ - skipped
+      -- Detecting CXX compile features
+      -- Detecting CXX compile features - done
+      -- PYTHON MODE - assuming we are invoked by pip/setup.py
+      -- PYTHON MODE - building static libraries
+      -- Found Git: /opt/homebrew/bin/git (found version "2.55.0")
+      -- Configuring incomplete, errors occurred!
+      ['-DPYTHON_INCLUDE_DIR=/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
+      '-DPYTHON_LIBRARY=',
+      '-DPYTHON_EXECUTABLE=/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/bin/python',
+      '-DBUILD_DOC=OFF', '-DADD_TESTS=OFF', '-DADD_TRIANGLE=OFF',
+      '-DADD_PYTHON_BINDINGS=ON']
+
+      [stderr]
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/dist.py:599:
+      SetuptoolsDeprecationWarning: Invalid dash-separated key
+      'description-file' in 'metadata' (setup.cfg), please use the underscore
+      name 'description_file' instead.
+      !!
+
+      
+      ********************************************************************************
+              Usage of dash-separated 'description-file' will not be supported
+      in future
+              versions. Please use the underscore name 'description_file'
+      instead.
+              (Affected: commonroad-drivability-checker).
+
+              Available configuration options are listed in:
+      
+      https://setuptools.pypa.io/en/latest/userguide/declarative_config.html
+
+              This deprecation is overdue, please update your project and
+      remove deprecated
+              calls to avoid build errors in the future.
+
+              See https://github.com/pypa/setuptools/discussions/5011 for
+      details.
+      
+      ********************************************************************************
+
+      !!
+        opt = self._enforce_underscore(opt, section)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/dist.py:765:
+      SetuptoolsDeprecationWarning: License classifiers are deprecated.
+      !!
+
+      
+      ********************************************************************************
+              Please consider removing the following classifiers in favor of a
+      SPDX license expression:
+
+              License :: OSI Approved :: BSD License
+
+              See
+      https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license
+      for details.
+      
+      ********************************************************************************
+
+      !!
+        self._finalize_license_expression()
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.__pycache__' is absent from the
+      `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.__pycache__' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.__pycache__' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.__pycache__' to be distributed
+      and are
+              already explicitly excluding 'commonroad_dc.__pycache__' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.boundary' is absent from the `packages`
+      configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.boundary' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.boundary' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.boundary' to be distributed
+      and are
+              already explicitly excluding 'commonroad_dc.boundary' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.collision' is absent from the
+      `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.collision' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.collision' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.collision' to be distributed
+      and are
+              already explicitly excluding 'commonroad_dc.collision' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.collision.collision_detection' is
+      absent from the `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.collision.collision_detection'
+      as an importable package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that
+      'commonroad_dc.collision.collision_detection' is explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.collision.collision_detection'
+      to be distributed and are
+              already explicitly excluding
+      'commonroad_dc.collision.collision_detection' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.collision.trajectory_queries' is absent
+      from the `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.collision.trajectory_queries'
+      as an importable package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that
+      'commonroad_dc.collision.trajectory_queries' is explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.collision.trajectory_queries'
+      to be distributed and are
+              already explicitly excluding
+      'commonroad_dc.collision.trajectory_queries' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.collision.visualization' is absent from
+      the `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.collision.visualization' as an
+      importable package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that
+      'commonroad_dc.collision.visualization' is explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.collision.visualization' to be
+      distributed and are
+              already explicitly excluding
+      'commonroad_dc.collision.visualization' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.costs' is absent from the `packages`
+      configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.costs' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.costs' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.costs' to be distributed and
+      are
+              already explicitly excluding 'commonroad_dc.costs' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.feasibility' is absent from the
+      `packages` configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.feasibility' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.feasibility' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.feasibility' to be distributed
+      and are
+              already explicitly excluding 'commonroad_dc.feasibility' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      /Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      _Warning: Package 'commonroad_dc.geometry' is absent from the `packages`
+      configuration.
+      !!
+
+      
+      ********************************************************************************
+              ############################
+              # Package would be ignored #
+              ############################
+              Python recognizes 'commonroad_dc.geometry' as an importable
+      package[^1],
+              but it is absent from setuptools' `packages` configuration.
+
+              This leads to an ambiguous overall configuration. If you want to
+      distribute this
+              package, please make sure that 'commonroad_dc.geometry' is
+      explicitly added
+              to the `packages` configuration field.
+
+              Alternatively, you can also rely on setuptools' discovery
+      methods
+              (for example by using
+      `find_namespace_packages(...)`/`find_namespace:`
+              instead of `find_packages(...)`/`find:`).
+
+              You can read more about "package discovery" on setuptools
+      documentation page:
+
+              -
+      https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+              If you don't want 'commonroad_dc.geometry' to be distributed
+      and are
+              already explicitly excluding 'commonroad_dc.geometry' via
+              `find_namespace_packages(...)/find_namespace` or
+      `find_packages(...)/find`,
+              you can try to use `exclude_package_data`, or
+      `include-package-data=False` in
+              combination with a more fine grained `package-data`
+      configuration.
+
+              You can read more about "package data files" on setuptools
+      documentation page:
+
+              - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+              [^1]: For Python, any directory (with suitable naming) can be
+      imported,
+                    even if it does not contain any `.py` files.
+                    On the other hand, currently there is no concept of
+      package data
+                    directory, all directories are treated like packages.
+      
+      ********************************************************************************
+
+      !!
+        check.warn(importable)
+      CMake Warning (author) at CMakeLists.txt:1 (project):
+        cmake_minimum_required() should be called prior to this top-level
+      project()
+        call.  Please see the cmake-commands(7) manual for usage documentation
+      of
+        both commands.
+      This warning is for project developers.  Use -Wno-author to suppress it.
+
+      CMake Error at
+      build/temp.macosx-11.0-arm64-cpython-310/build/_deps/ccd-src/CMakeLists.txt:1
+      (cmake_minimum_required):
+        Compatibility with CMake < 3.5 has been removed from CMake.
+
+        Update the VERSION argument <min> value.  Or, use the <min>...<max>
+      syntax
+        to tell CMake that the project requires at least <min> but has been
+      updated
+        to work with policies introduced by <max> or earlier.
+
+        Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.
+
+
+      Traceback (most recent call last):
+        File "<string>", line 11, in <module>
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/build_meta.py",
+      line 438, in build_wheel
+          return _build(['bdist_wheel'])
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/build_meta.py",
+      line 429, in _build
+          return self._build_with_temp_dir(
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/build_meta.py",
+      line 410, in _build_with_temp_dir
+          self.run_setup()
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/build_meta.py",
+      line 520, in run_setup
+          super().run_setup(setup_script=setup_script)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/build_meta.py",
+      line 317, in run_setup
+          exec(code, locals())  # noqa: S102 # exec is intentional here
+        File "<string>", line 178, in <module>
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/__init__.py",
+      line 117, in setup
+          return distutils.core.setup(**attrs)  # type: ignore[return-value]
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/core.py",
+      line 168, in setup
+          return run_commands(dist)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/core.py",
+      line 184, in run_commands
+          dist.run_commands()
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      line 1028, in run_commands
+          self.run_command(cmd)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/dist.py",
+      line 1106, in run_command
+          super().run_command(command)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      line 1047, in run_command
+          cmd_obj.run()
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/command/bdist_wheel.py",
+      line 385, in run
+          self.run_command("build")
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
+      line 342, in run_command
+          self.distribution.run_command(command)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/dist.py",
+      line 1106, in run_command
+          super().run_command(command)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      line 1047, in run_command
+          cmd_obj.run()
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/command/build.py",
+      line 137, in run
+          self.run_command(cmd_name)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
+      line 342, in run_command
+          self.distribution.run_command(command)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/dist.py",
+      line 1106, in run_command
+          super().run_command(command)
+        File
+      "/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      line 1047, in run_command
+          cmd_obj.run()
+        File "<string>", line 44, in run
+        File "<string>", line 139, in build_extension
+        File
+      "/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/lib/python3.10/subprocess.py",
+      line 369, in check_call
+          raise CalledProcessError(retcode, cmd)
+      subprocess.CalledProcessError: Command '['cmake',
+      '/Users/zhunhao/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src',
+      '-DPYTHON_INCLUDE_DIR=/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
+      '-DPYTHON_LIBRARY=',
+      '-DPYTHON_EXECUTABLE=/Users/zhunhao/.cache/uv/builds-v0/.tmpp2NmJM/bin/python',
+      '-DBUILD_DOC=OFF', '-DADD_TESTS=OFF', '-DADD_TRIANGLE=OFF',
+      '-DADD_PYTHON_BINDINGS=ON', '-DCMAKE_BUILD_TYPE=Release',
+      '-DCMAKE_INSTALL_PREFIX:PATH=/Users/zhunhao/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src/build/temp.macosx-11.0-arm64-cpython-310/dist']'
+      returned non-zero exit status 1.
+
+
+hint: `commonroad-drivability-checker` (v2023.1) was included because `commonocean-drivability-checker` (v2025.1) depends on `commonroad-drivability-checker`
+hint: Build failures usually indicate a problem with the package or the build environment
