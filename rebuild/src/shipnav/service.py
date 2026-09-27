@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 from shipnav.maps import SeaMap
 from shipnav.planning import astar, smooth
-from shipnav.simulation import traffic_for_route, run_episode
+from shipnav.simulation import run_episode
 from shipnav.policies import Direct, Learned, Reciprocal
 
 

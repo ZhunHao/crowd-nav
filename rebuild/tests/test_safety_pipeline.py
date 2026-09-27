@@ -1,7 +1,8 @@
 from shipnav.maps import SeaMap
 from shipnav.scenarios import make_scenario, scenario_hash
 from shipnav.observations import Observer
-from shipnav.simulation import Traffic
+from shipnav.simulation import Traffic, run_episode
+from shipnav.policies import Direct
 from shipnav.safety import choose
 
 
@@ -31,3 +32,13 @@ def test_filter_prevents_land_command_and_reports_no_solution():
     impossible = [{'radius': 10., 'points': [(3, 5)] * 13, 'margins': [0.] * 13}]
     r = choose(sea, (3, 5), (1, 0), impossible, .5, 1, .25)
     assert r['no_feasible_action']
+
+
+def test_filter_is_in_the_episode_loop():
+    sea = SeaMap((0, 0, 10, 10), ((4, 0, 6, 10),))
+    bare = run_episode(sea, [(2, 5), (8, 5)], [], Direct(), limit=4)
+    safe = run_episode(sea, [(2, 5), (8, 5)], [], Direct(), limit=4, filtered=True)
+    assert bare['status'] == 'collision'
+    assert safe['status'] == 'timeout'
+    assert any(d['override'] for d in safe['diagnostics'])
+    assert not any(d['land_collision'] for d in safe['diagnostics'])

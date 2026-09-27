@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from math import dist, hypot, isfinite
-from random import Random
 from time import perf_counter
 from typing import Callable
 from shipnav.maps import SeaMap
@@ -34,40 +33,6 @@ class Traffic:
         return p, v, self.radius
 
 
-def traffic_for_route(sea: SeaMap, route: list[Point], count: int, seed: int) -> list[Traffic]:
-    if count < 0:
-        raise ValueError('Traffic count cannot be negative')
-    if count == 0:
-        return []
-    if len(route) < 2:
-        raise ValueError('Moving traffic requires a nonzero route')
-    rng, ships = Random(seed), []
-    for index in range(count):
-        a, b = route[index % (len(route)-1):][:2]
-        length = dist(a, b)
-        if length == 0:
-            raise ValueError('Repeated route points')
-        normal = (-(b[1]-a[1])/length, (b[0]-a[0])/length)
-        for _ in range(500):
-            f, width = rng.uniform(.15, .85), rng.uniform(1.5, 4.0)
-            center = tuple(x + f*(y-x) for x, y in zip(a, b))
-            start = tuple(x + width*n for x, n in zip(center, normal))
-            goal = tuple(x - width*n for x, n in zip(center, normal))
-            if rng.random() < .5:
-                start, goal = goal, start
-            if not sea.clear(start, goal, .6):
-                continue
-            if dist(start, route[0]) <= 1.3 or dist(start, route[-1]) <= 1.3:
-                continue
-            if any(dist(start, other.start) <= 1.4 for other in ships):
-                continue
-            ships.append(Traffic(start, goal))
-            break
-        else:
-            raise ValueError('Cannot place traffic on this route; lower count or change map')
-    return ships
-
-
 def segment_distance(a: Point, b: Point) -> float:
     delta = (b[0]-a[0], b[1]-a[1])
     squared = delta[0]**2 + delta[1]**2
@@ -90,7 +55,8 @@ def swept_clearance(a: Point, b: Point, ship: Traffic, time: float, dt: float, r
 
 def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy: Policy,
                 dt: float = .25, limit: float = 100, radius: float = .5,
-                speed: float = 1.0, cancel: Callable[[], bool] = lambda: False) -> dict:
+                speed: float = 1.0, cancel: Callable[[], bool] = lambda: False, *, observer=None,
+                filtered=False, uncertainty=True, dynamics='holonomic') -> dict:
     if not all(isfinite(v) and v > 0 for v in (dt, limit, radius, speed)):
         raise ValueError('Episode parameters must be positive and finite')
     if not route or any(not sea.clear(p, p, radius) for p in route):
@@ -102,6 +68,17 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             raise ValueError('Traffic overlaps start')
         if any(dist(ship.start, other.start) <= ship.radius+other.radius for other in traffic[:i]):
             raise ValueError('Traffic overlaps traffic at start')
+    from shipnav.observations import Observer
+    from shipnav.prediction import predict
+    from shipnav.safety import choose
+    observer = observer or Observer()
+    diagnostics = []
+    vessel = None
+    if dynamics == 'marine':
+        from shipnav.dynamics import Vessel, advance, motion_from
+        vessel = Vessel(*route[0], 0., 0.)
+    elif dynamics != 'holonomic':
+        raise ValueError('Unknown dynamics')
     position, velocity, time, index = route[0], (0.0, 0.0), 0.0, 1
     minimum, latencies, frames, travelled = float('inf'), [], [], 0.0
 
@@ -120,17 +97,42 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             status = 'timeout'
             break
         step = min(dt, limit-time)
-        neighbours = [ship.at(time) for ship in traffic]
         began = perf_counter()
-        velocity = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
-        latencies.append((perf_counter()-began)*1000)
+        perceived = observer.observe(traffic, time, len(frames)-1)
+        predictions = predict(perceived, step, uncertainty=uncertainty)
+        neighbours = [(s['position'], s['velocity'], s['radius']) for s in perceived]
+        inference_start = perf_counter()
+        nominal = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
+        latencies.append((perf_counter()-inference_start)*1000)
+        if len(nominal) != 2 or not all(isfinite(x) for x in nominal) or hypot(*nominal) > speed+1e-6:
+            raise ValueError('Policy returned invalid velocity')
+        motion = motion_from(vessel, speed) if vessel is not None else None
+        decision = choose(sea, position, nominal, predictions, radius, speed, step, motion=motion) if filtered else {
+            'executed': nominal, 'override': False, 'no_feasible_action': False, 'path': [], 'predicted_clearance': None}
+        velocity = tuple(decision['executed'])
+        diagnostics.append({'t': time, 'observed': perceived, 'predictions': predictions,
+                            'nominal': nominal, **decision,
+                            'decision_ms': (perf_counter()-began)*1000})
         if len(velocity) != 2 or not all(isfinite(x) for x in velocity) or hypot(*velocity) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         next_position = tuple(x + step*v for x, v in zip(position, velocity))
+        if vessel is not None:
+            vessel = advance(vessel, velocity, step, max_speed=speed)
+            next_position = (vessel.x, vessel.y)
+            velocity = tuple((b-a)/step for a, b in zip(position, next_position))
+            diagnostics[-1]['heading'] = vessel.heading
+            diagnostics[-1]['speed'] = vessel.speed
+        for ship in traffic:
+            if hasattr(ship, 'advance'):
+                ship.advance(time, step, position)
         clearance = min((swept_clearance(position, next_position, ship, time, step, radius)
                          for ship in traffic), default=float('inf'))
         minimum = min(minimum, clearance)
-        collision = clearance <= 0 or not sea.clear(position, next_position, radius)
+        land_hit = not sea.clear(position, next_position, radius)
+        ship_hit = clearance <= 0
+        collision = ship_hit or land_hit
+        diagnostics[-1].update(land_collision=land_hit, ship_collision=ship_hit, actual_velocity=velocity,
+                               clearance=clearance if isfinite(clearance) else None)
         travelled += dist(position, next_position)
         position, time = next_position, time+step
         if collision:
@@ -142,4 +144,4 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         record()
     return {'status': status, 'elapsed': time, 'distance': travelled,
             'min_dynamic_clearance': minimum if isfinite(minimum) else None,
-            'inference_ms': latencies, 'frames': frames}
+            'inference_ms': latencies, 'frames': frames, 'diagnostics': diagnostics}
