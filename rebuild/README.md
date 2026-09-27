@@ -1,5 +1,7 @@
 # ShipNav modern runtime
 
+Real geographic maps and offline route planning are available through the `maps` extra. See [maps/README.md](maps/README.md) for the frozen Singapore sources, reproducible import, A*/Theta* comparison, preview commands, attribution and limits. The map backend uses wheel-backed Shapely, PyProj and Pyogrio; no NTNU or direct OSGeo/Fiona dependency is required.
+
 The supported application stack is CPython 3.14.7 with the modern dependencies in `uv.lock`. Local acceptance covers macOS arm64 CPU, checkpoint inference and native ORCA, a visible Cocoa Qt window, PNG and FFmpeg export. Linux x86_64 wheel resolution requires glibc >=2.34; Linux execution, CUDA and MPS parity remain deferred.
 
 From `rebuild/`, create the environment and install the separately hash-verified native wheel:
