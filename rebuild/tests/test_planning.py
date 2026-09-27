@@ -1,6 +1,6 @@
 import pytest
 from shipnav.maps import SeaMap
-from shipnav.planning import plan, NoPath, PlanningLimit
+from shipnav.planning import plan, astar, smooth, NoPath, PlanningLimit
 
 
 @pytest.mark.parametrize('planner', ['astar', 'theta'])
@@ -58,3 +58,31 @@ def test_validation_cannot_escape_deadline(monkeypatch):
     monkeypatch.setattr(planning,'perf_counter',lambda:clock[0])
     with pytest.raises(PlanningLimit):
         plan(SlowClearance(),(2,2),(8,8),timeout=1.)
+
+
+# --- Plan 02 (task-3-brief.md) conformance tests, appended verbatim per controller ruling ---
+
+def test_route_and_smoothing_preserve_clearance():
+    sea = SeaMap((0, 0, 24, 24), ((9, 5, 14, 18),))
+    route = astar(sea, (2, 2), (22, 22))
+    goals = smooth(sea, route)
+    assert goals[0] == (2, 2) and goals[-1] == (22, 22)
+    assert 2 < len(goals) <= len(route)
+    assert all(sea.clear(a, b, .7) for a, b in zip(goals, goals[1:]))
+
+
+def test_blocked_invalid_and_zero_length_routes():
+    sea = SeaMap((0, 0, 10, 10), ((4, 0, 6, 10),))
+    with pytest.raises(NoPath):
+        astar(sea, (2, 5), (8, 5))
+    with pytest.raises(NoPath):
+        astar(sea, (5, 5), (8, 5))
+    assert astar(sea, (2, 2), (2, 2)) == [(2, 2)]
+    with pytest.raises(ValueError):
+        astar(sea, (2, 2), (8, 8), resolution=0)
+
+
+def test_diagonal_cannot_cut_between_touching_land():
+    sea = SeaMap((0, 0, 6, 6), ((0, 3, 3, 6), (3, 0, 6, 3)))
+    with pytest.raises(NoPath):
+        astar(sea, (1, 1), (5, 5), clearance=.2)

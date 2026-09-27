@@ -76,3 +76,36 @@ def test_projection_roundtrip_axis_and_metric_scale():
     assert frame.unproject(*frame.project(103.98, 1.42)) == pytest.approx((103.98, 1.42), abs=1e-9)
     with pytest.raises(ValueError):
         frame.project(103, math.nan)
+
+
+# --- Plan 02 (task-2-brief.md) conformance tests, appended verbatim per controller ruling ---
+
+def test_swept_segment_cannot_jump_over_land():
+    sea = SeaMap((0, 0, 10, 10), ((4, 4, 6, 6),))
+    assert sea.clear((2, 2), (8, 2), .5)
+    assert not sea.clear((2, 5), (8, 5), .5)
+    assert not sea.clear((3.5, 3), (3.5, 7), .5)
+    assert not sea.clear((.5, 2), (2, 2), .5)
+
+
+def test_map_roundtrip_and_bad_rectangles(tmp_path):
+    sea = SeaMap((0, 0, 10, 10), ((4, 4, 6, 6),))
+    path = tmp_path / 'map.json'
+    sea.save(path)
+    assert SeaMap.load(path) == sea
+    with pytest.raises(ValueError):
+        SeaMap((0, 0, 10, 10), ((8, 8, 7, 9),))
+    with pytest.raises(ValueError):
+        SeaMap((0, 0, float('nan'), 10))
+
+
+def test_harbour_fixture_loads_blocks_and_routes():
+    from pathlib import Path
+
+    from shipnav.planning import astar, smooth
+
+    sea = SeaMap.load(Path(__file__).parents[1] / 'maps' / 'harbour.json')
+    assert not sea.clear((2, 12), (22, 12), .7)
+    route = astar(sea, (2, 2), (22, 22))
+    goals = smooth(sea, route)
+    assert goals[0] == (2, 2) and goals[-1] == (22, 22)

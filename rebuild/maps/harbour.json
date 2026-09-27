@@ -1,0 +1,1 @@
+{"bounds":[0.0,0.0,24.0,24.0],"coordinate_system":"local-east-north-metres","features":[{"geometry":{"coordinates":[[[9.0,5.0],[9.0,18.0],[14.0,18.0],[14.0,5.0],[9.0,5.0]]],"type":"Polygon"},"properties":{"layer":"land"},"type":"Feature"}],"metadata":{"description":"Synthetic test harbour (not geospatial data)"},"schema":1,"type":"FeatureCollection"}
