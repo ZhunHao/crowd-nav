@@ -99,7 +99,10 @@ def benchmark(manifest_path, output, repeats):
             raise ValueError(f"Frozen map changed for {case['id']}")
         sea=SeaMap.load(path)
         start,goal=case['start'],case['goal']
-        if case.get('coordinates') == 'lonlat':
+        coordinates=case.get('coordinates','local')
+        if coordinates not in ('lonlat','local'):
+            raise ValueError(f"Unknown coordinates '{coordinates}'; expected lonlat or local")
+        if coordinates == 'lonlat':
             frame=LocalFrame(*sea.to_dict()['metadata']['frame']['origin_lonlat'])
             start,goal=frame.project(*start),frame.project(*goal)
         settings={k:case[k] for k in ('resolution','radius','margin')}

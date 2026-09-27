@@ -161,7 +161,3 @@ def plan(sea, start, goal, *, planner='astar', resolution=1., clearance=.7,
 
 def astar(sea, start, goal, clearance=.7, resolution=1.):
     return plan(sea, start, goal, clearance=clearance, resolution=resolution).points
-
-
-def theta_star(sea, start, goal, clearance=.7, resolution=1.):
-    return plan(sea, start, goal, planner='theta', clearance=clearance, resolution=resolution).points

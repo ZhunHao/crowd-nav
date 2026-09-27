@@ -45,6 +45,35 @@ def test_benchmark_retains_failures_and_reports_paired_outcomes(tmp_path):
     assert all('latency_p99_s' in x for x in data['summary'].values())
 
 
+def test_benchmark_accepts_explicit_local_metre_coordinates(tmp_path):
+    source = tmp_path/'map.json'
+    SeaMap((0,0,10,10), [(4,0,6,10)]).save(source)
+    cases = {'schema':1, 'cases':[
+        {'id':'local','split':'dev','map':'map.json','coordinates':'local',
+         'start':[2,2],'goal':[2,8], 'resolution':1, 'radius':.5, 'margin':.2}]}
+    manifest = tmp_path/'cases.json'
+    manifest.write_text(json.dumps(cases))
+    run = subprocess.run([sys.executable,'-m','shipnav.map_demo','benchmark',str(manifest),
+        '--repeats','1','--output',str(tmp_path/'benchmark.json')],capture_output=True,text=True)
+    assert run.returncode == 0, run.stderr
+    data = json.loads((tmp_path/'benchmark.json').read_text())
+    assert all(r['status'] == 'success' for r in data['runs'])
+
+
+def test_benchmark_rejects_unknown_coordinates_value(tmp_path):
+    source = tmp_path/'map.json'
+    SeaMap((0,0,10,10), [(4,0,6,10)]).save(source)
+    cases = {'schema':1, 'cases':[
+        {'id':'bad','split':'dev','map':'map.json','coordinates':'utm',
+         'start':[2,2],'goal':[2,8], 'resolution':1, 'radius':.5, 'margin':.2}]}
+    manifest = tmp_path/'cases.json'
+    manifest.write_text(json.dumps(cases))
+    run = subprocess.run([sys.executable,'-m','shipnav.map_demo','benchmark',str(manifest),
+        '--repeats','1','--output',str(tmp_path/'benchmark.json')],capture_output=True,text=True)
+    assert run.returncode != 0
+    assert 'coordinates' in run.stderr
+
+
 def test_rejected_final_route_is_preserved_as_failure():
     from shipnav.map_demo import execute
     class RejectFinalValidation:
