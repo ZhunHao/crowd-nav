@@ -1,0 +1,102 @@
+{
+  "expanded": [
+    {
+      "id": "episode-0-frame-0",
+      "legacy_margin": 0.002515819808920655,
+      "modern_margin": 0.002515819808920655,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 5.8055147328373025e-08
+    },
+    {
+      "id": "episode-1-frame-0",
+      "legacy_margin": 0.0010085340191662573,
+      "modern_margin": 0.0010085630467399076,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 4.3541360489340875e-08
+    },
+    {
+      "id": "episode-2-frame-0",
+      "legacy_margin": 0.0023459214203016,
+      "modern_margin": 0.0023458923927279496,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 7.25689341396496e-08
+    },
+    {
+      "id": "episode-1-frame-3",
+      "legacy_margin": 3.076922807726534e-05,
+      "modern_margin": 3.082728322456596e-05,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 8.708272097868175e-08
+    },
+    {
+      "id": "episode-0-frame-13",
+      "legacy_margin": 3.402031632693259e-05,
+      "modern_margin": 3.402031632693259e-05,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 5.80551473561286e-08
+    },
+    {
+      "id": "episode-0-frame-7",
+      "legacy_margin": 4.624092483684894e-05,
+      "modern_margin": 4.624092483684894e-05,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 5.805514730061745e-08
+    },
+    {
+      "id": "neighbours-1",
+      "legacy_margin": 0.0012154425641989763,
+      "modern_margin": 0.0012154425641989763,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 5.8055147328373025e-08
+    },
+    {
+      "id": "neighbours-2",
+      "legacy_margin": 0.0005454861641771835,
+      "modern_margin": 0.0005454861641771835,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 7.25689341396496e-08
+    },
+    {
+      "id": "neighbours-8",
+      "legacy_margin": 0.00041824379504826203,
+      "modern_margin": 0.00041825830883510107,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 1.1611029462899047e-07
+    },
+    {
+      "id": "neighbours-24",
+      "legacy_margin": 0.0027910302347701477,
+      "modern_margin": 0.0027910302347701477,
+      "action_equal_1e_7": true,
+      "max_candidate_value_delta": 5.8055147328373025e-08
+    }
+  ],
+  "controller": [
+    {
+      "id": "episode-0-frame-0",
+      "legacy_status": "timeout",
+      "modern_status": "timeout",
+      "legacy_steps": 64,
+      "modern_steps": 64,
+      "exact_trace_equal": true
+    },
+    {
+      "id": "episode-1-frame-0",
+      "legacy_status": "timeout",
+      "modern_status": "timeout",
+      "legacy_steps": 64,
+      "modern_steps": 64,
+      "exact_trace_equal": true
+    },
+    {
+      "id": "episode-2-frame-0",
+      "legacy_status": "timeout",
+      "modern_status": "timeout",
+      "legacy_steps": 64,
+      "modern_steps": 64,
+      "exact_trace_equal": true
+    }
+  ],
+  "source_unchanged": true,
+  "scope": "CPU. Controller uses fixed constant-velocity neighbours and a 64-step bound; it is not original simulator trajectory reproduction. Timeout is a bounded failure, not success."
+}

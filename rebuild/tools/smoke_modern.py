@@ -6,6 +6,15 @@ import sys
 import sysconfig
 from pathlib import Path
 
+def require_local_platform():
+    """These artifacts record only the accepted macOS 26 arm64 CPU host."""
+    if (platform.system() != 'Darwin' or platform.machine() != 'arm64'
+            or platform.mac_ver()[0].split('.')[0] != '26'):
+        raise RuntimeError('This recorder supports only macOS 26 arm64; other platforms require separate acceptance tooling')
+
+
+require_local_platform()
+
 import gymnasium
 import matplotlib
 matplotlib.use('Agg')
@@ -17,7 +26,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QLabel
 import torch
 
-out = Path('migration/macos-arm64')
+out = Path(__file__).resolve().parents[1] / 'migration/macos-arm64'
 out.mkdir(parents=True, exist_ok=True)
 x = torch.tensor([1., 2., 3.], requires_grad=True)
 y = (x.square()).sum()

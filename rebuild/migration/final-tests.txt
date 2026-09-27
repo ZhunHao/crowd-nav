@@ -1,0 +1,41 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/bin/python
+cachedir: .pytest_cache
+PySide6 6.11.2 -- Qt runtime 6.11.2 -- Qt compiled 6.11.2
+rootdir: /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild
+configfile: pyproject.toml
+testpaths: tests
+plugins: qt-4.5.0
+collecting ... collected 29 items
+
+tests/test_migration.py::test_cpu_inference_parity PASSED                [  3%]
+tests/test_migration.py::test_expanded_cpu_inference_parity PASSED       [  6%]
+tests/test_migration.py::test_native_orca_runs PASSED                    [ 10%]
+tests/test_migration.py::test_bounded_replay_deterministic PASSED        [ 13%]
+tests/test_migration.py::test_complete_controller_trace_parity PASSED    [ 17%]
+tests/test_model.py::test_import_without_original_gym_or_native PASSED   [ 20%]
+tests/test_model.py::test_checkpoint_load_cpu_strict_eval PASSED         [ 24%]
+tests/test_model.py::test_missing_files[policy.config] PASSED            [ 27%]
+tests/test_model.py::test_missing_files[rl_model.pth] PASSED             [ 31%]
+tests/test_model.py::test_reject_invalid_checkpoint[nan] PASSED          [ 34%]
+tests/test_model.py::test_reject_invalid_checkpoint[inf] PASSED          [ 37%]
+tests/test_model.py::test_reject_invalid_checkpoint[missing_key] PASSED  [ 41%]
+tests/test_model.py::test_reject_invalid_checkpoint[shape] PASSED        [ 44%]
+tests/test_model.py::test_reject_invalid_checkpoint[unicycle] PASSED     [ 48%]
+tests/test_model.py::test_reject_nonfinite_network_output[nan] PASSED    [ 51%]
+tests/test_model.py::test_reject_nonfinite_network_output[inf] PASSED    [ 55%]
+tests/test_model.py::test_reject_nonfinite_network_output[-inf] PASSED   [ 58%]
+tests/test_model.py::test_empty_neighbour_adapter PASSED                 [ 62%]
+tests/test_platform_tools.py::test_foreign_host_rejected[build_rvo2] PASSED [ 65%]
+tests/test_platform_tools.py::test_foreign_host_rejected[install_rvo2] PASSED [ 68%]
+tests/test_platform_tools.py::test_foreign_host_rejected[accept_modern] PASSED [ 72%]
+tests/test_platform_tools.py::test_smoke_rejects_before_import_or_output[Darwin-x86_64-26.0] PASSED [ 75%]
+tests/test_platform_tools.py::test_smoke_rejects_before_import_or_output[Darwin-arm64-15.0] PASSED [ 79%]
+tests/test_platform_tools.py::test_smoke_rejects_before_import_or_output[Linux-aarch64-] PASSED [ 82%]
+tests/test_platform_tools.py::test_installer_rejects_mixed_manifest PASSED [ 86%]
+tests/test_release_inventory.py::test_inventory_preserves_release_and_wheel_metadata PASSED [ 89%]
+tests/test_retirement.py::test_retired_paths_absent PASSED               [ 93%]
+tests/test_retirement.py::test_modern_import_isolation PASSED            [ 96%]
+tests/test_retirement.py::test_capture_tools_have_one_loader PASSED      [100%]
+
+============================== 29 passed in 4.13s ==============================

@@ -13,6 +13,15 @@ RETIRED = ('.venv-legacy', 'legacy', 'locks/legacy.txt', 'src/shipnav/baseline.p
            'tests/legacy', 'tools/reference_manifest.py', 'tools/capture_reference.py')
 
 
+
+def require_local_platform():
+    """These artifacts record only the accepted macOS 26 arm64 CPU host."""
+    if (platform.system() != 'Darwin' or platform.machine() != 'arm64'
+            or platform.mac_ver()[0].split('.')[0] != '26'):
+        raise RuntimeError('This recorder supports only macOS 26 arm64; other platforms require separate acceptance tooling')
+
+
+
 def hashes(root):
     return {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest()
             for p in sorted(root.rglob('*')) if p.is_file()
@@ -20,6 +29,7 @@ def hashes(root):
 
 
 def record():
+    require_local_platform()
     from shipnav.model import load_policy
     from shipnav.compat.crowd_sim.envs.policy.orca import ORCA
     from shipnav.replay import replay
@@ -33,12 +43,13 @@ def record():
     assert source == json.loads((ROOT / 'migration/source-before-m3.json').read_text())
     names = ('numpy', 'torch', 'gymnasium', 'PySide6', 'matplotlib',
              'stable-baselines3', 'pytest', 'pyrvo2')
-    evidence = ('m4-clean-sync.txt', 'm4-native-install.txt',
+    evidence = ('final-native-install.txt', 'final-tests.txt', 'final-smoke.txt', 'final-parity.txt',
+                'm4-clean-sync.txt', 'm4-native-install.txt',
                 'm4-pre-retirement-tests.txt', 'm4-pre-retirement-parity.txt',
                 'm4-pre-retirement-smoke.txt', 'm4-post-retirement-tests.txt',
                 'm4-post-retirement-smoke.txt', 'm4-retirement-red.txt',
                 'm4-retirement-green.txt', 'm4-summary-output.txt')
-    for name in ('m4-pre-retirement-tests.txt', 'm4-pre-retirement-parity.txt',
+    for name in ('final-tests.txt', 'm4-pre-retirement-tests.txt', 'm4-pre-retirement-parity.txt',
                  'm4-post-retirement-tests.txt', 'm4-retirement-green.txt'):
         output = (ROOT / 'migration' / name).read_text()
         assert 'passed' in output and 'failed' not in output and 'ERROR' not in output, name
@@ -50,6 +61,8 @@ def record():
             'retired_paths_absent': absent, 'unavailable_original_imports': imports,
             'source_unchanged': True, 'source_sha256': source,
             'modern_source_sha256': hashes(ROOT / 'src/shipnav'),
+            'modern_tools_sha256': hashes(ROOT / 'tools'),
+            'native_build_sha256': hashes(ROOT / 'migration/rvo2'),
             'frozen_reference_sha256': hashes(ROOT / 'reference'),
             'frozen_comparison_sha256': {p.name: sha256(p.read_bytes()).hexdigest()
                 for p in (ROOT / 'migration').glob('*legacy.json')} |
@@ -62,7 +75,7 @@ def record():
             'video_probe': json.loads((ROOT / 'migration/macos-arm64/video-probe.json').read_text()),
             'parity_and_replay': json.loads((ROOT / 'migration/m3-summary.json').read_text()),
             'deferred': ['Linux execution', 'CUDA', 'MPS parity',
-                         'Native wheel macOS deployment-target portability']}
+                         'Older macOS native runtime validation']}
     (ROOT / 'migration/acceptance.json').write_text(json.dumps(data, indent=2, allow_nan=False) + '\n')
     print('Accepted modern macOS arm64 CPU; original source unchanged; retired paths and imports absent.')
 

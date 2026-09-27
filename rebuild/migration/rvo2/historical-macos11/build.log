@@ -1,17 +1,17 @@
-$ uv venv --python /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/bin/python /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env
-Using CPython 3.14.7 interpreter at: rebuild/.venv-modern/bin/python
-Creating virtual environment at: /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env
-Activate with: source /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env/bin/activate
-$ uv pip install --python /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env/bin/python --require-hashes -r /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2/build-requirements.txt
-Using Python 3.14.7 environment at: /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env
-Resolved 5 packages in 32ms
-Installed 5 packages in 199ms
+$ uv venv --python /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-modern/bin/python /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env
+Using CPython 3.14.7 interpreter at: .venv-modern/bin/python
+Creating virtual environment at: /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env
+Activate with: source /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env/bin/activate
+$ uv pip install --python /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env/bin/python --require-hashes -r /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2/build-requirements.txt
+Using Python 3.14.7 environment at: /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env
+Resolved 5 packages in 24ms
+Installed 5 packages in 87ms
  + cmake==4.4.3
  + cython==3.3.0
  + packaging==26.3
  + setuptools==82.0.1
  + wheel==0.46.3
-$ /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env/bin/python setup.py bdist_wheel --dist-dir /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2
+$ /var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env/bin/python setup.py bdist_wheel --dist-dir /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2
 Compiling src/rvo2.pyx because it changed.
 [1/1] Cythonizing src/rvo2.pyx
 running bdist_wheel
@@ -39,9 +39,9 @@ to suppress it.
 -- Check for working CXX compiler: /usr/bin/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Configuring done (1.3s)
+-- Configuring done (1.1s)
 -- Generating done (0.1s)
--- Build files have been written to: /private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/source/build/RVO2
+-- Build files have been written to: /private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/build/RVO2
 [  9%] Building CXX object src/CMakeFiles/RVO.dir/Agent.cpp.o
 [ 18%] Building CXX object src/CMakeFiles/RVO.dir/KdTree.cpp.o
 [ 27%] Building CXX object src/CMakeFiles/RVO.dir/Obstacle.cpp.o
@@ -49,7 +49,7 @@ to suppress it.
 [ 45%] Linking CXX static library libRVO.a
 [ 45%] Built target RVO
 [ 54%] Building CXX object examples/CMakeFiles/Blocks.dir/Blocks.cpp.o
-/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/source/examples/Blocks.cpp:178:40: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
+/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/examples/Blocks.cpp:178:40: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
   178 |                 float dist = std::rand() * 0.0001f / RAND_MAX;
       |                                                    ~ ^~~~~~~~
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:124:18: note: expanded from macro 'RAND_MAX'
@@ -62,7 +62,7 @@ to suppress it.
 [ 81%] Linking CXX executable Circle
 [ 81%] Built target Circle
 [ 90%] Building CXX object examples/CMakeFiles/Roadmap.dir/Roadmap.cpp.o
-/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/source/examples/Roadmap.cpp:318:40: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
+/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/examples/Roadmap.cpp:318:40: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
   318 |                 float dist = std::rand() * 0.0001f / RAND_MAX;
       |                                                    ~ ^~~~~~~~
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:124:18: note: expanded from macro 'RAND_MAX'
@@ -73,10 +73,14 @@ to suppress it.
 [100%] Built target Roadmap
 building 'rvo2' extension
 creating build/temp.macosx-11.0-arm64-cpython-314/src
-c++ -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Isrc -I/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env/include -I/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/include/python3.14 -c src/rvo2.cpp -o build/temp.macosx-11.0-arm64-cpython-314/src/rvo2.o -fPIC -mmacosx-version-min=26.0
+c++ -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -Isrc -I/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env/include -I/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/include/python3.14 -c src/rvo2.cpp -o build/temp.macosx-11.0-arm64-cpython-314/src/rvo2.o -fPIC
 creating build/lib.macosx-11.0-arm64-cpython-314
-c++ -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -bundle -undefined dynamic_lookup -arch arm64 -mmacosx-version-min=11.0 -Wl,-headerpad,40 build/temp.macosx-11.0-arm64-cpython-314/src/rvo2.o -Lbuild/RVO2/src -L/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/lib -lRVO -o build/lib.macosx-11.0-arm64-cpython-314/rvo2.cpython-314-darwin.so -mmacosx-version-min=26.0
-/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-lk7uhuik/build-env/lib/python3.14/site-packages/setuptools/_distutils/cmd.py:90: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+c++ -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -bundle -undefined dynamic_lookup -arch arm64 -mmacosx-version-min=11.0 -Wl,-headerpad,40 build/temp.macosx-11.0-arm64-cpython-314/src/rvo2.o -Lbuild/RVO2/src -L/Users/zhunhao/.local/share/uv/python/cpython-3.14.7-macos-aarch64-none/lib -lRVO -o build/lib.macosx-11.0-arm64-cpython-314/rvo2.cpython-314-darwin.so
+ld: warning: object file (/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/build/RVO2/src/libRVO.a[2](Agent.cpp.o)) was built for newer 'macOS' version (26.0) than being linked (11.0)
+ld: warning: object file (/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/build/RVO2/src/libRVO.a[3](KdTree.cpp.o)) was built for newer 'macOS' version (26.0) than being linked (11.0)
+ld: warning: object file (/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/build/RVO2/src/libRVO.a[4](Obstacle.cpp.o)) was built for newer 'macOS' version (26.0) than being linked (11.0)
+ld: warning: object file (/private/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/source/build/RVO2/src/libRVO.a[5](RVOSimulator.cpp.o)) was built for newer 'macOS' version (26.0) than being linked (11.0)
+/var/folders/xm/szb6k481351bwl0jdmq52dtr0000gn/T/shipnav-rvo2-_wx9tydc/build-env/lib/python3.14/site-packages/setuptools/_distutils/cmd.py:90: SetuptoolsDeprecationWarning: setup.py install is deprecated.
 !!
 
         ********************************************************************************
@@ -110,7 +114,7 @@ writing manifest file 'pyrvo2.egg-info/SOURCES.txt'
 Copying pyrvo2.egg-info to build/bdist.macosx-11.0-arm64/wheel/./pyrvo2-0.0.0-py3.14.egg-info
 running install_scripts
 creating build/bdist.macosx-11.0-arm64/wheel/pyrvo2-0.0.0.dist-info/WHEEL
-creating '/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2/pyrvo2-0.0.0-cp314-cp314-macosx_26_0_arm64.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+creating '/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2/pyrvo2-0.0.0-cp314-cp314-macosx_11_0_arm64.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
 adding 'rvo2.cpython-314-darwin.so'
 adding 'pyrvo2-0.0.0.dist-info/licenses/LICENSE'
 adding 'pyrvo2-0.0.0.dist-info/METADATA'

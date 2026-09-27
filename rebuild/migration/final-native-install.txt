@@ -1,0 +1,6 @@
+Using Python 3.14.7 environment at: .venv-modern
+Resolved 1 package in 29ms
+Prepared 1 package in 11ms
+Uninstalled 1 package in 1ms
+Installed 1 package in 2ms
+ ~ pyrvo2==0.0.0 (from file:///Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/migration/rvo2/pyrvo2-0.0.0-cp314-cp314-macosx_26_0_arm64.whl)

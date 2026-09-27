@@ -35,12 +35,12 @@ commands used PYTHONDONTWRITEBYTECODE=1. Original reference files were not edite
 Re-run from rebuild (modern environment already synchronized and native wheel installed):
 
 ```
-.venv-modern/bin/python tools/parity_fixture.py --modern --output migration/inference.json
-.venv-modern/bin/python tools/expanded_parity.py --modern --output migration/expanded-modern.json
-.venv-modern/bin/python tools/replay_migration.py --modern --output migration/replay-modern.json
+.venv-modern/bin/python tools/parity_fixture.py --output migration/inference.json
+.venv-modern/bin/python tools/expanded_parity.py --output migration/expanded-modern.json
+.venv-modern/bin/python tools/replay_migration.py --output migration/replay-modern.json
 .venv-modern/bin/python tools/migration_summary.py
 .venv-modern/bin/python -m pytest -v
 ```
 
-Legacy capture is complete. The M4 controller owns retirement and removal of
-legacy capture entry points; M3 has not deleted or retired that environment.
+Legacy capture is complete. M4 completed retirement: the legacy environment,
+runtime support and capture entry points have been removed. Frozen evidence remains.

@@ -143,6 +143,34 @@
     "model.py": "0749bff9507b5f4edbafc3affa263709ad992c4a13705e6734a567947161c5d9",
     "replay.py": "359b47fcb144816dd87f7584fc904a6ded9bfc7bfd98be67ba3f8a632ddd88f8"
   },
+  "modern_tools_sha256": {
+    "CROWDNAV-LICENSE": "7cdb8444870153776a3ca245a717e662353afca4e8f7e2166d551b90fe86170d",
+    "accept_modern.py": "a3ac5d450377a2ab445985bbdd00d6cd4679cc6ef516c027a1ef9d49ebafcc3b",
+    "build_rvo2.py": "287b26e4b6ab57e94d81f989d60023ac534bcf5d8f593b1f4ba61148463b9531",
+    "expanded_parity.py": "2a10ea3ba43bea0eb7bd8d48f3a09ebecf3f26ed5843f38e02ee62203ec0ffa8",
+    "install_rvo2.py": "b972ca3405ddbc9b1474262705fe5d6da8d3c11d5682a8f7ac65921ebc7111fd",
+    "migration_summary.py": "446a7373565fabc0068f7d615e4231e7bc2e0fb735f2ac91ea5c45648f98a245",
+    "parity_fixture.py": "d0ae29afbe28d135e70d5db6bfc21abcf1827ddb6996452b074490907403dc86",
+    "port_inference.py": "722ea16cae4177adef5ccb11bf65e0ba9f76f8da02ce740ec1467bb1356e044f",
+    "release_inventory.py": "40dfcde68e2a0df7e29b43248b2714b83842d4f58a5a6c5ed0673fc1340625d0",
+    "replay_migration.py": "c84749c9d3ecfa743bb90e1be805f8b2716b94f45cc452345a2677416a5ad892",
+    "smoke_modern.py": "210480de6eec03f6c43c7c10808c12177e11ecbd668853df05ac974ebd1a570f"
+  },
+  "native_build_sha256": {
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "README.md": "6a7869014002a69625f640d8cf2009302ce981609deb99b94950816bd8a51f6e",
+    "build-requirements.in": "f7f99d0f4fb7005820a1c7b209e2c81725545a9381af133137d43443b57fe8a5",
+    "build-requirements.txt": "9f8be9c15691b2ec97f9f4e4754e5602f5952fd30a6bb630faef064264e0a2f5",
+    "build.log": "abfeb48b84cadcb212a5f0e13e581219e76d8a47a52f252a13693a8db09eb623",
+    "historical-macos11/build.log": "1e1d54916443e21413f38d26f19a5429f88e56ceece4f0e3f926de5772245b65",
+    "historical-macos11/pyrvo2-0.0.0-cp314-cp314-macosx_11_0_arm64.whl": "27f5d09164c0751a976040123acd555e9724ad22fa3250702c84014be0ae8e71",
+    "historical-macos11/wheels.json": "3b595228a46d342872ffb056fd4e9c6e8f898a7d4b187ef96966bb99995bb725",
+    "lock.log": "91e82381439238c2b92ee67faa78e692fdabcf10460eb2781f5afa52ea60bf0e",
+    "modern.patch": "81356db8df8fe78284b16c1d8f3a534f889f5cfb7014394c22b99e4622d00027",
+    "pyrvo2-0.0.0-cp314-cp314-macosx_26_0_arm64.whl": "a638a78ec2d43d109c24d9ab862e6339f2bb57d6667decee3e2fac4b885db4ea",
+    "test.txt": "ca15fca9c83c37dee5902301ad1eca1dae23f800a892c5cac92c7a4341841a75",
+    "wheels.json": "4c58ed60c273187b5418f4ab52e6a1c1b9ca5033d8a4a8e7adb2807f5c9391e7"
+  },
   "frozen_reference_sha256": {
     "acceptance.json": "5de0584efecb9d295c17a398e5a2fe4e2a077e527d011342284937e7e130b594",
     "determinism.json": "bbda492b457a91fea6fecf4ade0cddb8597c7b95c242bce25413ab6f734b6cf8",
@@ -177,9 +205,13 @@
     "crowd_nav/data/output_trained/train.config": "face7d0011977ba8b75418f474cc5c9271acd70acda1155534ed2db148fb3121"
   },
   "native_wheels": {
-    "pyrvo2-0.0.0-cp314-cp314-macosx_11_0_arm64.whl": "27f5d09164c0751a976040123acd555e9724ad22fa3250702c84014be0ae8e71"
+    "pyrvo2-0.0.0-cp314-cp314-macosx_26_0_arm64.whl": "a638a78ec2d43d109c24d9ab862e6339f2bb57d6667decee3e2fac4b885db4ea"
   },
   "evidence_sha256": {
+    "final-native-install.txt": "e7857b748344d443740b595667c10d244597f1b53b6521b0416ad9b7924b7514",
+    "final-tests.txt": "de6edd0060ceffc7df6bf90cf3cd7fa0aeb8173f1894475f76c9541fe34273fd",
+    "final-smoke.txt": "90984289bc9f6f44fdc3e0fdab1a665acb90b53c65cd223a499601530f4e52a0",
+    "final-parity.txt": "65a7259c2cf154d6be698de756bf362f78e5bbb094b904f391b972f4576d7bfe",
     "m4-clean-sync.txt": "3e4992ef6b6e0b1a34bf37becc47af04cfc5f50ec7328bb63cfeed5bd73955ab",
     "m4-native-install.txt": "ed718d780e72112dc70392b6659a21c512457d7e5ecd93f5a806520150316ec4",
     "m4-pre-retirement-tests.txt": "2ab9551a6935a49cdac0dadb98b74b6a26bc4103b6dc14f08b4f1ab15614248c",
@@ -336,6 +368,6 @@
     "Linux execution",
     "CUDA",
     "MPS parity",
-    "Native wheel macOS deployment-target portability"
+    "Older macOS native runtime validation"
   ]
 }
