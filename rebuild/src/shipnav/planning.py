@@ -52,6 +52,10 @@ def plan(sea, start, goal, *, planner='astar', resolution=1., clearance=.7,
 
     Theta* performs parent line-of-sight relaxation during search. A* output is
     smoothed; both use identical grid connectors and continuous collision checks.
+
+    NoPath subclasses ValueError (also raised for invalid arguments), so callers
+    that must distinguish "no route" from "invalid input" need to catch NoPath
+    before a broader ValueError handler.
     """
     if planner not in ('astar', 'theta'):
         raise ValueError('planner must be astar or theta')
