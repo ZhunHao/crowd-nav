@@ -1,0 +1,9 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33 +33 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+--- a/setup.py
++++ b/setup.py
+@@ -34,0 +35 @@
++    version="0.0.0",

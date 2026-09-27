@@ -1,0 +1,12 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________ test_bounded_replay_deterministic _______________________
+
+    def test_bounded_replay_deterministic():
+>       from shipnav.replay import replay
+E       ModuleNotFoundError: No module named 'shipnav.replay'
+
+tests/test_migration.py:48: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_migration.py::test_bounded_replay_deterministic - ModuleNot...
+1 failed in 0.14s

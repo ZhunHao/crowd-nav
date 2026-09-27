@@ -53,3 +53,23 @@ def test_reject_invalid_checkpoint(tmp_path, failure):
     torch.save(weights, tmp_path / 'rl_model.pth')
     with pytest.raises((ValueError, RuntimeError)):
         load_policy(tmp_path)
+
+@pytest.mark.parametrize('bad', [float('nan'), float('inf'), -float('inf')])
+def test_reject_nonfinite_network_output(bad):
+    from shipnav.model import load_policy
+    policy = load_policy(MODEL)
+    with torch.no_grad():
+        policy.model.mlp3[-1].bias.fill_(bad)
+    with pytest.raises(ValueError, match='Non-finite policy output'):
+        policy.model(torch.ones(1, 1, 13))
+
+
+def test_empty_neighbour_adapter():
+    from shipnav.model import load_policy
+    from shipnav.compat.crowd_sim.envs.utils.state import FullState, JointState
+    policy = load_policy(MODEL)
+    policy.time_step = .25
+    own = FullState(0, 0, 0, 0, .1, 3, 4, 1, 0)
+    assert policy.predict(JointState(own, [])) == pytest.approx((.6, .8))
+    own.gx, own.gy = 0, 0
+    assert policy.predict(JointState(own, [])) == (0, 0)

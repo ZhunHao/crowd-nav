@@ -35,3 +35,9 @@ Finite output and empty-neighbour adapter acceptance are tracked in M3.
 Run the copy tool from any working directory. Its default source and target
 are derived from the script path. Re-running reproduces this closure and the
 license; keep any future approved source corrections in the copy tool too.
+
+M3 implements finite network-output rejection via a forward hook installed by
+`load_policy`, and an `InferenceSARL` subclass outside this copied closure.
+Empty-neighbour inference steers directly to the goal at preferred speed,
+capped to avoid stepping beyond it, and stops inside the arrival radius.
+Nonempty inference delegates unchanged to the copied SARL implementation.

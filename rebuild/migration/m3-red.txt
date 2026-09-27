@@ -1,0 +1,102 @@
+.........FFFF                                                            [100%]
+=================================== FAILURES ===================================
+__________________ test_reject_nonfinite_network_output[nan] ___________________
+
+bad = nan
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf'), -float('inf')])
+    def test_reject_nonfinite_network_output(bad):
+        from shipnav.model import load_policy
+        policy = load_policy(MODEL)
+        with torch.no_grad():
+            policy.model.mlp3[-1].bias.fill_(bad)
+>       with pytest.raises(ValueError, match='Non-finite policy output'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_model.py:63: Failed
+__________________ test_reject_nonfinite_network_output[inf] ___________________
+
+bad = inf
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf'), -float('inf')])
+    def test_reject_nonfinite_network_output(bad):
+        from shipnav.model import load_policy
+        policy = load_policy(MODEL)
+        with torch.no_grad():
+            policy.model.mlp3[-1].bias.fill_(bad)
+>       with pytest.raises(ValueError, match='Non-finite policy output'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_model.py:63: Failed
+__________________ test_reject_nonfinite_network_output[-inf] __________________
+
+bad = -inf
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf'), -float('inf')])
+    def test_reject_nonfinite_network_output(bad):
+        from shipnav.model import load_policy
+        policy = load_policy(MODEL)
+        with torch.no_grad():
+            policy.model.mlp3[-1].bias.fill_(bad)
+>       with pytest.raises(ValueError, match='Non-finite policy output'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_model.py:63: Failed
+_________________________ test_empty_neighbour_adapter _________________________
+
+    def test_empty_neighbour_adapter():
+        from shipnav.model import load_policy
+        from shipnav.compat.crowd_sim.envs.utils.state import FullState, JointState
+        policy = load_policy(MODEL)
+        policy.time_step = .25
+        own = FullState(0, 0, 0, 0, .1, 3, 4, 1, 0)
+>       assert policy.predict(JointState(own, [])) == pytest.approx((.6, .8))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_model.py:73:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <shipnav.compat.crowd_nav.policy.sarl.SARL object at 0x11bf22fd0>
+state = <shipnav.compat.crowd_sim.envs.utils.state.JointState object at 0x11bf17230>
+
+    def predict(self, state):
+        """
+        A base class for all methods that takes pairwise joint state as input to value network.
+        The input to the value network is always of shape (batch_size, # humans, rotated joint state length)
+
+        """
+        if self.phase is None or self.device is None:
+            raise AttributeError('Phase, device attributes have to be set!')
+        if self.phase == 'train' and self.epsilon is None:
+            raise AttributeError('Epsilon attribute has to be set in training phase')
+
+        if self.reach_destination(state):
+            return ActionXY(0, 0) if self.kinematics == 'holonomic' else ActionRot(0, 0)
+        if self.action_space is None:
+            self.build_action_space(state.self_state.v_pref)
+
+        occupancy_maps = None
+        probability = np.random.random()
+        if self.phase == 'train' and probability < self.epsilon:
+            max_action = self.action_space[np.random.choice(len(self.action_space))]
+        else:
+            self.action_values = list()
+            max_value = float('-inf')
+            max_action = None
+            for action in self.action_space:
+                next_self_state = self.propagate(state.self_state, action)
+                if self.query_env:
+>                   next_human_states, reward, done, info = self.env.onestep_lookahead(action)
+                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   AttributeError: 'NoneType' object has no attribute 'onestep_lookahead'
+
+src/shipnav/compat/crowd_nav/policy/multi_human_rl.py:38: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_model.py::test_reject_nonfinite_network_output[nan] - Faile...
+FAILED tests/test_model.py::test_reject_nonfinite_network_output[inf] - Faile...
+FAILED tests/test_model.py::test_reject_nonfinite_network_output[-inf] - Fail...
+FAILED tests/test_model.py::test_empty_neighbour_adapter - AttributeError: 'N...
+4 failed, 9 passed in 3.11s
