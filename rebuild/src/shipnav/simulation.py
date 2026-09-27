@@ -101,6 +101,8 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         perceived = observer.observe(traffic, time, len(frames)-1)
         predictions = predict(perceived, step, uncertainty=uncertainty)
         neighbours = [(s['position'], s['velocity'], s['radius']) for s in perceived]
+        if hasattr(policy, 'set_context'):
+            policy.set_context(sea, vessel, predictions)
         inference_start = perf_counter()
         nominal = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
         latencies.append((perf_counter()-inference_start)*1000)
@@ -110,9 +112,14 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         decision = choose(sea, position, nominal, predictions, radius, speed, step, motion=motion) if filtered else {
             'executed': nominal, 'override': False, 'no_feasible_action': False, 'path': [], 'predicted_clearance': None}
         velocity = tuple(decision['executed'])
+        decision_ms = (perf_counter()-began)*1000
+        # Soft wall-clock indicator only: a Python worker thread makes no hard real-time
+        # guarantee, so this flags a missed step budget rather than enforcing one.
         diagnostics.append({'t': time, 'observed': perceived, 'predictions': predictions,
                             'nominal': nominal, **decision,
-                            'decision_ms': (perf_counter()-began)*1000})
+                            'decision_ms': decision_ms,
+                            'deadline_miss': decision_ms > step*1000,
+                            'solver_failed': bool(getattr(policy, 'solver_failed', False))})
         if len(velocity) != 2 or not all(isfinite(x) for x in velocity) or hypot(*velocity) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         next_position = tuple(x + step*v for x, v in zip(position, velocity))
