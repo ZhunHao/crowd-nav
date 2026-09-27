@@ -34,6 +34,14 @@ def test_splits_are_disjoint_by_file():
     assert len(files) == len(set(files))
 
 
+def _land_geometry(scenario):
+    """Bounds + land features only, excluding metadata, so identical land
+    geometry with different metadata (e.g. a different source filename) is
+    still recognized as the same map."""
+    map_dict = scenario['map']
+    return json.dumps({'bounds': map_dict['bounds'], 'features': map_dict['features']}, sort_keys=True)
+
+
 def test_seeded_splits_use_distinct_maps_and_disjoint_seed_ranges():
     data = _splits()
     seeded = ('train', 'dev', 'calibration')
@@ -43,7 +51,7 @@ def test_seeded_splits_use_distinct_maps_and_disjoint_seed_ranges():
         for entry in data['splits'][split]:
             scenario = json.loads((ROOT / 'scenarios' / entry['file']).read_text())
             seeds.add(scenario['seed'])
-            maps.add(json.dumps(scenario['map'], sort_keys=True))
+            maps.add(_land_geometry(scenario))
         seeds_by_split[split], maps_by_split[split] = seeds, maps
     for a in seeded:
         for b in seeded:
@@ -67,6 +75,15 @@ def test_every_canonical_family_is_present_once_in_test_and_absent_elsewhere():
         for entry in entries:
             scenario = json.loads((ROOT / 'scenarios' / entry['file']).read_text())
             assert scenario['family'] not in module.CANONICAL_FAMILIES
+    assert set(data['withheld_families']) == set(module.CANONICAL_FAMILIES)
+
+
+def test_generalization_report_families_match_withheld_families():
+    module = _load_freeze_scenarios()
+    data = _splits()
+    text = (ROOT / 'scenarios/generalization.md').read_text()
+    for family in module.CANONICAL_FAMILIES:
+        assert family in text
     assert set(data['withheld_families']) == set(module.CANONICAL_FAMILIES)
 
 

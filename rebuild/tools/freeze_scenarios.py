@@ -32,7 +32,7 @@ EGO_START, EGO_GOAL = (3., 12.), (21., 12.)
 SEEDED_SPLITS = (
     ('train', lambda: SeaMap((0., 0., 24., 24.)),
      (2., 2.), (22., 22.), range(1000, 1010), 4),
-    ('dev', lambda: SeaMap((0., 0., 24., 24.), ((9., 5., 14., 18.),)),
+    ('dev', lambda: SeaMap((0., 0., 24., 24.), ((4., 14., 10., 20.), (14., 4., 20., 10.))),
      (2., 2.), (22., 22.), range(2000, 2005), 3),
     ('calibration', lambda: SeaMap.load(ROOT / 'maps/harbour.json'),
      (2., 2.), (22., 22.), range(3000, 3005), 3),

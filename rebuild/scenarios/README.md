@@ -46,7 +46,8 @@ speed `.3` and radius `.6` unless noted:
 - `test` -- the nine canonical families above, one scenario each, `seed: 0`.
 - `train` -- `make_scenario` draws on an open 24x24 map, seeds `1000..1009`
   (10 scenarios), 4 traffic ships each, ego `(2,2)->(22,22)`.
-- `dev` -- `make_scenario` draws on a 24x24 map with land `(9,5,14,18)`,
+- `dev` -- `make_scenario` draws on a 24x24 map with land `(4,14,10,20)` and
+  `(14,4,20,10)` (geometrically distinct from `calibration`'s harbour land),
   seeds `2000..2004` (5 scenarios), 3 ships each, ego `(2,2)->(22,22)`.
 - `calibration` -- `make_scenario` draws on `maps/harbour.json`, seeds
   `3000..3004` (5 scenarios), 3 ships each, ego `(2,2)->(22,22)`.
@@ -72,7 +73,10 @@ families. They appear only in `test` and never in `train`, `dev` or
 A policy or planner that only sees random encounters during training or
 calibration and is then scored on these named families is being tested for
 generalization to encounter geometries it has not seen, not for
-memorization of them.
+memorization of them. See `scenarios/generalization.md` for the full
+report: which splits contain the withheld families, what the held-out unit
+for `test` is (the encounter family, not the map or the seed), and this
+set's limits as a small smoke-scale check rather than statistical evidence.
 
 ## Noise keying and target identity
 
