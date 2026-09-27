@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.20, pytest-8.4.2, pluggy-1.6.0 -- /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/bin/python
+cachedir: .pytest_cache
+PySide6 6.7.3 -- Qt runtime 6.7.3 -- Qt compiled 6.7.3
+rootdir: /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild
+configfile: pyproject.toml
+plugins: qt-4.5.0
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_baseline.py ____________________
+ImportError while importing test module '/Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/tests/test_baseline.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/zhunhao/.local/share/uv/python/cpython-3.10-macos-aarch64-none/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_baseline.py:5: in <module>
+    from shipnav.baseline import build_baseline, load_policy
+E   ModuleNotFoundError: No module named 'shipnav.baseline'
+=========================== short test summary info ============================
+ERROR tests/test_baseline.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 1.41s ===============================

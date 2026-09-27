@@ -1,0 +1,128 @@
+{
+  "source_files": 78,
+  "source_unchanged": true,
+  "python": "3.10.20 (main, Jun 23 2026, 15:45:03) [Clang 22.1.3 ]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "ffmpeg": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers\nbuilt with Apple clang version 21.0.0 (clang-2100.1.1.101)\nconfiguration: --prefix=/opt/homebrew/Cellar/ffmpeg/9.0.1_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon\nlibavutil      61.  1.101 / 61.  1.101\nlibavcodec     63.  1.101 / 63.  1.101\nlibavformat    63.  1.101 / 63.  1.101\nlibavdevice    63.  1.101 / 63.  1.101\nlibavfilter    12.  1.101 / 12.  1.101\nlibswscale     10.  1.101 / 10.  1.101\nlibswresample   7.  1.101 /  7.  1.101\n\nExiting with exit code 0\n",
+  "reference_sha256": {
+    "reference/determinism.json": "bbda492b457a91fea6fecf4ade0cddb8597c7b95c242bce25413ab6f734b6cf8",
+    "reference/episodes/seed-0-baseline.json": "9b90e57f1b0e96e4350911009e96a9c9c5b88f3773def816e7c4a7ec989a2434",
+    "reference/episodes/seed-0-trace.json": "d89146c08dfb582a762fb3ce1a7e5d0b53d2362b0ec18033fd8eb3aa4db5acf2",
+    "reference/episodes/seed-1-baseline.json": "aeb42b89ce3307c3414579522898d2adfbabeca03a290bf7e3bca79cedf77d98",
+    "reference/episodes/seed-1-trace.json": "bb473fbf188d3578c7e9ee0440469b4265c80eeb7ae357827c90275371aac951",
+    "reference/episodes/seed-2-baseline.json": "cf376c1f79c7fbbf8ba411daab5ed8d59fdf88bec60cfa93216eb579711af1a0",
+    "reference/episodes/seed-2-trace.json": "0b82b69cb80a3676c40495f796e9aca1765cf92f8da0f47585050d4ea6d5793a",
+    "reference/inference.json": "799bddca2a364e42fd888124ebc96263a4e2346503c29dcf649972db17f82179",
+    "reference/manifest.json": "06ac02fccf38f5d83ed34d1fbe90eebe44ad3129935d3333f3eb3a917b93f679",
+    "reference/source-after.json": "c1ec16422cfaa71e9f267cd1eae1b423239928bb86f6623d7954a8f6cdb8f94c",
+    "reference/source-before.json": "c1ec16422cfaa71e9f267cd1eae1b423239928bb86f6623d7954a8f6cdb8f94c"
+  },
+  "fixture_rows": 6,
+  "fixture_forward_calls": [
+    81,
+    81,
+    81,
+    81,
+    81,
+    81
+  ],
+  "episode_results": [
+    {
+      "seed": 0,
+      "status": "ReachGoal",
+      "simulation_time": 14.0,
+      "frames": 56,
+      "time_step": 0.25,
+      "policy": "SARL",
+      "query_env": true,
+      "terminal_state": {
+        "px": 4.7931619758612705,
+        "py": 4.732563262494248,
+        "vx": 6.123233995736766e-17,
+        "vy": 1.0,
+        "radius": 0.5,
+        "gx": 5.0,
+        "gy": 5.0,
+        "v_pref": 1.0,
+        "theta": 1.5707963267948966,
+        "position": [
+          4.7931619758612705,
+          4.732563262494248
+        ],
+        "goal_position": [
+          5.0,
+          5.0
+        ],
+        "velocity": [
+          6.123233995736766e-17,
+          1.0
+        ]
+      }
+    },
+    {
+      "seed": 1,
+      "status": "ReachGoal",
+      "simulation_time": 12.25,
+      "frames": 49,
+      "time_step": 0.25,
+      "policy": "SARL",
+      "query_env": true,
+      "terminal_state": {
+        "px": 4.736504169052702,
+        "py": 4.736504169052698,
+        "vx": 6.123233995736766e-17,
+        "vy": 1.0,
+        "radius": 0.5,
+        "gx": 5.0,
+        "gy": 5.0,
+        "v_pref": 1.0,
+        "theta": 1.5707963267948966,
+        "position": [
+          4.736504169052702,
+          4.736504169052698
+        ],
+        "goal_position": [
+          5.0,
+          5.0
+        ],
+        "velocity": [
+          6.123233995736766e-17,
+          1.0
+        ]
+      }
+    },
+    {
+      "seed": 2,
+      "status": "ReachGoal",
+      "simulation_time": 12.5,
+      "frames": 50,
+      "time_step": 0.25,
+      "policy": "SARL",
+      "query_env": true,
+      "terminal_state": {
+        "px": 4.745802250108068,
+        "py": 4.5899051749984165,
+        "vx": 6.123233995736766e-17,
+        "vy": 1.0,
+        "radius": 0.5,
+        "gx": 5.0,
+        "gy": 5.0,
+        "v_pref": 1.0,
+        "theta": 1.5707963267948966,
+        "position": [
+          4.745802250108068,
+          4.5899051749984165
+        ],
+        "goal_position": [
+          5.0,
+          5.0
+        ],
+        "velocity": [
+          6.123233995736766e-17,
+          1.0
+        ]
+      }
+    }
+  ]
+}

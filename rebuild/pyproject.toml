@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "shipnav-rebuild"
+version = "0.1.0"
+requires-python = ">=3.10,<3.11"
+dependencies = ["numpy>=1.24,<2", "matplotlib>=3.7,<3.9", "torch>=2.2,<2.3", "scipy", "gym==0.15.7"]
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "pytest-qt>=4,<5"]
+gui = ["PySide6>=6.6,<6.8"]
+[tool.setuptools.packages.find]
+where = ["src"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires supplied checkpoint and native RVO2", "video: requires FFmpeg"]

@@ -1,0 +1,33 @@
+{
+  "rtol": 1e-06,
+  "atol": 1e-07,
+  "excluded": [
+    "wall_clock",
+    "video_bytes"
+  ],
+  "checks": [
+    {
+      "seed": 0,
+      "runs": 2,
+      "passed": true
+    },
+    {
+      "seed": 1,
+      "runs": 2,
+      "passed": true
+    },
+    {
+      "seed": 2,
+      "runs": 2,
+      "passed": true
+    }
+  ],
+  "output_sha256": {
+    "reference/episodes/seed-0-baseline.json": "9b90e57f1b0e96e4350911009e96a9c9c5b88f3773def816e7c4a7ec989a2434",
+    "reference/episodes/seed-0-trace.json": "d89146c08dfb582a762fb3ce1a7e5d0b53d2362b0ec18033fd8eb3aa4db5acf2",
+    "reference/episodes/seed-1-baseline.json": "aeb42b89ce3307c3414579522898d2adfbabeca03a290bf7e3bca79cedf77d98",
+    "reference/episodes/seed-1-trace.json": "bb473fbf188d3578c7e9ee0440469b4265c80eeb7ae357827c90275371aac951",
+    "reference/episodes/seed-2-baseline.json": "cf376c1f79c7fbbf8ba411daab5ed8d59fdf88bec60cfa93216eb579711af1a0",
+    "reference/episodes/seed-2-trace.json": "0b82b69cb80a3676c40495f796e9aca1765cf92f8da0f47585050d4ea6d5793a"
+  }
+}

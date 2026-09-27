@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.20, pytest-8.4.2, pluggy-1.6.0 -- /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/bin/python
+cachedir: .pytest_cache
+PySide6 6.7.3 -- Qt runtime 6.7.3 -- Qt compiled 6.7.3
+rootdir: /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild
+configfile: pyproject.toml
+plugins: qt-4.5.0
+collecting ... collected 4 items
+
+rebuild/tests/test_baseline.py::test_missing_model_is_explicit PASSED    [ 25%]
+rebuild/tests/test_baseline.py::test_checkpoint_runs_one_original_step PASSED [ 50%]
+rebuild/tests/test_baseline.py::test_renderer_resolves_ffmpeg_and_restores_on_failure PASSED [ 75%]
+rebuild/tests/test_baseline.py::test_renderer_missing_ffmpeg_is_explicit PASSED [100%]
+
+=============================== warnings summary ===============================
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88
+  /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:88: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92
+  /Users/zhunhao/.codex/worktrees/baseline/crowd-nav/rebuild/.venv-legacy/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:92: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 4 passed, 12 warnings in 4.57s ========================

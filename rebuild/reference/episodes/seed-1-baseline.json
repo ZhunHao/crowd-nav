@@ -1,0 +1,32 @@
+{
+  "seed": 1,
+  "status": "ReachGoal",
+  "simulation_time": 12.25,
+  "frames": 49,
+  "time_step": 0.25,
+  "policy": "SARL",
+  "query_env": true,
+  "terminal_state": {
+    "px": 4.736504169052702,
+    "py": 4.736504169052698,
+    "vx": 6.123233995736766e-17,
+    "vy": 1.0,
+    "radius": 0.5,
+    "gx": 5.0,
+    "gy": 5.0,
+    "v_pref": 1.0,
+    "theta": 1.5707963267948966,
+    "position": [
+      4.736504169052702,
+      4.736504169052698
+    ],
+    "goal_position": [
+      5.0,
+      5.0
+    ],
+    "velocity": [
+      6.123233995736766e-17,
+      1.0
+    ]
+  }
+}
