@@ -19,45 +19,68 @@ dict), plus `withheld_families` and any `failures`.
 
 Eleven canonical encounter families, all in the `test` split, each on a 24x24
 map unless noted, ego `(3,12)->(21,12)` unless noted, default `Traffic`
-speed `.3` and radius `.6` unless noted:
+speed `.3` and radius `.6` unless noted. The nominal ego used to time the
+encounters is a holonomic Direct ego on the `astar_smooth` route at 1 m/s
+(so on the default route it is at `x = 3 + t`). Where the plan fixes a
+family's endpoints the conflict is timed by target speed; otherwise by the
+target's start position.
 
-- `head_on` -- target `(21,12)->(3,12)`.
-- `crossing` -- target `(12,3)->(12,21)`.
-- `crossing_mirrored` -- target `(12,21)->(12,3)`.
-- `overtake` -- target `(7,12)->(21,12)`, speed `.3` (matches the default;
-  named explicitly since the family is about a slower target ahead of the
-  ego on the same line).
+- `head_on` -- target `(21,12)->(3,12)`; meets the ego at `x ~ 16.8`.
+- `crossing` -- target `(12,3)->(12,21)` at speed `1.0`, reaching the
+  crossing point `(12,12)` at `t=9` together with the ego.
+- `crossing_mirrored` -- target `(12,21)->(12,3)` at speed `1.0` (same timing).
+- `overtake` -- target `(7,12)->(21,12)`, speed `.3` (plan-specified; the
+  ego catches it at `x ~ 8.7`).
 - `narrow_passage` -- land `(8,0,12,10)` and `(8,14,12,24)`, leaving a gap
-  at `y` in `[10,14]`. Target `(21,12)->(3,12)` transits the same gap in the
-  opposite direction to the ego; the shared `y=12` centreline keeps 2m
-  clearance to each land block.
+  at `y` in `[10,14]` for `x` in `[8,12]`. Target `(12.1,12)->(3,12)` at
+  `.3` starts just east of the gap and meets the ego inside it (`x=10`,
+  `t=7`); the shared `y=12` centreline keeps 2m clearance to each block.
 - `detour_harbour` -- `maps/harbour.json` (land `x` in `[9,14]`, `y` in
-  `[5,18]`), ego `(2,12)->(22,12)`. Two targets run east-west clear of the
-  block: `(2,20)->(22,20)` (2m clearance to the block's north edge) and
-  `(22,4)->(2,4)` (1m clearance to its south edge).
+  `[5,18]`), ego `(2,12)->(22,12)`; the planned route detours north along
+  `y=19.5`. Target `(7.7,20)->(22,20)` (2m clear of the block's north edge)
+  is caught up by the ego alongside the harbour (`x ~ 11.5`); target
+  `(22,4)->(2,4)` (1m clear of the south edge) is background traffic.
 - `unreachable` -- land `(10,0,14,24)` spans the full map height, splitting
   it in two. No traffic: the point is that the goal is unreachable, not
-  that traffic is dense.
-- `shore_goal` -- land `(23.5,0,24,24)` along the east edge, goal
-  `(22.9,12)`, no traffic. The goal is .6m off the shore strip: clear at
-  the .5m ego radius used for validation (`.6 > .5`) but tight enough that a
-  planner may legitimately report `NoPath`. That is the point of this
-  family; endpoints are not tuned to make planning easy.
-- `multi_conflict` -- two nonoverlapping crossings, `(8,3)->(8,21)` and
-  `(16,21)->(16,3)`.
+  that traffic is dense. The service raises `NoPath`.
+- `shore_goal` -- land `(23.7,0,24,24)` along the east edge, goal
+  `(22.9,12)`, no traffic. The goal is .8m off the shore strip: above the
+  planner's .7m clearance, so a genuine near-shore approach runs (marine
+  runs report `terminal_speed`/`runout_min_clearance` for it).
+- `multi_conflict` -- two nonoverlapping crossings, both on a collision
+  course: `(8,3)->(8,21)` at `1.8` (meets the ego at `t=5`) and
+  `(16,21)->(16,3)` at `9/13` (meets it at `t=13`).
 - `course_change` -- scripted, deterministic `CourseChangeTraffic` (not
-  reactive) with waypoints `(0,(12,3)) -> (30,(12,12)) -> (60,(20,12))`: an
-  actual L-shaped turn that crosses the ego's straight route exactly at the
-  turn point `(12,12)`. `traffic_mode: "scripted"`.
+  reactive) with waypoints `(0,(12,10.2)) -> (6,(12,12)) -> (26,(18,12))`:
+  north at `.3`, then an actual turn at the crossing point `(12,12)` into
+  the ego's lane, heading east at `.3`. The ego passes `x=12` at `t=9`, after
+  the turn, and closes on the target ahead of it. `traffic_mode: "scripted"`.
 - `reactive` (frozen file `noncooperative_reactive.json`) -- a plain fixed
-  `Traffic((14,3),(14,21))` voyage crossing the ego's route, tagged
-  `traffic_mode: "reactive"`. The frozen scenario stores only the initial
-  voyage; wrapping it in `ReactiveTraffic` (a handcrafted, controlled-test
-  collision-responsive heading change -- not COLREGs-compliant, not
-  ORCA/reciprocal-velocity-obstacle) happens in the service at run time, not
-  here. Because the realized path depends on which ego it faces, a paired
-  comparison across ego policies is expected to produce different realized
-  target paths for this family, not identical ones.
+  `Traffic((14,8.7),(14,21))` voyage timed to reach the ego's route at `t=11`
+  as the ego passes `x=14`, tagged `traffic_mode: "reactive"`. The frozen
+  scenario stores only the initial voyage; wrapping it in `ReactiveTraffic`
+  (a handcrafted, controlled-test collision-responsive heading change -- not
+  COLREGs-compliant, not ORCA/reciprocal-velocity-obstacle) happens in the
+  service at run time, not here. Because the realized path depends on which
+  ego it faces, a paired comparison across ego policies is expected to
+  produce different realized target paths for this family, not identical
+  ones.
+
+## Freeze-time validity checks
+
+`tools/freeze_scenarios.py` checks every canonical family before writing it
+and records a `failures` entry (`name`, `seed`, `split`, `error`) instead of
+writing -- or adjusting -- a scenario that fails:
+
+- every family except `unreachable` plans with `astar_smooth`;
+  `unreachable` must raise `NoPath`;
+- every encounter family's nominal straight-line CPA (nominal ego above vs.
+  the frozen voyage) is below `ego radius .5 + target radius + 0.5 m`
+  (centre distance), for every target in `multi_conflict`;
+- the CPA lies at the crossing point (`crossing`, `crossing_mirrored`),
+  inside the gap (`narrow_passage`), alongside the harbour
+  (`detour_harbour`), or at/after the turn (`course_change`);
+- the `reactive` target's reaction actually fires against a Direct ego.
 
 ## Split construction
 

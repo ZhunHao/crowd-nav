@@ -3,6 +3,13 @@ import json
 from hashlib import sha256
 from pathlib import Path
 
+import pytest
+
+from shipnav.maps import SeaMap
+from shipnav.planning import NoPath, astar, smooth
+from shipnav.scenarios import load_traffic
+from shipnav.simulation import Traffic
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -110,3 +117,75 @@ def test_regenerating_reproduces_identical_bytes(tmp_path):
     committed_names = {p.name for p in committed.glob('*.json')}
     regenerated_names = {p.name for p in tmp_path.glob('*.json')}
     assert committed_names == regenerated_names
+
+
+ENCOUNTER_FAMILIES = ('head_on', 'crossing', 'crossing_mirrored', 'overtake', 'narrow_passage',
+                      'detour_harbour', 'multi_conflict', 'course_change', 'reactive')
+
+
+def _canonical_files():
+    data = _splits()
+    return {json.loads((ROOT / 'scenarios' / e['file']).read_text())['family']: e['file']
+            for e in data['splits']['test']}
+
+
+def _load(name):
+    return json.loads((ROOT / 'scenarios' / name).read_text())
+
+
+def test_committed_splits_record_no_freeze_failures():
+    assert _splits()['failures'] == []
+
+
+def test_every_encounter_family_has_a_nominal_conflict_against_a_direct_ego():
+    module = _load_freeze_scenarios()
+    files = _canonical_files()
+    for family in ENCOUNTER_FAMILIES:
+        scenario = _load(files[family])
+        assert module.encounter_errors(scenario) == [], family
+        route = module.planned_route(scenario)
+        cpas = [module.nominal_cpa(route, ship) for ship in load_traffic(scenario)]
+        threshold = module.EGO_RADIUS + .6 + module.CPA_MARGIN
+        assert min(c['distance'] for c in cpas) < threshold, family
+
+
+def test_narrow_passage_conflict_is_inside_the_gap_and_course_change_after_the_turn():
+    module = _load_freeze_scenarios()
+    files = _canonical_files()
+    narrow = _load(files['narrow_passage'])
+    [ship] = load_traffic(narrow)
+    cpa = module.nominal_cpa(module.planned_route(narrow), ship)
+    assert 8 <= cpa['ego'][0] <= 12
+    course = _load(files['course_change'])
+    [turning] = load_traffic(course)
+    cpa = module.nominal_cpa(module.planned_route(course), turning)
+    assert cpa['t'] >= turning.waypoints[1][0]
+
+
+def test_reactive_fixture_reaction_fires_against_a_direct_ego():
+    module = _load_freeze_scenarios()
+    assert module.reaction_fires(_load(_canonical_files()['reactive']))
+
+
+def test_freeze_checks_flag_encounters_that_never_happen():
+    # The pre-fix crossing (.3 m/s target 9 m from the crossing point while the
+    # ego passes in 9 s) never comes within the CPA threshold; the freeze-time
+    # check must report it instead of writing it silently.
+    module = _load_freeze_scenarios()
+    stale = module._scenario(SeaMap((0., 0., 24., 24.)), module.EGO_START, module.EGO_GOAL,
+                             [Traffic((12., 3.), (12., 21.))], 'crossing', 'test')
+    assert module.encounter_errors(stale)
+
+
+def test_every_family_except_unreachable_plans_with_astar_smooth():
+    module = _load_freeze_scenarios()
+    for family, name in _canonical_files().items():
+        scenario = _load(name)
+        sea = SeaMap.from_dict(scenario['map'])
+        start, goal = tuple(scenario['start']), tuple(scenario['goal'])
+        if family == 'unreachable':
+            with pytest.raises(NoPath):
+                smooth(sea, astar(sea, start, goal))
+        else:
+            assert smooth(sea, astar(sea, start, goal))[-1] == goal
+        assert module.planning_errors(scenario) == []

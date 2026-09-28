@@ -19,11 +19,12 @@ The eleven canonical encounter families are withheld from every seeded split:
 - `shore_goal`
 - `multi_conflict`
 - `course_change` -- a scripted, waypoint-interpolated target
-  (`CourseChangeTraffic`) that makes a genuine turn crossing the ego's route
-  at the turn itself. Deterministic and immutable; not reactive.
+  (`CourseChangeTraffic`) that makes a genuine turn at the crossing point,
+  into the ego's lane, just before the ego arrives. Deterministic and
+  immutable; not reactive.
 - `reactive` -- a fixed initial voyage (`traffic_mode: 'reactive'`,
-  frozen scenario file `noncooperative_reactive.json`) that the service (a
-  later task) wraps in `ReactiveTraffic` at run time, so the target reacts to
+  frozen scenario file `noncooperative_reactive.json`) that the service
+  wraps in `ReactiveTraffic` at run time, so the target reacts to
   whichever ego it actually faces. This handcrafted collision-responsive
   heading change is a controlled test rule only -- it is not COLREGs-compliant
   and not an ORCA/reciprocal-velocity-obstacle implementation. Because the
