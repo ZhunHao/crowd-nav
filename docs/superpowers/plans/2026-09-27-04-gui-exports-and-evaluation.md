@@ -36,7 +36,7 @@ All file paths below are relative to the workspace root. Run commands from `rebu
 
 The first version of this plan was written before plans 02–03b landed. Its snippets no longer matched the code, and several were wrong in ways the tests exposed. This revision rewrites the code blocks against the current `execute()` schema-2 result and polygon `SeaMap`.
 
-**Verification of this revision.** Every code block and diff below was applied to a scratch copy of `rebuild/` and run: **all 25 new tests pass**, and the full suite gives 207 passed. The 14 remaining failures need torch or the RVO2 native wheel, which were not installed; they fail identically on the unmodified code. The Task 6 changes to existing modules were checked for behavioural parity: all 31 frozen scenarios × {direct, MPC} × {filtered, unfiltered} × {holonomic, marine} (248 runs) produce identical statuses, frames, routes and filter decisions before and after. That run used Python 3.11 with current Shapely/Matplotlib/PySide6/pyogrio wheels and FFmpeg, **not** the locked 3.14 `.venv-modern`, and did not load the SARL checkpoint (it is not in the cloud checkout). Rerun every step in `.venv-modern`; these results are not a substitute for it.
+**Verification of this revision.** Every code block and diff below was applied to a scratch copy of `rebuild/` and run: **all 26 new tests pass**, and the full suite gives 208 passed. The 14 remaining failures need torch or the RVO2 native wheel, which were not installed; they fail identically on the unmodified code. The Task 6 changes to existing modules were checked for behavioural parity: all 31 frozen scenarios × {direct, MPC} × {filtered, unfiltered} × {holonomic, marine} (248 runs) produce identical statuses, frames, routes and filter decisions before and after. That run used Python 3.11 with current Shapely/Matplotlib/PySide6/pyogrio wheels and FFmpeg, **not** the locked 3.14 `.venv-modern`, and did not load the SARL checkpoint (it is not in the cloud checkout). Rerun every step in `.venv-modern`; these results are not a substitute for it.
 
 What changed and why:
 
@@ -219,6 +219,18 @@ def test_frozen_real_map_scenario_reuses_its_recorded_planner_settings(tmp_path)
     run = json.loads(next(tmp_path.glob('*-direct.json')).read_text())
     assert rows[0]['status'] == 'success'
     assert run['settings']['resolution'] == 5. and run['settings']['clearance'] == 1.5
+
+
+def test_open_water_shortcut_bounds_reach_by_the_fastest_candidate():
+    from shipnav import safety
+    calls = []
+    real = safety.local_sea
+    safety.local_sea = lambda sea, p, reach, radius: calls.append(reach) or real(sea, p, reach, radius)
+    try:
+        safety.choose(SeaMap((0, 0, 24, 24)), (12, 12), (1+1e-6, 0), [], .5, 1., .25)
+    finally:
+        safety.local_sea = real
+    assert calls == [pytest.approx((1+1e-6)*.25*12, abs=0)]
 ```
 
 - [ ] **Step 2: Run `python -m pytest tests/test_scale.py -v`.** Expect a missing `shipnav.scale` module.
@@ -442,11 +454,13 @@ Apply these changes to existing modules (`git apply` from the workspace root acc
  def rollout(position, desired, dt, steps, motion=None, goal=None, arrival=0.):
      """Roll a constant command out `steps` steps (bounded `motion` if given).
  
-@@ -53,6 +68,7 @@
+@@ -53,6 +68,9 @@
      if steps is None:
          steps = horizon_steps(dt, 'holonomic' if motion is None else 'marine', speed)
      hold = goal if final else None
-+    sea = local_sea(sea, position, speed*dt*steps, radius)
++    # run_episode accepts a nominal up to speed+1e-6, and holonomic rollouts move at the
++    # command's own speed, so bound reach by the fastest candidate actually tried.
++    sea = local_sea(sea, position, max(speed, hypot(*nominal))*dt*steps, radius)
      candidates = [tuple(nominal), (0., 0.)]
      candidates += [(s*cos(k*pi/8), s*sin(k*pi/8)) for s in (speed*.5, speed) for k in range(16)]
      scored = []
