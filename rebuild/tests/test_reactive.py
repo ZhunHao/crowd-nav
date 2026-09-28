@@ -53,10 +53,16 @@ def test_paired_reactive_runs_share_initial_conditions_but_not_realized_target_p
     run_episode(sea, route, [target_stay], _stay, dt=.5, limit=3, observer=Observer(seed=42))
 
     # Shared initial conditions: same seed voyage, same start, same goal.
-    assert target_toward.history[0] == target_stay.history[0] == (0., (5., 12.), (0., 0.))
+    assert target_toward.history[0] == target_stay.history[0] == (0., (5., 12.), (.3, 0.))
     assert target_toward.start == target_stay.start
     assert target_toward.goal == target_stay.goal
     assert target_toward.radius == target_stay.radius
     # Different ego policy -> free to realize a different target path; this
     # is never asserted to be identical.
     assert target_toward.history[-1][1] != target_stay.history[-1][1]
+
+
+def test_initial_history_velocity_is_the_nominal_voyage_velocity():
+    target = ReactiveTraffic(Traffic((5, 5), (10, 5), speed=.3), SeaMap((0, 0, 24, 24)))
+    assert target.history[0] == (0., (5, 5), (.3, 0.))
+    assert target.at(0.)[1] == (.3, 0.)

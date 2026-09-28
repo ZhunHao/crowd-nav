@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from math import dist, hypot, isfinite
+from math import atan2, dist, hypot, isfinite
 from time import perf_counter
 from typing import Callable
 from shipnav.maps import SeaMap
@@ -131,7 +131,9 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
     vessel = None
     if dynamics == 'marine':
         from shipnav.dynamics import Vessel, advance, motion_from, runout
-        vessel = Vessel(*route[0], 0., 0.)
+        # Start on the bearing of the first route leg (east if already arrived).
+        heading = atan2(route[1][1]-route[0][1], route[1][0]-route[0][0]) if len(route) > 1 else 0.
+        vessel = Vessel(*route[0], heading, 0.)
     elif dynamics != 'holonomic':
         raise ValueError('Unknown dynamics')
     position, velocity, time, index = route[0], (0.0, 0.0), 0.0, 1
@@ -165,9 +167,11 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         if len(nominal) != 2 or not all(isfinite(x) for x in nominal) or hypot(*nominal) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         motion = motion_from(vessel, speed) if vessel is not None else None
+        # Unfiltered runs never evaluate feasibility: no_feasible_action is None
+        # ("not evaluated"), not False ("a feasible action existed").
         decision = choose(sea, position, nominal, predictions, radius, speed, step, steps=steps, motion=motion,
                           goal=route[index], final=index == len(route)-1) if filtered else {
-            'executed': nominal, 'override': False, 'no_feasible_action': False, 'path': [], 'predicted_clearance': None}
+            'executed': nominal, 'override': False, 'no_feasible_action': None, 'path': [], 'predicted_clearance': None}
         velocity = tuple(decision['executed'])
         decision_ms = (perf_counter()-began)*1000
         # Soft wall-clock indicator only: a Python worker thread makes no hard real-time

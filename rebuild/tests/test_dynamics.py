@@ -110,3 +110,12 @@ def test_timestep_refinement_filtered_status_agrees_but_horizon_shifts_trajector
     # Observed divergence is ~0.013 m; bound by one coarse step's worst-case chord
     # error at max speed (.25 m), the same tolerance as the unfiltered comparison.
     assert divergence <= .25
+
+
+def test_marine_vessel_starts_on_the_first_route_leg_bearing():
+    # Due north first leg: the initial heading must be pi/2, so the first
+    # step already moves north instead of spending steps turning from east.
+    r = run_episode(SeaMap((0, 0, 24, 24)), [(12, 2), (12, 20)], [], Direct(), dynamics='marine', limit=.25)
+    assert abs(r['diagnostics'][0]['heading'] - 1.5707963267948966) < 1e-12
+    assert abs(r['frames'][1]['position'][0] - 12) < 1e-12
+    assert r['frames'][1]['position'][1] > 2

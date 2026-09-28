@@ -22,6 +22,7 @@ Scope and honesty notes (see task D4 rulings):
     and are always reported as "not checked", never as passed.
 """
 import os
+from math import atan2
 
 from shipnav.adapters.coordinates import conservative_radius
 
@@ -194,6 +195,25 @@ def import_scenario(path):
     }
 
 
+def trajectory_orientations(result):
+    """One orientation per frame. Marine results record the vessel heading
+    after each step (`diagnostics[k-1]['heading']` for frame k); holonomic
+    results have no heading, so it is derived from the step displacement
+    (keeping the previous orientation across stationary steps). Frame 0 takes
+    the first step's orientation (0 for a single-frame result)."""
+    frames, diagnostics = result['frames'], result['diagnostics']
+    orientations = []
+    for k in range(1, len(frames)):
+        record = diagnostics[k-1] if k-1 < len(diagnostics) else {}
+        if 'heading' in record:
+            orientations.append(float(record['heading']))
+            continue
+        (x0, y0), (x1, y1) = frames[k-1]['position'], frames[k]['position']
+        moved = (x1-x0, y1-y0) != (0., 0.) and (x1-x0, y1-y0) != (0, 0)
+        orientations.append(atan2(y1-y0, x1-x0) if moved else (orientations[-1] if orientations else 0.))
+    return [orientations[0] if orientations else 0.] + orientations
+
+
 def check_collision(original_path, result, length, width):
     """Independent upstream collision oracle for a resampled ego trajectory,
     per the task brief's verified starting point (matches the official
@@ -213,12 +233,11 @@ def check_collision(original_path, result, length, width):
     scenario, _ = CommonOceanFileReader(str(original_path)).open()
     dt = float(scenario.dt)
     frames = result['frames']
-    diagnostics = result['diagnostics']
+    orientations = trajectory_orientations(result)
     states = []
-    for k, frame in enumerate(frames):
+    for k, (frame, orientation) in enumerate(zip(frames, orientations)):
         if abs(frame['t'] - k * dt) > 1e-6:
             raise ValueError('Resample to the upstream timestep before checking')
-        orientation = 0. if k == 0 else diagnostics[k - 1]['heading']
         states.append(GeneralState(time_step=k, position=np.asarray(frame['position']), orientation=orientation))
     predicted = TrajectoryPrediction(Trajectory(0, states), Rectangle(length=length, width=width))
     return {'discrete_collision': bool(create_collision_checker(scenario).collide(create_collision_object(predicted))),

@@ -1,4 +1,3 @@
-import pytest
 from math import dist
 from shipnav.maps import SeaMap
 from shipnav.simulation import CourseChangeTraffic, Traffic, run_episode, swept_clearance
@@ -118,3 +117,10 @@ def test_filter_no_feasible_action_is_logged_not_fabricated_as_success():
                          radius=.5, speed=1.0, filtered=True)
     assert result['status'] != 'success'
     assert any(d['no_feasible_action'] for d in result['diagnostics'])
+
+
+def test_unfiltered_diagnostics_mark_feasibility_as_not_evaluated():
+    result = run_episode(SeaMap((0, 0, 20, 20)), [(2, 2), (8, 2)], [], toward, limit=1)
+    assert all(d['no_feasible_action'] is None for d in result['diagnostics'])
+    filtered = run_episode(SeaMap((0, 0, 20, 20)), [(2, 2), (8, 2)], [], toward, limit=1, filtered=True)
+    assert all(d['no_feasible_action'] is False for d in filtered['diagnostics'])

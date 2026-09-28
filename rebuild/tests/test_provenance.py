@@ -56,3 +56,20 @@ def test_settings_hash_is_order_independent_and_content_sensitive(tmp_path):
     c = provenance({'x': 1, 'y': 3}, tmp_path)
     assert a['settings_sha256'] == b['settings_sha256']
     assert a['settings_sha256'] != c['settings_sha256']
+
+
+def test_partial_git_failure_reports_no_git_fields(tmp_path, monkeypatch):
+    # rev-parse succeeds but diff fails: never report a revision without its diff.
+    import shipnav.provenance as module
+    real = module._git
+
+    def flaky(args, root):
+        if args[0] == 'diff':
+            raise subprocess.CalledProcessError(1, ['git', *args])
+        return real(args, root)
+    _init_repo(tmp_path)
+    monkeypatch.setattr(module, '_git', flaky)
+    result = provenance({}, tmp_path)
+    assert result['git_revision'] is None
+    assert result['dirty_diff_sha256'] is None
+    assert result['git_error']

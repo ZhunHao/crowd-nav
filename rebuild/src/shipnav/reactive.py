@@ -4,9 +4,11 @@ purposes only -- it is NOT COLREGs-compliant and NOT an ORCA/reciprocal
 velocity-obstacle implementation. Do not label it as either.
 
 `ReactiveTraffic.advance` is called by `run_episode` once per step, after the
-ego's control decision and before truth (swept-clearance) checks are made --
-so the target's reaction is always to the ego's *realized* position for that
-step, never to a value computed ahead of the ego's own decision. Its `at(t)`
+ego's control decision and before truth (swept-clearance) checks are made,
+with the ego's start-of-step position -- the realized position at time `t`,
+before this step's motion. The target therefore reacts to where the ego
+actually is, never to a value computed ahead of the ego's own decision (and
+not to the end-of-step position either). Its `at(t)`
 interpolates the immutable history of realized `(time, position, velocity)`
 samples recorded by `advance`; delayed observations therefore read back a
 true past state, never a regenerated or resimulated trajectory.
@@ -18,7 +20,10 @@ from shipnav.simulation import Traffic
 class ReactiveTraffic:
     def __init__(self, ship, sea):
         self.start, self.goal, self.speed, self.radius = ship.start, ship.goal, ship.speed, ship.radius
-        self.sea, self.history = sea, [(0., self.start, (0., 0.))]
+        d = dist(self.start, self.goal)
+        # Before any step the target is on its nominal voyage (not stationary).
+        nominal = tuple((b-a)/d*self.speed if d else 0. for a, b in zip(self.start, self.goal))
+        self.sea, self.history = sea, [(0., self.start, nominal)]
         self.arrival = float('inf')
 
     def at(self, t):
