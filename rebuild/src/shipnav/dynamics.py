@@ -24,6 +24,9 @@ against real vessel data.
 from dataclasses import dataclass
 from math import atan2, hypot, sin, cos, pi
 
+ACCELERATION = .2
+YAW_RATE = .35
+
 
 @dataclass(frozen=True)
 class Vessel:
@@ -33,7 +36,7 @@ class Vessel:
     speed: float
 
 
-def advance(state, desired, dt, max_speed=1., acceleration=.2, yaw_rate=.35):
+def advance(state, desired, dt, max_speed=1., acceleration=ACCELERATION, yaw_rate=YAW_RATE):
     """Advance `state` one step toward the velocity reference `desired`.
 
     Heading and speed are each clamped to what is reachable within `dt` given
@@ -69,3 +72,15 @@ def motion_from(state, max_speed=1.):
             path.append((current.x, current.y))
         return path
     return motion
+
+
+def runout(state, dt, max_speed=1.):
+    """Zero-command run-out after arrival: the positions the vessel would still
+    sweep while decelerating to a stop under the same bounded dynamics."""
+    current, path = state, [(state.x, state.y)]
+    for _ in range(int(max_speed/ACCELERATION/dt)+2):
+        if current.speed <= 1e-9:
+            break
+        current = advance(current, (0., 0.), dt, max_speed)
+        path.append((current.x, current.y))
+    return path

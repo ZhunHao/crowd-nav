@@ -1,4 +1,7 @@
-def predict(observed, dt, steps=12, uncertainty=True, growth=.15):
+from shipnav.horizon import HOLONOMIC_STEPS
+
+
+def predict(observed, dt, steps=HOLONOMIC_STEPS, uncertainty=True, growth=.15):
     if dt <= 0 or steps < 1 or growth < 0:
         raise ValueError('Invalid prediction horizon')
     return [{'id': s['id'], 'radius': s['radius'],

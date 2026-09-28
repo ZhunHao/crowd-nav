@@ -1,5 +1,7 @@
 from math import cos, sin, pi, hypot, dist
 
+from shipnav.horizon import horizon_steps
+
 
 def relative_clearance(a, b, c, d, radius):
     x, y = a[0]-c[0], a[1]-c[1]
@@ -15,6 +17,10 @@ def rollout(position, desired, dt, steps, motion=None):
 
 
 def assess(sea, path, predictions, radius):
+    for target in predictions:
+        if len(target['points']) != len(path) or len(target['margins']) != len(path):
+            raise ValueError(f"Prediction horizon ({len(target['points'])} points) does not match "
+                             f"rollout horizon ({len(path)} points)")
     margin = float('inf')
     for k, (a, b) in enumerate(zip(path, path[1:])):
         if not sea.clear(a, b, radius):
@@ -25,7 +31,9 @@ def assess(sea, path, predictions, radius):
     return margin
 
 
-def choose(sea, position, nominal, predictions, radius, speed, dt, steps=12, motion=None):
+def choose(sea, position, nominal, predictions, radius, speed, dt, steps=None, motion=None):
+    if steps is None:
+        steps = horizon_steps(dt, 'holonomic' if motion is None else 'marine', speed)
     candidates = [tuple(nominal), (0., 0.)]
     candidates += [(s*cos(k*pi/8), s*sin(k*pi/8)) for s in (speed*.5, speed) for k in range(16)]
     scored = []

@@ -125,11 +125,12 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
     from shipnav.observations import Observer
     from shipnav.prediction import predict
     from shipnav.safety import choose
+    from shipnav.horizon import horizon_steps
     observer = observer or Observer()
     diagnostics = []
     vessel = None
     if dynamics == 'marine':
-        from shipnav.dynamics import Vessel, advance, motion_from
+        from shipnav.dynamics import Vessel, advance, motion_from, runout
         vessel = Vessel(*route[0], 0., 0.)
     elif dynamics != 'holonomic':
         raise ValueError('Unknown dynamics')
@@ -153,17 +154,18 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         step = min(dt, limit-time)
         began = perf_counter()
         perceived = observer.observe(traffic, time, len(frames)-1)
-        predictions = predict(perceived, step, uncertainty=uncertainty)
+        steps = horizon_steps(step, dynamics, speed)
+        predictions = predict(perceived, step, steps=steps, uncertainty=uncertainty)
         neighbours = [(s['position'], s['velocity'], s['radius']) for s in perceived]
         if hasattr(policy, 'set_context'):
-            policy.set_context(sea, vessel, predictions)
+            policy.set_context(sea, vessel, predictions, steps=steps)
         inference_start = perf_counter()
         nominal = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
         latencies.append((perf_counter()-inference_start)*1000)
         if len(nominal) != 2 or not all(isfinite(x) for x in nominal) or hypot(*nominal) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         motion = motion_from(vessel, speed) if vessel is not None else None
-        decision = choose(sea, position, nominal, predictions, radius, speed, step, motion=motion) if filtered else {
+        decision = choose(sea, position, nominal, predictions, radius, speed, step, steps=steps, motion=motion) if filtered else {
             'executed': nominal, 'override': False, 'no_feasible_action': False, 'path': [], 'predicted_clearance': None}
         velocity = tuple(decision['executed'])
         decision_ms = (perf_counter()-began)*1000
@@ -214,6 +216,19 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             if index == len(route):
                 status = 'success'
         record()
-    return {'status': status, 'elapsed': time, 'distance': travelled,
-            'min_dynamic_clearance': minimum if isfinite(minimum) else None,
-            'inference_ms': latencies, 'frames': frames, 'diagnostics': diagnostics}
+    result = {'status': status, 'elapsed': time, 'distance': travelled,
+              'min_dynamic_clearance': minimum if isfinite(minimum) else None,
+              'inference_ms': latencies, 'frames': frames, 'diagnostics': diagnostics}
+    if vessel is not None:
+        # Marine runs end at arrival with way still on. Success semantics are
+        # unchanged; instead report the terminal speed and the minimum land/edge
+        # clearance (ego radius subtracted) swept by a zero-command run-out under
+        # the same bounded dynamics. Negative means the vessel would ground after
+        # "arriving"; SeaMap.minimum_clearance saturates at 0 inside land, so a
+        # run-out that ends on land reads -radius. Only evaluated after final
+        # arrival (None otherwise); holonomic runs carry neither field.
+        swept = runout(vessel, dt, speed) if status == 'success' else None
+        result['terminal_speed'] = vessel.speed
+        result['runout_min_clearance'] = None if swept is None else min(
+            sea.minimum_clearance(a, b) for a, b in zip(swept, swept[1:] or swept)) - radius
+    return result

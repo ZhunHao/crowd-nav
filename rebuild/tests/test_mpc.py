@@ -1,6 +1,7 @@
 import pytest
 from shipnav.controllers.mpc import MPC
 from shipnav.dynamics import Vessel
+from shipnav.horizon import horizon_steps
 from shipnav.maps import SeaMap
 from shipnav.simulation import Traffic, run_episode
 
@@ -10,7 +11,8 @@ def test_mpc_has_explicit_infeasibility_and_bounded_command():
     m.set_context(SeaMap((0, 0, 24, 24)), Vessel(2, 2, 0, 0), [])
     u = m((2, 2), (0, 0), (20, 2), [], .5, 1, .25)
     assert u[0] > 0 and not m.solver_failed
-    bad = [{'radius': 100., 'points': [(2, 2)]*13, 'margins': [0.]*13}]
+    points = horizon_steps(.25, 'marine', 1)+1  # Vessel context -> shared marine horizon
+    bad = [{'radius': 100., 'points': [(2, 2)]*points, 'margins': [0.]*points}]
     m.set_context(SeaMap((0, 0, 24, 24)), Vessel(2, 2, 0, 0), bad)
     m((2, 2), (0, 0), (20, 2), [], .5, 1, .25)
     assert m.solver_failed

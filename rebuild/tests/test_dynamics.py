@@ -89,17 +89,12 @@ def test_timestep_refinement_unfiltered_integration_agrees_closely():
 
 
 def test_timestep_refinement_filtered_status_agrees_but_horizon_shifts_trajectory():
-    # With the safety filter engaged, `choose()` rolls candidates out a FIXED number of
-    # steps (steps=12) regardless of dt, so its look-ahead horizon in seconds is
-    # steps*dt: 3.0 s at dt=.25 versus 1.5 s at dt=.125. Refining the timestep therefore
-    # does not purely refine integration accuracy here — it also halves the filter's
-    # prediction horizon, which measurably changes when/how hard it brakes near the
-    # wall. This is an honest finding, not something to paper over: the safety-relevant
-    # outcome (never colliding, same terminal status) still agrees, but the resulting
-    # trajectory and final position are not close under this dt refinement, because the
-    # filter horizon is coupled to dt. That coupling is out of scope to fix in this
-    # task (it lives in safety.choose's fixed `steps` default, not in dynamics.py's
-    # integration scheme) and is reported rather than tuned away.
+    # With the safety filter engaged, `choose()` rolls candidates out the shared
+    # marine horizon (`shipnav.horizon.horizon_steps`), which is defined in seconds
+    # of stopping time (ceil(max_speed/acceleration/dt)+1 steps): 5.25 s at dt=.25
+    # versus 5.125 s at dt=.125. Refining the timestep therefore now refines
+    # integration accuracy without also halving the filter's look-ahead (the
+    # previous fixed steps=12 coupling gave ~1.04 m divergence here).
     sea = SeaMap((0, 0, 20, 20), ((10, 0, 12, 20),))
     route = [(6, 10), (16, 10)]
 
@@ -112,7 +107,6 @@ def test_timestep_refinement_filtered_status_agrees_but_horizon_shifts_trajector
     last_coarse = coarse['frames'][-1]['position']
     last_fine = fine['frames'][-1]['position']
     divergence = hypot(last_coarse[0]-last_fine[0], last_coarse[1]-last_fine[1])
-    # Observed divergence is ~1.04 m, driven by the horizon-length coupling above, not by
-    # integration error. 1.5 m gives headroom without silently loosening past what is
-    # explained; a larger jump here would indicate a fresh regression worth investigating.
-    assert divergence <= 1.5
+    # Observed divergence is ~0.013 m; bound by one coarse step's worst-case chord
+    # error at max speed (.25 m), the same tolerance as the unfiltered comparison.
+    assert divergence <= .25

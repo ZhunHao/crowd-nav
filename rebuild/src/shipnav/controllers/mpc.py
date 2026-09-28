@@ -12,6 +12,7 @@ as safe when that flag is set.
 from math import sin, cos, pi, dist
 
 from shipnav.dynamics import motion_from
+from shipnav.horizon import horizon_steps
 from shipnav.safety import assess, rollout
 
 
@@ -20,10 +21,11 @@ class MPC:
         self.sea = None
         self.vessel = None
         self.predictions = []
+        self.steps = None
         self.solver_failed = False
 
-    def set_context(self, sea, vessel, predictions):
-        self.sea, self.vessel, self.predictions = sea, vessel, predictions
+    def set_context(self, sea, vessel, predictions, steps=None):
+        self.sea, self.vessel, self.predictions, self.steps = sea, vessel, predictions, steps
 
     def __call__(self, p, v, goal, neighbours, radius, speed, dt):
         if self.sea is None:
@@ -31,10 +33,11 @@ class MPC:
         # Finite-control-set MPC: constant velocity references over a finite horizon.
         # The tracker integrates bounded acceleration and yaw rate, then only step 1 executes.
         motion = motion_from(self.vessel, speed) if self.vessel is not None else None
+        steps = self.steps or horizon_steps(dt, 'holonomic' if self.vessel is None else 'marine', speed)
         commands = [(0., 0.)] + [(s*cos(k*pi/12), s*sin(k*pi/12)) for s in (speed*.5, speed) for k in range(24)]
         ranked = []
         for command in commands:
-            path = rollout(p, command, dt, 12, motion)
+            path = rollout(p, command, dt, steps, motion)
             clearance = assess(self.sea, path, self.predictions, radius)
             cost = dist(path[-1], goal) + .1*dist(command, v)
             ranked.append((clearance, cost, command))
