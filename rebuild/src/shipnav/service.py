@@ -4,7 +4,7 @@ import json
 from shipnav.maps import SeaMap, canonical_json
 from shipnav.planning import astar, smooth
 from shipnav.simulation import CourseChangeTraffic, run_episode
-from shipnav.scenarios import make_scenario, load_traffic, scenario_hash
+from shipnav.scenarios import make_scenario, load_traffic, scenario_hash, validate_observation, validate_scenario
 from shipnav.observations import Observer
 from shipnav.theta import theta_star
 from shipnav.policies import Direct, Learned, Reciprocal
@@ -17,6 +17,9 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
             policy_name: str = 'sarl', global_goals: bool = True, seed: int = 0,
             count: int = 5, cancel=lambda: False, *, scenario=None, planner='astar_smooth',
             filtered=False, uncertainty=True, observation=None, dynamics='holonomic') -> dict:
+    if scenario is not None:
+        validate_scenario(scenario)
+    validate_observation(observation or {})
     sea = SeaMap.from_dict(map_data)
     scenario = make_scenario(sea,start,goal,count,seed) if scenario is None else scenario
     if (canonical_json(SeaMap.from_dict(scenario['map']).to_dict()) != canonical_json(sea.to_dict())
@@ -83,11 +86,14 @@ if __name__ == '__main__':
     parser.add_argument('--filtered', action='store_true')
     parser.add_argument('--dynamics', choices=['holonomic','marine'], default='holonomic')
     args = parser.parse_args()
-    scenario = json.loads(args.scenario.read_text()) if args.scenario else None
-    if scenario:
-        args.start,args.goal=scenario['start'],scenario['goal']
     try:
-        result = execute(scenario['map'] if scenario else SeaMap.load(args.map).to_dict(), tuple(args.start), tuple(args.goal),
+        # json.JSONDecodeError is a ValueError; schema problems surface as
+        # ValueError from validate_scenario rather than KeyError/TypeError.
+        scenario = json.loads(args.scenario.read_text()) if args.scenario else None
+        if scenario is not None:
+            validate_scenario(scenario)
+            args.start,args.goal=scenario['start'],scenario['goal']
+        result = execute(scenario['map'] if scenario is not None else SeaMap.load(args.map).to_dict(), tuple(args.start), tuple(args.goal),
                          args.model, args.policy, not args.no_global_goals, args.seed, args.count,
                          scenario=scenario,planner=args.planner,filtered=args.filtered,dynamics=args.dynamics)
     except (ValueError, FileNotFoundError, RuntimeError) as error:

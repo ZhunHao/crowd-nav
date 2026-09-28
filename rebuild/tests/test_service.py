@@ -131,3 +131,30 @@ def test_cli_unreachable_scenario_exits_two(tmp_path):
                          cwd=_REBUILD_ROOT, capture_output=True, text=True)
     assert run.returncode == 2
     assert not output.exists()
+
+
+def test_execute_rejects_malformed_scenario_with_value_error():
+    scenario = json.loads((_REBUILD_ROOT/'scenarios/head_on.json').read_text())
+    broken = {k: v for k, v in scenario.items() if k != 'traffic'}
+    with pytest.raises(ValueError, match='traffic'):
+        execute(scenario['map'], tuple(scenario['start']), tuple(scenario['goal']),
+                policy_name='direct', scenario=broken)
+
+
+def test_execute_rejects_observation_seed_override():
+    sea = SeaMap((0, 0, 24, 24)).to_dict()
+    with pytest.raises(ValueError, match='seed'):
+        execute(sea, (2, 2), (10, 2), policy_name='direct', count=0, observation={'seed': 3})
+
+
+@pytest.mark.parametrize('body', ['{not json', '{"schema": 1}', '[]'])
+def test_cli_malformed_scenario_file_exits_two_without_traceback(tmp_path, body):
+    scenario = tmp_path/'bad.json'
+    scenario.write_text(body)
+    output = tmp_path/'run.json'
+    run = subprocess.run([sys.executable, '-m', 'shipnav.service', '--scenario', str(scenario),
+                          '--policy', 'direct', '--output', str(output)],
+                         cwd=_REBUILD_ROOT, capture_output=True, text=True)
+    assert run.returncode == 2, run.stderr
+    assert 'Traceback' not in run.stderr
+    assert not output.exists()
