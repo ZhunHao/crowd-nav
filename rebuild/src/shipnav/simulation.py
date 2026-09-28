@@ -165,7 +165,8 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         if len(nominal) != 2 or not all(isfinite(x) for x in nominal) or hypot(*nominal) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         motion = motion_from(vessel, speed) if vessel is not None else None
-        decision = choose(sea, position, nominal, predictions, radius, speed, step, steps=steps, motion=motion) if filtered else {
+        decision = choose(sea, position, nominal, predictions, radius, speed, step, steps=steps, motion=motion,
+                          goal=route[index], final=index == len(route)-1) if filtered else {
             'executed': nominal, 'override': False, 'no_feasible_action': False, 'path': [], 'predicted_clearance': None}
         velocity = tuple(decision['executed'])
         decision_ms = (perf_counter()-began)*1000
