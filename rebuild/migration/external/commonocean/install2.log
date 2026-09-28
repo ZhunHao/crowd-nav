@@ -52,7 +52,7 @@ Downloading commonroad-io (3.6MiB)
       -- Performing Test COMPILER_SUPPORTS_VISIBILITY
       -- Performing Test COMPILER_SUPPORTS_VISIBILITY - Success
       -- Set RPATH explicitly to
-      '/Users/zhunhao/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src/build/temp.macosx-11.0-arm64-cpython-310/dist/lib'
+      '~/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src/build/temp.macosx-11.0-arm64-cpython-310/dist/lib'
       -- FCL does not use OctoMap (as requested)
       -- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
       -- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
@@ -62,7 +62,7 @@ Downloading commonroad-io (3.6MiB)
       -- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
       -- pybind11 v2.6.2
       -- Found PythonInterp:
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/bin/python (found version
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/bin/python (found version
       "3.10.20")
       -- Found PythonLibs: python3.10
       -- Performing Test HAS_FLTO
@@ -72,21 +72,21 @@ Downloading commonroad-io (3.6MiB)
       -- The non-free Triangle library is excluded from build.
       --
       --
-      /Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10
+      ~/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10
       --
-      -- /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/bin/python
+      -- ~/.cache/uv/builds-v0/.tmpsDXpB4/bin/python
       -- Found OpenMP_C: -Xclang -fopenmp
       -- Found OpenMP_CXX: -Xclang -fopenmp
       -- Found OpenMP: TRUE
       -- Configuring incomplete, errors occurred!
-      ['-DPYTHON_INCLUDE_DIR=/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
+      ['-DPYTHON_INCLUDE_DIR=~/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
       '-DPYTHON_LIBRARY=',
-      '-DPYTHON_EXECUTABLE=/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/bin/python',
+      '-DPYTHON_EXECUTABLE=~/.cache/uv/builds-v0/.tmpsDXpB4/bin/python',
       '-DBUILD_DOC=OFF', '-DADD_TESTS=OFF', '-DADD_TRIANGLE=OFF',
       '-DADD_PYTHON_BINDINGS=ON']
 
       [stderr]
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py:599:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py:599:
       SetuptoolsDeprecationWarning: Invalid dash-separated key
       'description-file' in 'metadata' (setup.cfg), please use the underscore
       name 'description_file' instead.
@@ -115,7 +115,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         opt = self._enforce_underscore(opt, section)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py:765:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py:765:
       SetuptoolsDeprecationWarning: License classifiers are deprecated.
       !!
 
@@ -134,7 +134,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         self._finalize_license_expression()
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.__pycache__' is absent from the
       `packages` configuration.
       !!
@@ -193,7 +193,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.boundary' is absent from the `packages`
       configuration.
       !!
@@ -252,7 +252,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.collision' is absent from the
       `packages` configuration.
       !!
@@ -311,7 +311,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.collision.collision_detection' is
       absent from the `packages` configuration.
       !!
@@ -371,7 +371,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.collision.trajectory_queries' is absent
       from the `packages` configuration.
       !!
@@ -431,7 +431,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.collision.visualization' is absent from
       the `packages` configuration.
       !!
@@ -491,7 +491,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.costs' is absent from the `packages`
       configuration.
       !!
@@ -550,7 +550,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.feasibility' is absent from the
       `packages` configuration.
       !!
@@ -609,7 +609,7 @@ Downloading commonroad-io (3.6MiB)
 
       !!
         check.warn(importable)
-      /Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
+      ~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/build_py.py:215:
       _Warning: Package 'commonroad_dc.geometry' is absent from the `packages`
       configuration.
       !!
@@ -802,96 +802,96 @@ Downloading commonroad-io (3.6MiB)
       Traceback (most recent call last):
         File "<string>", line 11, in <module>
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
       line 438, in build_wheel
           return _build(['bdist_wheel'])
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
       line 429, in _build
           return self._build_with_temp_dir(
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
       line 410, in _build_with_temp_dir
           self.run_setup()
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
       line 520, in run_setup
           super().run_setup(setup_script=setup_script)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/build_meta.py",
       line 317, in run_setup
           exec(code, locals())  # noqa: S102 # exec is intentional here
         File "<string>", line 178, in <module>
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/__init__.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/__init__.py",
       line 117, in setup
           return distutils.core.setup(**attrs)  # type: ignore[return-value]
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/core.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/core.py",
       line 168, in setup
           return run_commands(dist)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/core.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/core.py",
       line 184, in run_commands
           dist.run_commands()
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
       line 1028, in run_commands
           self.run_command(cmd)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
       line 1106, in run_command
           super().run_command(command)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
       line 1047, in run_command
           cmd_obj.run()
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/bdist_wheel.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/command/bdist_wheel.py",
       line 385, in run
           self.run_command("build")
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
       line 342, in run_command
           self.distribution.run_command(command)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
       line 1106, in run_command
           super().run_command(command)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
       line 1047, in run_command
           cmd_obj.run()
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/command/build.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/command/build.py",
       line 137, in run
           self.run_command(cmd_name)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/cmd.py",
       line 342, in run_command
           self.distribution.run_command(command)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/dist.py",
       line 1106, in run_command
           super().run_command(command)
         File
-      "/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
+      "~/.cache/uv/builds-v0/.tmpsDXpB4/lib/python3.10/site-packages/setuptools/_distutils/dist.py",
       line 1047, in run_command
           cmd_obj.run()
         File "<string>", line 44, in run
         File "<string>", line 139, in build_extension
         File
-      "/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/lib/python3.10/subprocess.py",
+      "~/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/lib/python3.10/subprocess.py",
       line 369, in check_call
           raise CalledProcessError(retcode, cmd)
       subprocess.CalledProcessError: Command '['cmake',
-      '/Users/zhunhao/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src',
-      '-DPYTHON_INCLUDE_DIR=/Users/zhunhao/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
+      '~/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src',
+      '-DPYTHON_INCLUDE_DIR=~/.local/share/uv/python/cpython-3.10.20-macos-aarch64-none/include/python3.10',
       '-DPYTHON_LIBRARY=',
-      '-DPYTHON_EXECUTABLE=/Users/zhunhao/.cache/uv/builds-v0/.tmpsDXpB4/bin/python',
+      '-DPYTHON_EXECUTABLE=~/.cache/uv/builds-v0/.tmpsDXpB4/bin/python',
       '-DBUILD_DOC=OFF', '-DADD_TESTS=OFF', '-DADD_TRIANGLE=OFF',
       '-DADD_PYTHON_BINDINGS=ON', '-DCMAKE_BUILD_TYPE=Release',
-      '-DCMAKE_INSTALL_PREFIX:PATH=/Users/zhunhao/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src/build/temp.macosx-11.0-arm64-cpython-310/dist']'
+      '-DCMAKE_INSTALL_PREFIX:PATH=~/.cache/uv/sdists-v9/pypi/commonroad-drivability-checker/2023.1/L_6YnXheYXKG23KU/src/build/temp.macosx-11.0-arm64-cpython-310/dist']'
       returned non-zero exit status 1.
 
 

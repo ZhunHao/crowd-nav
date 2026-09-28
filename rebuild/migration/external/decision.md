@@ -9,7 +9,7 @@ feasibility checker discussed below; neither is claimed to cover it.
 **Not reinstalled for this task.** A bounded compatibility investigation was
 already run by the user and its evidence lives, untracked, in the main
 checkout at
-`/Users/zhunhao/Documents/Projects/crowd-nav/rebuild/migration/ntnu-investigation/`
+`rebuild/migration/ntnu-investigation/`
 (see `README.md` there; not copied or committed here per controller ruling).
 
 Verdict recorded there: the unmodified NTNU stack is not ready to adopt in
