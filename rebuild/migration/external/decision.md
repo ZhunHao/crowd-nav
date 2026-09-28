@@ -183,3 +183,17 @@ available environment (tests marked `external`, skipped when `commonocean`
 is not importable, and one `xfail(strict=True)` guarding the
 `commonocean_dc` ImportError so a future successful install is caught rather
 than silently accepted as still-unchecked).
+
+## Addendum 2026-09-28 — retry with native dependencies installed
+
+At the user's request the missing native libraries were installed with Homebrew and the build was retried in the same disposable environment (CPython 3.10.20, `CMAKE_POLICY_VERSION_MINIMUM=3.5`):
+
+| Attempt | Host change | Result | Log |
+|---|---|---|---|
+| 3 | `brew install boost` (1.92.0) | Boost found; configure fails: Eigen3 not found | `commonocean/install3.log` |
+| 4 | `brew install eigen` (5.0.1) | Eigen 5 rejected: the build requests `Eigen3 3.0.5` via CONFIG and Eigen 5's version file refuses major 3 | `commonocean/install4.log` |
+| 5 | `brew install eigen@3` (3.4.1, keg-only; `CMAKE_PREFIX_PATH`/`Eigen3_DIR` pointed at it) | Configure passes; compile fails: `clang++: error: unsupported option '-msse'/'-msse2'/'-msse3'/'-mssse3'` for arm64 | `commonocean/install5.log` |
+
+PyPI publishes no macOS arm64 wheel for any `commonroad-drivability-checker` release (only x86_64 wheels up to 2022.2.1), and `commonocean-drivability-checker==2025.1` hard-pins `commonroad-drivability-checker==2023.1`, `numpy~=1.24.0` and `scipy<=1.7.2`. Going further requires patching vendored C++ build flags, which this spike does not do.
+
+**Decision (unchanged, now with stronger evidence): do not adopt CommonOcean as a dependency or backend.** Keep `commonocean-io` (pure Python, works) as an optional external scenario importer in this disposable environment. If an independent collision oracle is still wanted, run the upstream checker on Linux x86_64 (e.g. an EC2 instance or an x86_64 container) in its own legacy environment; its discrete-time check is weaker than ShipNav's continuous swept checks and serves only as a cross-check. Homebrew packages installed on the host for this attempt: boost 1.92.0, eigen 5.0.1, eigen@3 3.4.1 (removable with `brew uninstall boost eigen eigen@3`).
