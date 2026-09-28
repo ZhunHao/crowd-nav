@@ -158,7 +158,7 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         predictions = predict(perceived, step, steps=steps, uncertainty=uncertainty)
         neighbours = [(s['position'], s['velocity'], s['radius']) for s in perceived]
         if hasattr(policy, 'set_context'):
-            policy.set_context(sea, vessel, predictions, steps=steps)
+            policy.set_context(sea, vessel, predictions, steps=steps, final=index == len(route)-1)
         inference_start = perf_counter()
         nominal = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
         latencies.append((perf_counter()-inference_start)*1000)
