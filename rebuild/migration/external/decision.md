@@ -197,3 +197,7 @@ At the user's request the missing native libraries were installed with Homebrew 
 PyPI publishes no macOS arm64 wheel for any `commonroad-drivability-checker` release (only x86_64 wheels up to 2022.2.1), and `commonocean-drivability-checker==2025.1` hard-pins `commonroad-drivability-checker==2023.1`, `numpy~=1.24.0` and `scipy<=1.7.2`. Going further requires patching vendored C++ build flags, which this spike does not do.
 
 **Decision (unchanged, now with stronger evidence): do not adopt CommonOcean as a dependency or backend.** Keep `commonocean-io` (pure Python, works) as an optional external scenario importer in this disposable environment. If an independent collision oracle is still wanted, run the upstream checker on Linux x86_64 (e.g. an EC2 instance or an x86_64 container) in its own legacy environment; its discrete-time check is weaker than ShipNav's continuous swept checks and serves only as a cross-check. Homebrew packages installed on the host for this attempt: boost 1.92.0, eigen 5.0.1, eigen@3 3.4.1 (removable with `brew uninstall boost eigen eigen@3`).
+
+## Final decision 2026-09-28 — CommonOcean dropped
+
+The user decided to drop CommonOcean. `src/shipnav/adapters/commonocean.py`, its tests and the exported sample scenario were removed; the disposable environment and upstream checkout were deleted. This file and the install logs remain as evidence of why. `adapters/coordinates.py` (North–East conversion, conservative hull radius) stays for any future external source.
