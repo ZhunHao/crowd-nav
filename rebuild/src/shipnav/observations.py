@@ -1,3 +1,17 @@
+"""Deterministic observation model for traffic targets.
+
+Per (seed, tick, target) keyed draws decide dropout and position noise, so a
+replay with the same seed reproduces identical perception. A target is
+measured at ``t - delay`` (a true past state from ``ship.at``), extrapolated
+to ``t`` with the measured velocity, and carries a conservative margin
+``3*noise + 2*stale_speed_bound*age`` that grows while it goes unmeasured.
+A target dropped on every tick so far is simply absent (never fabricated).
+
+Known limitation: velocity is measured noise-free (only position gets
+Gaussian noise); there is no velocity-noise feature. Extrapolation error from
+a wrong heading/speed estimate is therefore not modelled beyond the stale
+speed bound.
+"""
 from hashlib import sha256
 from random import Random
 from math import isfinite
