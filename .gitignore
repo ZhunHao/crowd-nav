@@ -1,0 +1,7 @@
+
+# Supplied document artifacts
+/*.pptx
+/*.pdf
+
+# macOS metadata
+.DS_Store
