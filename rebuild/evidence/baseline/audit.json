@@ -1,0 +1,61 @@
+{
+  "verified_utc": "2026-09-29T14:13:08.133399+00:00",
+  "arms": 1320,
+  "scenario_count": 110,
+  "variant_count": 12,
+  "exact_complete_grid": true,
+  "exact_preregistered_order": true,
+  "shared_limits_verified": true,
+  "variant_controls_verified": true,
+  "original_scenarios_preserved": true,
+  "source_hashes_match_protocol": true,
+  "lock_model_identities_match": true,
+  "executed_trace_source_revisions": {
+    "8611fa038f512b8725481212e790982fdd3380d1": 1212
+  },
+  "executed_trace_dirty_diff_hashes": {
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": 1212
+  },
+  "statuses": {
+    "success": 620,
+    "timeout": 389,
+    "collision": 203,
+    "planning_failure": 108
+  },
+  "unique_archives": 2750,
+  "total_raw_bytes_unique_archives": 589762196,
+  "total_stored_bytes_unique_archives": 70682630,
+  "sum_unit_wall_s": 3875.3715890781314,
+  "infrastructure_retries": 0,
+  "runtime": {
+    "python": "3.14.7 (main, Sep  1 2026, 14:05:28) [Clang 22.1.3 ]",
+    "executable": "/Users/zhunhao/.codex/worktrees/gui-exports-evaluation-0818/crowd-nav/rebuild/.venv-modern/bin/python",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "packages": {
+      "torch": "2.14.0",
+      "numpy": "2.5.3",
+      "shapely": "2.1.2",
+      "pyproj": "3.8.0",
+      "pyogrio": "0.13.0",
+      "PySide6": "6.11.2",
+      "matplotlib": "3.11.2",
+      "gymnasium": "1.3.0",
+      "pytest": "9.1.1"
+    },
+    "rvo2_extension": "/Users/zhunhao/.codex/worktrees/gui-exports-evaluation-0818/crowd-nav/rebuild/.venv-modern/lib/python3.14/site-packages/rvo2.cpython-314-darwin.so",
+    "rvo2_extension_sha256": "af8ae3eceb6bcd15f89e6c35dea232067f27d29f4c37e88aeb3603e2719f9bca"
+  },
+  "checks": {
+    "full_suite": "302 passed, 136 Qt/Matplotlib AA_UseHighDpiPixmaps deprecation warnings in96.01s",
+    "test_log_sha256": "e0f3e4c22b8e4ea5f00f012993e1a73d3c9cd87c4478a8f03d7aa6f28c82c13d"
+  },
+  "artifact_hashes": {
+    "results/baseline-heldout/metrics.json": "b96bcc4bf2b91dfccc095725d9e740db747f98c1c2d210787f29310fd3e280b1",
+    "results/baseline-heldout/rows.jsonl": "8513f91b827775fdd56ec9a350f0e9d792dd757bf8fa21e05d2544c78c8bfc80",
+    "results/baseline-heldout/summary.json": "a345cf0dabc41990934e17b50eb1f2bd3eb10ca4a89b9ce40d3630ba1ba78c93",
+    "results/baseline-heldout/benchmark_protocol.json": "21cdd0d107785da0c64ba2b126599139662d9338e3290812e95b1931d94848da",
+    "evidence/baseline/scenario-results.json.gz": "619b15319c9b847dea568db907df50c79041513888cac6c19de5606034af6878",
+    "evidence/baseline/summary.json": "a345cf0dabc41990934e17b50eb1f2bd3eb10ca4a89b9ce40d3630ba1ba78c93"
+  },
+  "scenario_results_raw_sha256": "6c8fb6d6b97e1b62dd0922085c10611436e0257284e5dd8a357263ad576cce72"
+}
