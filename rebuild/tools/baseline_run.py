@@ -5,6 +5,7 @@ protocol SHA and its exact Git commit are mandatory and verified before executio
 """
 from collections import Counter, defaultdict
 from hashlib import sha256
+from math import dist
 from pathlib import Path
 from statistics import mean
 import argparse
@@ -17,6 +18,7 @@ import time
 from baseline_evidence import archive, compare, load_verified, reference_metrics, summarize_timing, timing_samples
 from shipnav.benchmark import VARIANTS, benchmark
 from shipnav.scale import units
+from shipnav.service import execute
 
 ROOT = Path(__file__).resolve().parents[1]
 PAIRS = [('sarl_reference', 'sarl_theta', 'planner'), ('sarl_reference', 'sarl_no_goals', 'goals'),
@@ -30,13 +32,27 @@ def dump(path, value):
     Path(path).write_text(json.dumps(value, indent=2, allow_nan=False)+'\n')
 
 
+def verify_limit(run, expected):
+    if run.get('settings') and run['settings']['limit'] != expected:
+        raise ValueError('Recorded episode limit differs from frozen shared budget')
+
+
 def run_unit(scenario, entry, name, model, output):
     output = Path(output)
     if shutil.disk_usage(output).free < 400*1024**2:
         raise RuntimeError('Below 400 MiB headroom; pause without discarding evidence')
     began = time.monotonic()
-    [row] = benchmark([scenario], model, output, {name: VARIANTS[name]})
+    route = entry['reference_route'] or []
+    reference_length = sum(dist(a, b) for a, b in zip(route, route[1:]))
+    limit = max(100., 3*reference_length) if 'model_scale' in scenario['map']['metadata'] else 100.
+
+    def matched_runner(*args, **kwargs):
+        return execute(*args, **kwargs, limit=limit)
+
+    [row] = benchmark([scenario], model, output, {name: VARIANTS[name]}, runner=matched_runner)
     run = json.loads((output/row['trace_file']).read_text())
+    verify_limit(run, limit)
+    row['shared_limit_model'] = limit
     row.update(reference_metrics(run, entry['reference_route']))
     length_scale, time_scale = units(scenario['map'])
     row.update(distance_model=run.get('distance'), elapsed_model=run.get('elapsed'),
@@ -144,9 +160,14 @@ def main():
     if args.mode in ('audit', 'summarize'):
         rows = [json.loads(line) for line in (args.output/'rows.jsonl').read_text().splitlines()]
         if args.mode == 'audit':
+            frozen_limits = {}
+            if args.protocol.exists():
+                frozen_limits = json.loads(args.protocol.read_text()).get('shared_limits_model', {})
             for row in rows:
                 for key in ('archive', 'scenario_archive', 'original_metrics_archive'):
-                    load_verified(args.output, row[key])
+                    run = load_verified(args.output, row[key])
+                    if key == 'archive' and row['scenario_hash'] in frozen_limits:
+                        verify_limit(run, frozen_limits[row['scenario_hash']])
             print(f'Verified {len(rows)} rows and all raw/stored archive hashes')
         else:
             dump(args.output/'summary.json', summary(rows))

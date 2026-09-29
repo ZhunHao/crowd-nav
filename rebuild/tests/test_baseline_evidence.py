@@ -136,3 +136,29 @@ def test_real_map_extension_respects_geographic_split_and_corridor(tmp_path):
         assert len(scenario['traffic']) in (1, 2)
         assert all(t['kind'] == 'course_change' for t in scenario['traffic'])
     assert scenarios[0][1]['start'] != scenarios[1][1]['start']
+
+
+def test_unit_uses_shared_reference_timeout_instead_of_own_planner_length(tmp_path):
+    import sys
+    sys.path.insert(0, str(ROOT/'tools'))
+    from baseline_run import run_unit
+    scenario = json.loads((ROOT/'scenarios/head_on.json').read_text())
+    scenario['traffic'] = []
+    scenario['map']['metadata']['model_scale'] = {'length_m': 10., 'speed_mps': 5.,
+                                                'radius_m': 5., 'margin_m': 10., 'resolution_m': 50.}
+    # Fixed valid reference is38 units long, while direct own route is18.
+    reference = [[3, 12], [3, 22], [21, 22], [21, 12]]
+    row = run_unit(scenario, {'id': 'limit', 'reference_route': reference}, 'direct_reference', '', tmp_path)
+    run = module().load_verified(tmp_path, row['archive'])
+    assert run['settings']['limit'] == 114
+
+
+def test_audit_rejects_changed_recorded_limit_and_accepts_unexecuted_failure():
+    import sys
+    sys.path.insert(0, str(ROOT/'tools'))
+    import baseline_run
+    assert hasattr(baseline_run, 'verify_limit')
+    with pytest.raises(ValueError, match='limit'):
+        baseline_run.verify_limit({'settings': {'limit': 100}}, 114)
+    baseline_run.verify_limit({'settings': {'limit': 114}}, 114)
+    baseline_run.verify_limit({'status': 'planning_failure'}, 114)
