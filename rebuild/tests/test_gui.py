@@ -139,6 +139,64 @@ def test_worker_error_is_visible(qtbot):
     window.close()
 
 
+@pytest.mark.parametrize('outcome', ['success', 'error', 'cancelled'])
+def test_busy_native_resize_does_not_render_coastline_and_restores_canvas(
+        qtbot, monkeypatch, outcome):
+    # Changing back to a live Matplotlib canvas during jobs must fail this test:
+    # real QWidget resize/queued idle events would render the expensive coastline.
+    entered, release = Event(), Event()
+    def runner(*args, **kwargs):
+        entered.set()
+        release.wait(5)
+        if outcome == 'error':
+            raise ValueError('Bad checkpoint')
+        return execute(SeaMap((0, 0, 24, 24)).to_dict(), (2, 2), (4, 2),
+                       policy_name='direct', count=0, cancel=args[8])
+    window = Window(SeaMap.load('maps/singapore-ubin.json'), runner=runner)
+    qtbot.addWidget(window)
+    window.show()
+    qtbot.waitExposed(window)
+    window.mode.setCurrentIndex(0); window.apply_click(-444.98, 138.39)
+    window.mode.setCurrentIndex(1); window.apply_click(445.17, 303.81)
+    qtbot.wait(100)
+    renders = []
+    original = window.canvas.draw
+    def render():
+        renders.append(window.canvas.size())
+        original()
+    monkeypatch.setattr(window.canvas, 'draw', render)
+    # Include an idle request queued immediately before Run, not only new resize events.
+    window.canvas.draw_idle()
+    window.start_run()
+    renders.clear()  # Caching before the worker starts may render the current preview.
+    try:
+        qtbot.waitUntil(entered.is_set)
+        for size in [(1200, 900), (1100, 850), (1180, 880)]:
+            window.resize(*size)
+            qtbot.wait(50)
+        assert renders == []
+        assert not window.canvas.isVisible()
+        assert not window.cached_plot.image.isNull()
+        assert not any(a.isEnabled() for a in window.navigation.actions())
+        if outcome == 'cancelled':
+            window.stop_button.click()
+            assert window.cancel_event.is_set()
+        release.set()
+        qtbot.waitUntil(lambda: window.future is None)
+        qtbot.waitUntil(lambda: len(renders) > 0)
+        assert window.canvas.isVisible()
+        assert window.cached_plot.image.isNull()
+        assert window.navigation.isEnabled()
+        assert any(a.isEnabled() for a in window.navigation.actions())
+        assert window.run_button.isEnabled()
+        assert ('Bad checkpoint' in window.status.text() if outcome == 'error'
+                else window.result['status'] == outcome)
+    finally:
+        release.set()
+        qtbot.waitUntil(lambda: window.future is None)
+        window.close()
+
+
 def test_default_model_points_to_supplied_assets():
     from pathlib import Path
     from shipnav.gui import MODEL
@@ -217,22 +275,35 @@ def test_replay_delayed_callbacks_follow_elapsed_time_and_keep_terminal_frame(
     window.close()
 
 
-def test_export_runs_in_worker_and_restores_controls(qtbot, monkeypatch, tmp_path):
+@pytest.mark.parametrize('failure', [False, True])
+def test_export_runs_in_worker_and_restores_controls(qtbot, monkeypatch, tmp_path, failure):
     import json
     import shipnav.gui as gui
     window = Window(SeaMap((0, 0, 24, 24)))
     qtbot.addWidget(window)
+    window.show()
+    qtbot.waitExposed(window)
     window.result = execute(window.sea.to_dict(), (2, 2), (4, 2),
                             policy_name='direct', count=0)
     filename = tmp_path / 'run.json'
+    if failure:
+        filename.mkdir()  # Actual exporter fails writing a file over a directory.
     monkeypatch.setattr(gui.QFileDialog, 'getSaveFileName',
                         lambda *args: (str(filename), 'JSON (*.json)'))
     window.export()
     assert not window.run_button.isEnabled()
     assert not window.stop_button.isEnabled()
+    assert not window.canvas.isVisible()
+    assert not window.navigation.isEnabled()
     qtbot.waitUntil(lambda: window.future is None)
-    assert json.loads(filename.read_text())['status'] == 'success'
-    assert window.status.text() == 'Export saved'
+    if failure:
+        assert window.status.text().startswith('Failed:')
+    else:
+        assert json.loads(filename.read_text())['status'] == 'success'
+        assert window.status.text() == 'Export saved'
+    assert window.canvas.isVisible()
+    assert window.navigation.isEnabled()
+    assert window.cached_plot.image.isNull()
     assert window.run_button.isEnabled()
     assert window.export_button.isEnabled()
     window.close()

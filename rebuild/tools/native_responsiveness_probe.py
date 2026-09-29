@@ -9,6 +9,7 @@ import gc
 import json
 import threading
 import time
+import sys
 from pathlib import Path
 import torch
 torch.set_num_threads(2)
@@ -20,7 +21,10 @@ from shipnav.maps import SeaMap
 from shipnav.service import execute
 from shipnav.controllers.mpc import MPC
 
-OUT=Path('results/plan04-native').resolve()
+ROOT=Path('results/plan04-native').resolve()
+corrected='--cached-preview' in sys.argv
+OUT=ROOT/'cached-preview-round1' if corrected else ROOT
+OUT.mkdir(parents=True,exist_ok=True)
 app=QApplication([])
 objc=ctypes.CDLL('/usr/lib/libobjc.A.dylib')
 objc.objc_getClass.argtypes=[ctypes.c_char_p];objc.objc_getClass.restype=ctypes.c_void_p
@@ -77,20 +81,32 @@ def pump(ms):
 pump(700)
 summaries=[]
 retained=None
-for label in ('fresh','retained-sarl'):
+for label in (('fresh','retained-sarl','stop') if corrected else ('fresh','retained-sarl')):
     if label=='retained-sarl':
-        retained=json.loads((OUT/'ubin-sarl.json').read_text())
+        retained=json.loads((ROOT/'ubin-sarl.json').read_text())
         pump(200)
     events=[];heartbeats=[];origin=time.monotonic()
     event('run-button')
     QTest.mouseClick(w.run_button,Qt.MouseButton.LeftButton)
-    last_resize=time.monotonic();moves=0
+    last_resize=time.monotonic();moves=0;stop_requested=None
     while w.future is not None:
         pump(20)
         if time.monotonic()-last_resize>2:
             event('resize-start');w.resize(1120+40*(moves%2),860+20*(moves%2));w.move(30,30)
             event('resize-stop');last_resize=time.monotonic();moves+=1
+            if corrected and moves==1:
+                # Capture the actual static native preview; its small cost is
+                # included in the measured interval and explicitly timestamped.
+                event('screenshot-start')
+                w.grab().save(str(OUT/f'{label}-busy.png'))
+                event('screenshot-stop')
+        if label=='stop' and stop_requested is None and time.monotonic()-origin>3:
+            stop_requested=time.monotonic()
+            event('stop-click')
+            QTest.mouseClick(w.stop_button,Qt.MouseButton.LeftButton)
+            event('stop-handler-return',cancel_requested=w.cancel_event.is_set())
         if time.monotonic()-origin>180:raise TimeoutError(label)
+    stop_latency=None if stop_requested is None else time.monotonic()-stop_requested
     pump(150)
     elapsed=time.monotonic()-origin
     gaps=[dict(start=a,end=b,duration_s=b-a) for a,b in zip(heartbeats,heartbeats[1:])]
@@ -108,9 +124,22 @@ for label in ('fresh','retained-sarl'):
                  longest_canvas_s=max((e['duration_s'] for e in events if e['kind']=='canvas-stop'),default=0),
                  main_thread=main_thread,resizes=moves,status=w.result['status'],frames=len(w.result['frames']),
                  retained_frames=0 if retained is None else len(retained['frames']))
+    if corrected:
+        entry=next(e['t'] for e in events if e['kind']=='worker-entry')
+        returned=next(e['t'] for e in events if e['kind']=='worker-return')
+        active_renders=[e for e in events if e['kind']=='canvas-start' and entry<=e['t']<=returned]
+        summary.update(active_canvas_renders=len(active_renders),stop_latency_s=stop_latency,
+                       canvas_restored=w.canvas.isVisible() and not w.canvas.render_suspended,
+                       cache_released=w.cached_plot.image.isNull(),
+                       toolbar_restored=w.navigation.isEnabled())
+        passed=summary['max_gap_s']<1 and not active_renders and summary['canvas_restored'] and summary['cache_released'] and summary['toolbar_restored']
+        if label=='stop':passed=passed and stop_requested is not None and stop_latency<1 and w.result['status']=='cancelled'
+        summary['outcome']='pass' if passed else 'fail'
+        w.grab().save(str(OUT/f'{label}-restored.png'))
     summaries.append(summary)
     (OUT/f'mpc-responsiveness-{label}-events.json').write_text(json.dumps(dict(summary=summary,events=events,heartbeats=heartbeats),indent=2))
     (OUT/f'mpc-responsiveness-{label}-trace.json').write_text(json.dumps(w.result,indent=2))
     print(json.dumps(summary),flush=True)
 (OUT/'mpc-responsiveness-comparison.json').write_text(json.dumps(summaries,indent=2))
 gc.callbacks.remove(collector);timer.stop();w.close()
+if corrected:assert all(s['outcome']=='pass' for s in summaries)

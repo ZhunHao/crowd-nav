@@ -3,9 +3,10 @@ from pathlib import Path
 from threading import Event
 from bisect import bisect_right
 from time import monotonic
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt, QRect
+from PySide6.QtGui import QPainter, QPixmap, QResizeEvent
 from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QComboBox, QFileDialog, QSpinBox)
+    QPushButton, QLabel, QComboBox, QFileDialog, QSpinBox, QStackedLayout)
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 from shipnav.maps import SeaMap
@@ -16,6 +17,41 @@ from shipnav.scale import PROFILES, check_grid, default_profile, scaled, units
 DEGRADED = {'noise': .1, 'delay': .5, 'dropout': .1}
 REPLAY_SPEEDS = (1, 10, 50, 200)
 MODEL = Path(__file__).resolve().parents[3]/'CrowdNav-20250813-DIP/crowd_nav/data/output_trained'
+
+
+class PlotCanvas(FigureCanvasQTAgg):
+    """Suspend expensive resize/queued renders while a static preview is shown."""
+    render_suspended = False
+
+    def resizeEvent(self, event):
+        if not self.render_suspended:
+            super().resizeEvent(event)
+
+    def draw_idle(self):
+        if not self.render_suspended:
+            super().draw_idle()
+
+    def _draw_idle(self):
+        if self.render_suspended:
+            self._draw_pending = False
+        else:
+            super()._draw_idle()
+
+
+class CachedPlot(QWidget):
+    """Resize a single cached image without recomputing coastline geometry."""
+    def __init__(self):
+        super().__init__()
+        self.image = QPixmap()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), self.palette().window())
+        if not self.image.isNull():
+            size = self.image.size().scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            target = QRect(0, 0, size.width(), size.height())
+            target.moveCenter(self.rect().center())
+            painter.drawPixmap(target, self.image)
 
 
 def default_endpoints(sea: SeaMap, clearance: float):
@@ -93,11 +129,15 @@ class Window(QWidget):
         self.status = QLabel('Select start and goal, then run')
         layout.addWidget(self.status)
         self.figure = Figure()
-        self.canvas = FigureCanvasQTAgg(self.figure)
+        self.canvas = PlotCanvas(self.figure)
         self.ax = self.figure.subplots()
         self.navigation = NavigationToolbar2QT(self.canvas, self)
         layout.addWidget(self.navigation)  # zoom/pan for kilometre maps
-        layout.addWidget(self.canvas)
+        self.cached_plot = CachedPlot()
+        self.plot_stack = QStackedLayout()
+        self.plot_stack.addWidget(self.canvas)
+        self.plot_stack.addWidget(self.cached_plot)
+        layout.addLayout(self.plot_stack)
         self.canvas.mpl_connect('button_press_event', self.clicked)
         self.map_button.clicked.connect(self.load_map)
         self.model_button.clicked.connect(self.load_model)
@@ -141,6 +181,27 @@ class Window(QWidget):
                             f'{profile.speed_mps:g} m/s, grid {profile.resolution_m:g} m')
 
     def set_busy(self, busy):
+        if busy and not self.canvas.render_suspended:
+            # Capture on the GUI thread before submitting work. Flush any pending
+            # preview paint here; no Matplotlib resize paint runs during the job.
+            self.cached_plot.image = self.canvas.grab()
+            self.canvas.render_suspended = True
+            self.canvas._draw_pending = False
+            self.plot_stack.setCurrentWidget(self.cached_plot)
+            self.navigation_states = [a.isEnabled() for a in self.navigation.actions()]
+            for action in self.navigation.actions():
+                action.setEnabled(False)
+            self.navigation.setEnabled(False)
+        elif not busy and self.canvas.render_suspended:
+            self.canvas.render_suspended = False
+            self.plot_stack.setCurrentWidget(self.canvas)
+            # Hidden stack pages can receive geometry changes. Apply the current
+            # size now so the restored plot has the correct figure dimensions.
+            self.canvas.resizeEvent(QResizeEvent(self.canvas.size(), self.canvas.size()))
+            self.cached_plot.image = QPixmap()
+            self.navigation.setEnabled(True)
+            for action, enabled in zip(self.navigation.actions(), self.navigation_states):
+                action.setEnabled(enabled)
         for widget in self.edit_controls:
             widget.setEnabled(not busy)
         self.stop_button.setEnabled(busy and self.job_kind == 'run')
