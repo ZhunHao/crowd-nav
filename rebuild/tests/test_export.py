@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import numpy as np
 import pytest
-from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry import MultiPolygon, Polygon, mapping
 
 from shipnav.maps import SeaMap
 from shipnav.service import execute
@@ -62,12 +62,13 @@ def test_mp4_keeps_every_frame_at_one_over_dt(tmp_path):
 
 
 def test_polygon_render_preserves_holes_and_multipolygon_components():
-    # Reverse the exterior/hole orientation to prove rendering normalizes rings.
+    # Feed raw same-winding rings directly; SeaMap canonicalization must not normalize this fixture.
     shell = [(1, 1), (9, 1), (9, 9), (1, 9), (1, 1)]
     hole = [(3, 3), (7, 3), (7, 7), (3, 7), (3, 3)]
-    polygon = Polygon(shell[::-1], [hole])
+    polygon = Polygon(shell, [hole])
     island = Polygon([(11, 1), (14, 1), (14, 4), (11, 4), (11, 1)])
-    map_data = SeaMap((0, 0, 16, 10), [MultiPolygon([polygon, island])]).to_dict()
+    map_data = {'bounds': [0, 0, 16, 10], 'metadata': {},
+                'features': [{'geometry': mapping(MultiPolygon([polygon, island]))}]}
     assert len(list(land_polygons(map_data))) == 2
     result = {'map': map_data, 'route': [], 'goals': [], 'frames': [], 'settings': {}}
     figure = Figure(figsize=(4, 2.5), dpi=100)
@@ -84,6 +85,7 @@ def test_polygon_render_preserves_holes_and_multipolygon_components():
     land = pixel_at((2, 2))
     water_hole = pixel_at((5, 5))
     second_island = pixel_at((12, 2))
+    assert water_hole == pixel_at((.5, 5))
     assert land != water_hole
     assert second_island == land
 
@@ -102,3 +104,41 @@ def test_csv_deadline_uses_physical_control_period(scaled, latency, expected):
     assert rows[0]['deadline_miss'] is expected
     assert 'deadline_miss' not in rows[-1]
     assert json.loads(json.dumps(result)) == original
+
+
+def test_recorded_outgoing_overlays_follow_the_selected_frame_and_terminal_has_none():
+    from matplotlib.patches import FancyArrow
+    stored = json.loads(json.dumps({
+        'map': {'bounds': [0, 0, 10, 10], 'metadata': {}, 'features': []},
+        'route': [[2, 2], [6, 2]], 'goals': [], 'settings': {'radius': .5},
+        'status': 'timeout', 'traffic_definitions': [],
+        'frames': [{'position': [2, 2], 'traffic': [], 't': 0},
+                   {'position': [3, 2], 'traffic': [], 't': .25},
+                   {'position': [4, 2], 'traffic': [], 't': .5}],
+        'diagnostics': [
+            {'nominal': [2, 0], 'executed': [0, 1], 'override': False,
+             'no_feasible_action': None, 'predictions': [{'points': [[7, 7], [8, 7]]}],
+             'path': [[2, 2], [2, 3]]},
+            {'nominal': [-1, 0], 'executed': [0, -1], 'override': True,
+             'no_feasible_action': False, 'predictions': [{'points': [[7, 6], [8, 6]]}],
+             'path': [[3, 2], [3, 1]]}]}))
+    original = json.loads(json.dumps(stored))
+    figure = Figure()
+    ax = figure.subplots()
+    for index, arrow_tips, prediction, path, title in [
+        (0, [[4.1125, 2], [2, 3.1125]], [[7, 7], [8, 7]], [[2, 2], [2, 3]], 'no feasible action=n/a'),
+        (1, [[1.8875, 2], [3, .8875]], [[7, 6], [8, 6]], [[3, 2], [3, 1]], 'no feasible action=False')]:
+        draw(ax, stored, index)
+        arrows = {p.get_label(): p for p in ax.patches if isinstance(p, FancyArrow)}
+        assert set(arrows) == {'Nominal', 'Executed'}
+        # FancyArrow's first vertex is the rendered arrowhead tip, including its default head length.
+        np.testing.assert_allclose(arrows['Nominal'].get_xy()[0], arrow_tips[0])
+        np.testing.assert_allclose(arrows['Executed'].get_xy()[0], arrow_tips[1])
+        plotted = [np.column_stack((line.get_xdata(), line.get_ydata())).tolist() for line in ax.lines]
+        assert plotted[-2:] == [prediction, path]
+        assert title in ax.get_title()
+    draw(ax, stored, 2)
+    assert not any(isinstance(p, FancyArrow) for p in ax.patches)
+    assert len(ax.lines) == 2  # global route and travelled positions only
+    assert 'override=' not in ax.get_title() and 'no feasible action=' not in ax.get_title()
+    assert stored == original

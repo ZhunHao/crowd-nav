@@ -17,6 +17,7 @@ import time
 
 from baseline_evidence import archive, compare, load_verified, reference_metrics, summarize_timing, timing_samples
 from shipnav.benchmark import VARIANTS, benchmark
+from shipnav.scenarios import scenario_hash
 from shipnav.scale import units
 from shipnav.service import execute
 
@@ -116,16 +117,92 @@ def summary(rows):
     return result
 
 
-def execute_matrix(entries, manifest_dir, model, output, protocol=None):
+def verify_frozen_identities(data, model):
+    """Reject a changed implementation, lock, manifest or checkpoint before reuse."""
+    expected = {**data['source_sha256'], data['manifest']: data['manifest_sha256'],
+                data['original_manifest']: data['original_manifest_sha256'],
+                'uv.lock': data['identities']['lock_sha256']}
+    for name, digest in expected.items():
+        path = ROOT/name
+        if not path.is_file() or sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError('Frozen source/lock/manifest identity mismatch: '+name)
+    for name, digest in data['identities']['model'].items():
+        path = Path(model)/name
+        if not path.is_file() or sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError('Frozen checkpoint identity mismatch: '+name)
+    if data['variants'] != VARIANTS:
+        raise ValueError('Frozen variant identity mismatch')
+
+
+def bind_output(output, protocol, entries, create=True):
+    """A directory belongs to one protocol and one scenario/variant grid."""
+    binding = {'protocol': protocol, 'scenarios': entries, 'variants': VARIANTS}
+    path = output/'run-identity.json'
+    if path.exists():
+        if json.loads(path.read_text()) != binding:
+            raise ValueError('Output protocol/grid identity mismatch')
+    elif not create or any(output.iterdir()):
+        raise ValueError('Existing output lacks a protocol binding; use a fresh directory')
+    else:
+        dump(path, binding)
+
+
+def validate_rows(rows, entries, output, protocol, data=None, complete=False):
+    """Validate partial resumes; final audit additionally requires the entire grid."""
+    by_hash = {e['scenario_hash']: e for e in entries}
+    if len(by_hash) != len(entries):
+        raise ValueError('Duplicate frozen scenario identities')
+    expected = {(h, name) for h in by_hash for name in VARIANTS}
+    seen = set()
+    for row in rows:
+        pair = (row['scenario_hash'], row['variant'])
+        if pair in seen:
+            raise ValueError('Duplicate journal rows')
+        if pair not in expected or row.get('protocol') != protocol:
+            raise ValueError('Journal scenario/variant/protocol identity mismatch')
+        seen.add(pair)
+        entry = by_hash[pair[0]]
+        for field, key in [('scenario_id', 'id'), ('family', 'family'), ('seed', 'seed'),
+                           ('traffic_count', 'traffic_count')]:
+            if row.get(field) != entry[key]:
+                raise ValueError('Journal scenario metadata mismatch: '+field)
+        run = load_verified(output, row['archive'])
+        if (run['scenario_hash'], run['variant']) != pair or run['variant_config'] != VARIANTS[pair[1]]:
+            raise ValueError('Trace scenario/variant identity mismatch')
+        if (row['trace_hash'] != row['archive']['raw_sha256'] or
+                row['trace_file'] != row['archive']['file'] or row['status'] != run['status']):
+            raise ValueError('Journal trace identity mismatch')
+        if data:
+            limit = data['shared_limits_model'][pair[0]]
+            verify_limit(run, limit)
+            if row['shared_limit_model'] != limit:
+                raise ValueError('Journal shared limit mismatch')
+            if run.get('settings'):
+                if (run.get('model_hashes') != data['identities']['model'] or
+                        run.get('provenance', {}).get('uv_lock_sha256') != data['identities']['lock_sha256']):
+                    raise ValueError('Trace model/lock identity mismatch')
+        scenario = load_verified(output, row['scenario_archive'])
+        if scenario_hash(scenario) != pair[0]:
+            raise ValueError('Archived scenario identity mismatch')
+        metrics = load_verified(output, row['original_metrics_archive'])
+        if len(metrics) != 1 or any(metrics[0].get(k) != row[k]
+                                   for k in ('scenario_hash', 'variant', 'trace_hash', 'status')):
+            raise ValueError('Archived metrics identity mismatch')
+    if complete and seen != expected:
+        raise ValueError('Final audit requires the complete scenario/variant grid')
+
+
+def execute_matrix(entries, manifest_dir, model, output, protocol=None, data=None):
+    if protocol is not None:
+        if data is None or entries != data['scenarios']['test']:
+            raise ValueError('Frozen protocol scenario identity mismatch')
+        verify_frozen_identities(data, model)
     output.mkdir(parents=True, exist_ok=True)
+    bind_output(output, protocol, entries)
     journal = output/'rows.jsonl'
     rows = [json.loads(line) for line in journal.read_text().splitlines()] if journal.exists() else []
+    validate_rows(rows, entries, output, protocol, data)
     finished = {(r['scenario_hash'], r['variant']) for r in rows}
-    if len(finished) != len(rows):
-        raise ValueError('Duplicate journal rows')
-    for row in rows:
-        for key in ('archive', 'scenario_archive', 'original_metrics_archive'):
-            load_verified(output, row[key])
     order = list(entries)
     random.Random(9127).shuffle(order)
     for i, entry in enumerate(order):
@@ -136,11 +213,14 @@ def execute_matrix(entries, manifest_dir, model, output, protocol=None):
             if (entry['scenario_hash'], name) in finished:
                 continue
             row = run_unit(scenario, entry, name, model, output)
+            row['protocol'] = protocol
+            validate_rows([row], entries, output, protocol, data)
             with journal.open('a') as stream:
                 stream.write(json.dumps(row, allow_nan=False)+'\n')
                 stream.flush()
             rows.append(row)
             print(f'{len(rows)}/{len(entries)*len(VARIANTS)} {entry["id"]} {name} {row["status"]} free_MiB={shutil.disk_usage(output).free//1024**2}', flush=True)
+    validate_rows(rows, entries, output, protocol, data, complete=True)
     dump(output/'metrics.json', rows)
     result = summary(rows)
     result['protocol'] = protocol
@@ -157,46 +237,41 @@ def main():
     parser.add_argument('--protocol-commit')
     parser.add_argument('--protocol-sha256')
     args = parser.parse_args()
-    if args.mode in ('audit', 'summarize'):
-        rows = [json.loads(line) for line in (args.output/'rows.jsonl').read_text().splitlines()]
-        if args.mode == 'audit':
-            frozen_limits = {}
-            if args.protocol.exists():
-                frozen_limits = json.loads(args.protocol.read_text()).get('shared_limits_model', {})
-            for row in rows:
-                for key in ('archive', 'scenario_archive', 'original_metrics_archive'):
-                    run = load_verified(args.output, row[key])
-                    if key == 'archive' and row['scenario_hash'] in frozen_limits:
-                        verify_limit(run, frozen_limits[row['scenario_hash']])
-            print(f'Verified {len(rows)} rows and all raw/stored archive hashes')
-        else:
-            dump(args.output/'summary.json', summary(rows))
-        return
-    import torch
-    torch.set_num_threads(1)
-    torch.set_num_interop_threads(1)
     manifest_dir = ROOT/'scenarios/baseline'
     manifest = json.loads((manifest_dir/'splits.json').read_text())
+    data = None
     if args.mode == 'pilot':
         entries = [e for e in manifest['splits']['dev'] if e['id'] in ('dev_2000', 'dev_ubin_corridor_6000')]
         protocol = None
     else:
         if not args.protocol_commit or not args.protocol_sha256:
-            parser.error('Heldout requires frozen protocol commit and SHA256')
+            parser.error('Heldout/audit/summarize require frozen protocol commit and SHA256')
         raw = args.protocol.read_bytes()
         if sha256(raw).hexdigest() != args.protocol_sha256:
             raise ValueError('Protocol hash mismatch')
-        committed = subprocess.check_output(['git', 'show', f'{args.protocol_commit}:rebuild/{args.protocol.as_posix()}'], cwd=ROOT)
+        protocol_path = args.protocol.resolve().relative_to(ROOT.parent)
+        committed = subprocess.check_output(['git', 'show', f'{args.protocol_commit}:{protocol_path.as_posix()}'], cwd=ROOT)
         if raw != committed:
             raise ValueError('Protocol is not the committed preregistration')
         data = json.loads(raw)
-        if sha256((manifest_dir/'splits.json').read_bytes()).hexdigest() != data['manifest_sha256']:
-            raise ValueError('Manifest changed after preregistration')
-        if data['variants'] != VARIANTS:
-            raise ValueError('Variants changed after preregistration')
+        verify_frozen_identities(data, args.model)
         entries = manifest['splits']['test']
+        if entries != data['scenarios']['test']:
+            raise ValueError('Frozen protocol scenario identity mismatch')
         protocol = {'sha256': args.protocol_sha256, 'commit': args.protocol_commit}
-    execute_matrix(entries, manifest_dir, args.model, args.output, protocol)
+    if args.mode in ('audit', 'summarize'):
+        bind_output(args.output, protocol, entries, create=False)
+        rows = [json.loads(line) for line in (args.output/'rows.jsonl').read_text().splitlines()]
+        validate_rows(rows, entries, args.output, protocol, data, complete=True)
+        if args.mode == 'audit':
+            print(f'Verified {len(rows)} unique complete rows and all raw/stored archive hashes')
+        else:
+            dump(args.output/'summary.json', {**summary(rows), 'protocol': protocol})
+        return
+    import torch
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
+    execute_matrix(entries, manifest_dir, args.model, args.output, protocol, data)
 
 
 if __name__ == '__main__':

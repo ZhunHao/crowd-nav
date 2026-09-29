@@ -70,6 +70,31 @@ endpoint/speed differences, plus 11 Southern Islands voyages; Ubin appears only
 in development/calibration. Previously inspected canonical fixtures are held out
 from training/tuning, not claimed unseen by all developers.
 
+## Future runner reuse and dependency maintenance
+
+The frozen baseline was independently audited at `8611fa0`; its protocol, summaries,
+audit, test log and raw results remain unchanged. To reproduce or audit those
+historical artifacts with their original tooling, check out
+`8611fa038f512b8725481212e790982fdd3380d1` first and use the commands above. The
+current runner intentionally rejects that protocol because its frozen source
+hashes include the subsequently hardened tooling.
+
+For a future study, freeze a new protocol on the intended source and locked
+checkpoint before launch, and select a fresh output directory. The current
+heldout, audit and summarize commands require its explicit `--protocol-commit`
+and `--protocol-sha256`. They validate source, lock, checkpoint and manifests;
+new directories record `run-identity.json`, and journal rows carry the protocol
+identity. Resume accepts validated partial grids; final audit and summary require
+the exact unique complete scenario × variant grid. Existing unbound directories
+are rejected instead of relabelled. Pilot runs remain development probes without
+a preregistered performance claim.
+
+The frozen test log's 136 Qt/Matplotlib warnings concern Matplotlib's deprecated
+`AA_UseHighDpiPixmaps` usage. Track this as a dependency maintenance follow-up:
+verify an upstream fix in a separate locked runtime change and repeat the relevant
+Qt/Matplotlib and native acceptance checks there. Do not suppress unrelated
+warnings or upgrade the frozen runtime to polish historical evidence.
+
 ## Interpretation
 
 All comparisons are scenario-paired A minus B, with 2,000 bootstrap resamples and

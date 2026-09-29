@@ -45,7 +45,7 @@ corners)** adds a rectangular obstacle with two clicks. Use the plot's pan/zoom
 bar for kilometre maps; leave pan/zoom mode before placing endpoints. Changing
 inputs invalidates the displayed result. Run computes in a worker; Stop requests
 cooperative cancellation, retaining the partial trace. Replay uses recorded
-frames and elapsed simulation time. Controls are disabled during a run/export;
+frames and elapsed simulation time. Scene and run controls are disabled during a run/export;
 wait for completion before closing.
 
 The second row selects A* with smoothing or Theta*, holonomic or marine dynamics,

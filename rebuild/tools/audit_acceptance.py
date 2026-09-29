@@ -14,6 +14,11 @@ def audit(directory, expected):
     assert len(files)==expected,(directory,len(files),expected)
     runs={p.name:json.loads(p.read_text()) for p in files}
     rows=list(csv.DictReader((directory/'summary.csv').open()))
+    expected_keys={(name,str(count)) for name,_,_ in VARIANTS
+                   for count in ([5] if expected==8 else [5,8,12,15])}
+    summary_keys=[(row['variant'],row['traffic_count']) for row in rows]
+    assert len(summary_keys)==len(set(summary_keys)), 'Duplicate smoke summary keys'
+    assert set(summary_keys)==expected_keys, 'Incomplete or unexpected smoke summary keys'
     outcomes=Counter(r['status'] for r in runs.values())
     for row in rows:
         selected=[r for n,r in runs.items() if n.startswith(f"{row['variant']}-n{row['traffic_count']}-")]
