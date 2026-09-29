@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from hashlib import sha256
 from random import Random
-from math import dist, isfinite
+from math import atan2, cos, dist, isfinite, pi, sin
 import json
 from shipnav.simulation import CourseChangeTraffic, Traffic
 
@@ -94,9 +94,16 @@ def scenario_hash(data):
     return sha256(json.dumps(data, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
-def make_scenario(sea, start, goal, count, seed):
+def make_scenario(sea, start, goal, count, seed, *, corridor=None):
+    """Random traffic. With `corridor` (a reference route) ships are timed to meet the
+    nominal 1 m/s ego along it (see `corridor_traffic`); otherwise uniform over the map."""
     if count < 0:
         raise ValueError('Traffic count cannot be negative')
+    if corridor is not None:
+        ships = corridor_traffic(sea, corridor, count, Random(seed))
+        return {'schema': 1, 'seed': seed, 'map': sea.to_dict(), 'start': list(start),
+                'goal': list(goal), 'traffic': [traffic_to_dict(s) for s in ships],
+                'traffic_mode': 'scripted', 'family': 'corridor', 'split': 'smoke'}
     rng, ships = Random(seed), []
     x0, y0, x1, y1 = sea.bounds
     for _ in range(count):
@@ -115,6 +122,60 @@ def make_scenario(sea, start, goal, count, seed):
     return {'schema': 1, 'seed': seed, 'map': sea.to_dict(), 'start': list(start),
             'goal': list(goal), 'traffic': [asdict(s) for s in ships],
             'traffic_mode': 'scripted', 'family': 'random', 'split': 'smoke'}
+
+
+def _along(route, s):
+    """Point and unit tangent at arc length `s` of a polyline."""
+    for a, b in zip(route, route[1:]):
+        length = dist(a, b)
+        if s <= length or b == route[-1]:
+            f = min(1., s/length) if length else 0.
+            return (a[0]+f*(b[0]-a[0]), a[1]+f*(b[1]-a[1])), ((b[0]-a[0])/length, (b[1]-a[1])/length)
+        s -= length
+    raise ValueError('Route needs at least two distinct points')
+
+
+def corridor_traffic(sea, route, count, rng, radius=.6, speeds=(.3, 1.), run_up=(3., 15.)):
+    """Scripted ships that reach a point of the reference route when a nominal 1 m/s ego
+    does. Each waits at its start, departs `run_up` model units before the meeting point
+    and continues the same distance beyond it, so encounters happen on maps far larger
+    than the ships' voyages. Kinds: crossing (±60-120°), head-on and overtaking.
+    The reference route is frozen into the timing, not into the scenario, so runs with
+    another planner or controller face identical traffic."""
+    total = sum(dist(a, b) for a, b in zip(route, route[1:]))
+    if total <= 0:
+        return []
+    ships = []
+    for _ in range(count):
+        for attempt in range(500):
+            arc = rng.uniform(.1, .95)*total
+            point, (tx, ty) = _along(route, arc)
+            heading = atan2(ty, tx)
+            kind = rng.choice(('crossing', 'crossing', 'head_on', 'overtake'))
+            speed = rng.uniform(*speeds)
+            if kind == 'crossing':
+                heading += rng.choice((1, -1))*rng.uniform(pi/3, 2*pi/3)
+            elif kind == 'head_on':
+                heading += pi + rng.uniform(-pi/12, pi/12)
+            else:
+                speed = rng.uniform(speeds[0], min(speeds[1], .6))
+            d = (cos(heading), sin(heading))
+            run = rng.uniform(*run_up)
+            meet = arc  # nominal ego arrival time at this arc length (1 model unit/s)
+            depart = max(0., meet-run/speed)
+            a = tuple(p-c*speed*(meet-depart) for p, c in zip(point, d))
+            b = tuple(p+c*run for p, c in zip(point, d))
+            if not sea.clear(a, b, radius) or dist(a, route[0]) <= 1.3 or dist(a, route[-1]) <= 1.3:
+                continue
+            if any(dist(a, s.start) <= 1.4 for s in ships):
+                continue
+            waypoints = ((0., a),) + (((depart, a),) if depart > 0 else ()) + \
+                        ((meet, point), (meet+run/speed, b))
+            ships.append(CourseChangeTraffic(waypoints, radius))
+            break
+        else:
+            raise ValueError('Scenario placement failed; preserve this failed seed')
+    return ships
 
 
 def traffic_to_dict(ship):

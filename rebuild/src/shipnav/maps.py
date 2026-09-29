@@ -1,7 +1,7 @@
 """Metric polygon maps. Vector distance is authoritative; unknown depth is blocked."""
 from dataclasses import dataclass, field
 import json
-from math import floor, isfinite
+from math import ceil, floor, isfinite
 from pathlib import Path
 
 from pyproj import CRS, Transformer
@@ -53,12 +53,36 @@ class LocalFrame:
         return {'origin_lonlat': [self.lon, self.lat], 'epsg': self.epsg, 'units': 'metres', 'axes': 'east,north'}
 
 
+TILES_ACROSS = 48
+
+
+def tile(polygons, size):
+    """Split land into grid-aligned pieces for the spatial index only.
+
+    `land` stays the canonical merged geometry. The union of the pieces equals it, so
+    `clear` and `minimum_clearance` are unchanged, but each query now tests a few small
+    pieces instead of a coastline with thousands of vertices."""
+    pieces = []
+    for polygon in polygons:
+        a, b, c, d = polygon.bounds
+        if c-a <= size and d-b <= size:
+            pieces.append(polygon)
+            continue
+        for i in range(floor(a/size), ceil(c/size)):
+            for j in range(floor(b/size), ceil(d/size)):
+                part = polygon.intersection(box(i*size, j*size, (i+1)*size, (j+1)*size))
+                pieces.extend(q for q in getattr(part, 'geoms', [part])
+                              if isinstance(q, Polygon) and not q.is_empty)
+    return tuple(pieces)
+
+
 @dataclass(frozen=True, init=False)
 class SeaMap:
     bounds: tuple
     land: tuple
     _metadata: str = field(repr=False)
     _tree: STRtree = field(repr=False, compare=False)
+    _pieces: tuple = field(repr=False, compare=False)
 
     def __init__(self, bounds, land=(), metadata=None):
         bounds = tuple(float(v) for v in bounds)
@@ -84,7 +108,11 @@ class SeaMap:
         parts.sort(key=lambda p: p.wkb_hex)
         object.__setattr__(self, 'bounds', bounds)
         object.__setattr__(self, 'land', tuple(parts))
-        object.__setattr__(self, '_tree', STRtree(parts))
+        # About 48 tiles across the longer side (at least 1 unit): ~25 units on the scaled
+        # Ubin map. Bounded tile count keeps loading fast at any coordinate scale.
+        pieces = tile(parts, max(1., max(bounds[2]-bounds[0], bounds[3]-bounds[1])/TILES_ACROSS))
+        object.__setattr__(self, '_pieces', pieces)
+        object.__setattr__(self, '_tree', STRtree(pieces))
         object.__setattr__(self, '_metadata', canonical_json(metadata or {}))
 
     @staticmethod
@@ -101,7 +129,7 @@ class SeaMap:
             return 0.
         segment = self._segment(a, b)
         nearest = self._tree.nearest(segment)
-        return min(edge, float(segment.distance(self.land[nearest]))) if nearest is not None else edge
+        return min(edge, float(segment.distance(self._pieces[nearest]))) if nearest is not None else edge
 
     def clear(self, a, b, clearance=0., *, mode='coastline'):
         if not isfinite(clearance) or clearance < 0:

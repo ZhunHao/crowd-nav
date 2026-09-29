@@ -29,7 +29,7 @@ from math import sin, cos, pi, dist
 
 from shipnav.dynamics import motion_from
 from shipnav.horizon import horizon_steps
-from shipnav.safety import assess, rollout
+from shipnav.safety import assess, local_sea, rollout
 
 TIME_WEIGHT = .05
 EFFORT_WEIGHT = .1
@@ -78,10 +78,11 @@ class MPC:
         motion = motion_from(self.vessel, speed) if self.vessel is not None else None
         steps = self.steps or horizon_steps(dt, 'holonomic' if self.vessel is None else 'marine', speed)
         hold = goal if self.final else None
+        sea = local_sea(self.sea, p, speed*dt*steps, radius)
         ranked = []
         for command in candidates(p, goal, speed, dt):
             path = rollout(p, command, dt, steps, motion, hold, radius)
-            clearance = assess(self.sea, path, self.predictions, radius)
+            clearance = assess(sea, path, self.predictions, radius)
             cost = progress_cost(path, goal, radius, dt) + EFFORT_WEIGHT*dist(command, v)
             ranked.append((clearance, cost, command))
         feasible = [r for r in ranked if r[0] > 0]

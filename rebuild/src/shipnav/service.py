@@ -1,4 +1,5 @@
 from hashlib import sha256
+from math import dist
 from pathlib import Path
 import json
 from shipnav.maps import SeaMap, canonical_json
@@ -16,21 +17,29 @@ _ROOT = Path(__file__).resolve().parents[3]
 def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
             policy_name: str = 'sarl', global_goals: bool = True, seed: int = 0,
             count: int = 5, cancel=lambda: False, *, scenario=None, planner='astar_smooth',
-            filtered=False, uncertainty=True, observation=None, dynamics='holonomic') -> dict:
+            filtered=False, uncertainty=True, observation=None, dynamics='holonomic',
+            resolution=1., clearance=.7, limit=None, placement='uniform') -> dict:
     if scenario is not None:
         validate_scenario(scenario)
     validate_observation(observation or {})
     sea = SeaMap.from_dict(map_data)
-    scenario = make_scenario(sea,start,goal,count,seed) if scenario is None else scenario
+    if placement not in ('uniform', 'corridor'):
+        raise ValueError('Placement must be uniform or corridor')
+    if planner == 'astar_smooth':
+        route = smooth(sea,astar(sea,tuple(start),tuple(goal),clearance,resolution),clearance)
+    elif planner == 'theta':
+        route = theta_star(sea,tuple(start),tuple(goal),clearance,resolution)
+    else:
+        raise ValueError('Unknown planner')
+    if scenario is None:
+        # Corridor traffic is timed on the A*-smoothed reference route whichever planner
+        # runs, so planner comparisons share identical traffic.
+        reference = None if placement == 'uniform' else route if planner == 'astar_smooth' else \
+            smooth(sea,astar(sea,tuple(start),tuple(goal),clearance,resolution),clearance)
+        scenario = make_scenario(sea,start,goal,count,seed,corridor=reference)
     if (canonical_json(SeaMap.from_dict(scenario['map']).to_dict()) != canonical_json(sea.to_dict())
             or tuple(scenario['start'])!=tuple(start) or tuple(scenario['goal'])!=tuple(goal)):
         raise ValueError('Scenario map/endpoints differ from run request')
-    if planner == 'astar_smooth':
-        route = smooth(sea,astar(sea,tuple(start),tuple(goal)))
-    elif planner == 'theta':
-        route = theta_star(sea,tuple(start),tuple(goal))
-    else:
-        raise ValueError('Unknown planner')
     traffic = load_traffic(scenario)
     if scenario.get('traffic_mode')=='reactive':
         from shipnav.reactive import ReactiveTraffic
@@ -55,10 +64,16 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
     else:
         raise ValueError('Policy must be sarl, orca, mpc or direct')
     observer = Observer(seed=scenario['seed'],**(observation or {}))
-    result = run_episode(sea,goals,traffic,policy,cancel=cancel,observer=observer,filtered=filtered,uncertainty=uncertainty,dynamics=dynamics)
+    # Scaled real maps get three times the nominal route time; synthetic maps retain
+    # their legacy 100 s default, including previously timed-out long routes.
+    length = sum(dist(a, b) for a, b in zip(route, route[1:]))
+    if limit is None:
+        limit = max(100., 3*length) if 'model_scale' in map_data['metadata'] else 100.
+    result = run_episode(sea,goals,traffic,policy,limit=limit,cancel=cancel,observer=observer,filtered=filtered,uncertainty=uncertainty,dynamics=dynamics)
     settings = {'seed': scenario['seed'], 'planner': planner, 'filtered': filtered, 'uncertainty': uncertainty, 'observation': observation or {}, 'dynamics': dynamics, 'requested_traffic': count,
                 'actual_traffic': len(traffic), 'policy': policy_name,
-                'global_goals': global_goals, 'dt': .25, 'limit': 100,
+                'global_goals': global_goals, 'dt': .25, 'limit': limit,
+                'resolution': resolution, 'clearance': clearance, 'placement': placement,
                 'radius': .5, 'speed': 1.0, 'query_env': False,
                 'traffic_model': scenario['traffic_mode']}
     result.update({'schema': 2, 'scenario': scenario, 'scenario_hash': scenario_hash(scenario), 'map': map_data, 'route': route, 'goals': goals,
@@ -85,17 +100,37 @@ if __name__ == '__main__':
     parser.add_argument('--planner', choices=['astar_smooth','theta'], default='astar_smooth')
     parser.add_argument('--filtered', action='store_true')
     parser.add_argument('--dynamics', choices=['holonomic','marine'], default='holonomic')
+    parser.add_argument('--profile', help='Vessel profile for a metric map (default: model for maps up to '
+                        '250,000 m², harbour_craft above). --start/--goal stay in metres')
+    parser.add_argument('--placement', choices=['uniform','corridor'],
+                        help='Traffic placement (default: uniform for model profile, corridor otherwise)')
     args = parser.parse_args()
     try:
         # json.JSONDecodeError is a ValueError; schema problems surface as
         # ValueError from validate_scenario rather than KeyError/TypeError.
+        from shipnav.scale import PROFILES, check_grid, default_profile, map_options, scaled
         scenario = json.loads(args.scenario.read_text()) if args.scenario else None
         if scenario is not None:
+            # A frozen scenario is already in model units and records its own planner settings.
             validate_scenario(scenario)
-            args.start,args.goal=scenario['start'],scenario['goal']
-        result = execute(scenario['map'] if scenario is not None else SeaMap.load(args.map).to_dict(), tuple(args.start), tuple(args.goal),
+            if args.profile:
+                raise ValueError('--profile applies to --map, not to a frozen --scenario')
+            map_data, start, goal = scenario['map'], tuple(scenario['start']), tuple(scenario['goal'])
+            options = map_options(map_data)
+        else:
+            real = SeaMap.load(args.map)
+            if args.profile is not None and args.profile not in PROFILES:
+                raise ValueError(f'Unknown profile; choose from {", ".join(PROFILES)}')
+            profile = PROFILES[args.profile] if args.profile else default_profile(real)
+            check_grid(real, profile)
+            map_data = scaled(real, profile).to_dict()
+            start, goal = (tuple(v/profile.length for v in p) for p in (args.start, args.goal))
+            options = profile.service_options()
+        placement = args.placement or ('uniform' if not map_data['metadata'].get('model_scale') else 'corridor')
+        result = execute(map_data, start, goal,
                          args.model, args.policy, not args.no_global_goals, args.seed, args.count,
-                         scenario=scenario,planner=args.planner,filtered=args.filtered,dynamics=args.dynamics)
+                         scenario=scenario,planner=args.planner,filtered=args.filtered,dynamics=args.dynamics,
+                         placement=placement, **options)
     except (ValueError, FileNotFoundError, RuntimeError) as error:
         parser.exit(2, str(error)+'\n')
     args.output.parent.mkdir(parents=True, exist_ok=True)

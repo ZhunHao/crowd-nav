@@ -10,6 +10,21 @@ def relative_clearance(a, b, c, d, radius):
     return hypot(x+f*u, y+f*v)-radius
 
 
+class _OpenWater:
+    def clear(self, *args, **kwargs):
+        return True
+
+
+_OPEN_WATER = _OpenWater()
+
+
+def local_sea(sea, position, reach, radius):
+    """Exact shortcut for rollouts from `position`: every candidate is speed-bounded, so
+    no rollout moves the disk further than `reach`. When the nearest land or map edge is
+    beyond reach+radius no rollout can touch it, and land checks are skipped."""
+    return _OPEN_WATER if sea.minimum_clearance(position, position) > reach+radius+1e-9 else sea
+
+
 def rollout(position, desired, dt, steps, motion=None, goal=None, arrival=0.):
     """Roll a constant command out `steps` steps (bounded `motion` if given).
 
@@ -53,6 +68,9 @@ def choose(sea, position, nominal, predictions, radius, speed, dt, steps=None, m
     if steps is None:
         steps = horizon_steps(dt, 'holonomic' if motion is None else 'marine', speed)
     hold = goal if final else None
+    # run_episode accepts a nominal up to speed+1e-6, and holonomic rollouts move at the
+    # command's own speed, so bound reach by the fastest candidate actually tried.
+    sea = local_sea(sea, position, max(speed, hypot(*nominal))*dt*steps, radius)
     candidates = [tuple(nominal), (0., 0.)]
     candidates += [(s*cos(k*pi/8), s*sin(k*pi/8)) for s in (speed*.5, speed) for k in range(16)]
     scored = []
