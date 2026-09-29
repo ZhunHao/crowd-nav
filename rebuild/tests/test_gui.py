@@ -213,3 +213,34 @@ def test_export_runs_in_worker_and_restores_controls(qtbot, monkeypatch, tmp_pat
     assert window.run_button.isEnabled()
     assert window.export_button.isEnabled()
     window.close()
+
+
+@pytest.mark.parametrize('root', [None, [], [1], 'invalid', 1, 1.5, True])
+def test_malformed_map_root_preserves_scene_and_valid_load_recovers(qtbot, tmp_path, root):
+    import json
+    window = Window(SeaMap((0, 0, 24, 24)))
+    qtbot.addWidget(window)
+    window.apply_click(3, 3)
+    window.mode.setCurrentIndex(2)
+    window.apply_click(8, 8)
+    previous = (window.real, window.sea, window.profile, window.start, window.goal,
+                window.corner, window.vessel.currentText(), window.placement.currentIndex())
+    malformed = tmp_path / 'malformed.json'
+    malformed.write_text(json.dumps(root))
+    try:
+        window.set_map(malformed)
+        assert window.status.text().startswith('Map not loaded:')
+        assert (window.real, window.sea, window.profile, window.start, window.goal,
+                window.corner, window.vessel.currentText(),
+                window.placement.currentIndex()) == previous
+        valid = tmp_path / 'valid.json'
+        replacement = SeaMap((0, 0, 30, 30), metadata={'description': 'recovery'})
+        valid.write_text(json.dumps(replacement.to_dict()))
+        window.set_map(valid)
+        assert window.real.to_dict() == replacement.to_dict()
+        assert window.sea.to_dict() == replacement.to_dict()
+        assert window.start == (2, 2) and window.goal == (28, 28)
+        assert window.corner is None
+        assert window.status.text().startswith('Map loaded with vessel profile model')
+    finally:
+        window.close()

@@ -207,7 +207,7 @@ class Window(QWidget):
             profile = default_profile(real)
             check_grid(real, profile)
             sea = scaled(real, profile)
-        except (ValueError, TypeError, KeyError, OSError) as error:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
             self.status.setText(f'Map not loaded: {error}')
             return
         self.real, self.profile, self.sea, self.corner = real, profile, sea, None
