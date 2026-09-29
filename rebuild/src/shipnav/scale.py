@@ -11,7 +11,7 @@ dt = .25 L/V seconds; traffic speed .3-1 model units = .3V-V m/s; marine limits
 .2 V²/L m/s² and .35 V/L rad/s; the planner grid is `resolution_m`.
 """
 from dataclasses import dataclass
-from math import isfinite
+from math import ceil, isfinite
 from shapely import affinity
 from shapely.geometry import box
 from shipnav.maps import SeaMap
@@ -91,7 +91,7 @@ def scaled(sea: SeaMap, profile: Profile) -> SeaMap:
 def check_grid(sea: SeaMap, profile: Profile, max_cells: int = 250_000) -> None:
     """Reject a map/profile pair whose planning grid exceeds the planner's cell budget."""
     x0, y0, x1, y1 = sea.bounds
-    cells = ((x1-x0)/profile.resolution_m)*((y1-y0)/profile.resolution_m)
+    cells = ceil((x1-x0)/profile.resolution_m)*ceil((y1-y0)/profile.resolution_m)
     if cells > max_cells:
         raise ValueError(f'{profile.name} plans on a {profile.resolution_m:g} m grid: {cells:,.0f} cells '
                          f'exceed {max_cells:,}. Choose a larger vessel profile')

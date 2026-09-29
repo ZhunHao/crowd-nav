@@ -135,3 +135,14 @@ def test_long_synthetic_route_keeps_the_legacy_automatic_timeout():
                   policy_name='direct', count=0)
     assert run['status'] == 'timeout' and run['elapsed'] == 100.
     assert len(run['frames']) == 401 and run['settings']['limit'] == 100.
+
+
+def test_grid_preflight_rounds_fractional_dimensions_like_the_planner():
+    from shipnav.planning import PlanningLimit, plan
+    sea = SeaMap((0, 0, 500.1, 499.8), ((240, 100, 260, 400),))
+    # The route requires a grid; fractional-area arithmetic undercounts its cells.
+    with pytest.raises(PlanningLimit, match='Grid has 250500 cells'):
+        plan(sea, (100, 250), (400, 250))
+    with pytest.raises(ValueError, match='250,500 cells'):
+        check_grid(sea, PROFILES['model'])
+    check_grid(SeaMap((0, 0, 500, 499.8)), PROFILES['model'])
