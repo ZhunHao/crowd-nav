@@ -146,3 +146,35 @@ def test_grid_preflight_rounds_fractional_dimensions_like_the_planner():
     with pytest.raises(ValueError, match='250,500 cells'):
         check_grid(sea, PROFILES['model'])
     check_grid(SeaMap((0, 0, 500, 499.8)), PROFILES['model'])
+
+
+def test_a_ten_times_larger_harbour_runs_identically_in_model_units(tmp_path):
+    import csv
+    from shipnav.export import export_run
+
+    profile = Profile('ten', 5., 1., 2., 10.)   # L = 10 m, time scale 10 s
+    real = enlarged(HARBOUR, 10)
+    model = to_model(real, profile)
+    assert model.bounds == HARBOUR.bounds and units(model.to_dict()) == (10., 10.)
+    options = dict(policy_name='direct', seed=3, count=4, filtered=True, **profile.service_options())
+    a = execute(HARBOUR.to_dict(), (2, 2), (22, 22), **options)
+    b = execute(model.to_dict(), (2, 2), (22, 22), **options)
+    assert a['status'] == b['status'] and a['traffic_definitions'] == b['traffic_definitions']
+    for f, g in zip(a['frames'], b['frames'], strict=True):
+        assert f['t'] == g['t'] and f['position'] == pytest.approx(g['position'], abs=1e-9)
+    export_run(b, tmp_path/'b.csv')
+    with (tmp_path/'b.csv').open() as handle:
+        rows = list(csv.DictReader(handle))
+    assert float(rows[-1]['time_s']) == pytest.approx(10*b['elapsed'])
+    assert float(rows[-1]['x_m']) == pytest.approx(10*b['frames'][-1]['position'][0])
+    assert float(rows[0]['executed_vx']) == pytest.approx(b['diagnostics'][0]['executed'][0])
+
+
+def test_video_speedup_keeps_terminal_frame_and_caps_fps():
+    from shipnav.export import video_frames
+
+    result = {'frames': [{}]*4191, 'settings': {'dt': .25}, 'elapsed': 1047.5,
+              'map': {'metadata': {'model_scale': {'length_m': 10., 'speed_mps': 5.}}}}
+    indices, fps = video_frames(result, speedup=18.)
+    assert indices[0] == 0 and indices[-1] == 4190 and fps <= 30
+    assert len(indices)/fps == pytest.approx(1047.5*2/18, rel=.01)
