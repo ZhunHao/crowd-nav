@@ -1,0 +1,3112 @@
+{
+  "rows": 24,
+  "variants": {
+    "sarl_reference": {
+      "n": 2,
+      "statuses": {
+        "collision": 1,
+        "timeout": 1
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.5,
+      "ship_collisions": 0,
+      "land_collisions": 1,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": false,
+      "by_family": {
+        "random": {
+          "collision": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 535.9999999999955
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 34.85677459913254
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.8889087296525884
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 89.69199573860391
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.09391122807924
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "sarl_theta": {
+      "n": 2,
+      "statuses": {
+        "collision": 1,
+        "timeout": 1
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.5,
+      "ship_collisions": 0,
+      "land_collisions": 1,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": false,
+      "by_family": {
+        "random": {
+          "collision": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 535.9999999999955
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 34.85677459913254
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.8889087296525884
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 89.69199573860391
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.09391122807924
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "sarl_no_goals": {
+      "n": 2,
+      "statuses": {
+        "collision": 1,
+        "timeout": 1
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.5,
+      "ship_collisions": 0,
+      "land_collisions": 1,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": false,
+      "by_family": {
+        "random": {
+          "collision": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 535.9999999999955
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 34.85677459913254
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.8889087296525884
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 89.69199573860391
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.09391122807924
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "sarl_filtered": {
+      "n": 2,
+      "statuses": {
+        "timeout": 2
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "timeout": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 536.4999999999955
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 33.800861087023954
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.906586399182252
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 91.56145221149878
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.43260465007967
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 162.5
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "sarl_cv_filter": {
+      "n": 2,
+      "statuses": {
+        "timeout": 2
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "timeout": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 536.4999999999955
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 33.800861087023954
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.906586399182252
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 91.56145221149878
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.43260465007967
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 162.5
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "sarl_degraded": {
+      "n": 2,
+      "statuses": {
+        "timeout": 2
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "timeout": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 536.8124999999951
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 33.05629565476751
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.9176349426382908
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 91.37703071351058
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 117.14282478112983
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 162.5
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "orca_reference": {
+      "n": 2,
+      "statuses": {
+        "success": 2
+      },
+      "success_rate": 1.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": true,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "success": 1
+        },
+        "ubin_corridor": {
+          "success": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 2,
+          "mean": 49.75
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 187.11646367766775
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 0.10996701877355125
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 2.625
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 0.9907755940185575
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 1.9619813873609406
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 127.1093661741709
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "orca_filtered": {
+      "n": 2,
+      "statuses": {
+        "success": 2
+      },
+      "success_rate": 1.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": true,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "success": 1
+        },
+        "ubin_corridor": {
+          "success": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 2,
+          "mean": 49.75
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 188.30056969807495
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 1.1328834489497925
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 1.5
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 0.9956949750688401
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 2.61207074429203
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 127.1093661741709
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 9.5
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "direct_reference": {
+      "n": 2,
+      "statuses": {
+        "collision": 2
+      },
+      "success_rate": 0.0,
+      "collision_rate": 1.0,
+      "ship_collisions": 2,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": false,
+      "by_family": {
+        "random": {
+          "collision": 1
+        },
+        "ubin_corridor": {
+          "collision": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 49.124999999998046
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": -0.8151920221079677
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0.875
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 0.4369031832020708
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 1.7098419750751741e-12
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 127.1093661741709
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "marine_sarl": {
+      "n": 2,
+      "statuses": {
+        "timeout": 2
+      },
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": false,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "timeout": 1
+        },
+        "ubin_corridor": {
+          "timeout": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 521.5809157523685
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 32.66413403275439
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 0
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 1.876434556900173
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 91.26249514331711
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 116.4411860935261
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 164.5
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "marine_mpc": {
+      "n": 2,
+      "statuses": {
+        "success": 2
+      },
+      "success_rate": 1.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": true,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "success": 1
+        },
+        "ubin_corridor": {
+          "success": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 2,
+          "mean": 52.5
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 187.21100608221127
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 2.9265453866026263
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 1.375
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 0.9955548178721016
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 1.151885067885204
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 127.1093661741709
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 2,
+          "mean": 0
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    },
+    "marine_mpc_unfiltered": {
+      "n": 2,
+      "statuses": {
+        "success": 2
+      },
+      "success_rate": 1.0,
+      "collision_rate": 0.0,
+      "ship_collisions": 0,
+      "land_collisions": 0,
+      "unevaluated_collision_count": 0,
+      "success_target_met": true,
+      "collision_target_met": true,
+      "by_family": {
+        "random": {
+          "success": 1
+        },
+        "ubin_corridor": {
+          "success": 1
+        }
+      },
+      "metrics": {
+        "elapsed_s": {
+          "n": 2,
+          "mean": 52.5
+        },
+        "distance_m": {
+          "n": 2,
+          "mean": 187.21100608221127
+        },
+        "min_ship_clearance": {
+          "n": 2,
+          "mean": 2.9265453866026263
+        },
+        "domain_time_s": {
+          "n": 2,
+          "mean": 1.375
+        },
+        "reference_detour_ratio": {
+          "n": 2,
+          "mean": 0.9955548178721016
+        },
+        "reference_cross_track_mean_m": {
+          "n": 2,
+          "mean": 1.151885067885204
+        },
+        "sampled_land_clearance_m": {
+          "n": 2,
+          "mean": 127.1093661741709
+        },
+        "overrides": {
+          "n": 2,
+          "mean": 0
+        },
+        "no_feasible_actions": {
+          "n": 0,
+          "mean": null
+        },
+        "solver_failures": {
+          "n": 2,
+          "mean": 0
+        },
+        "dynamics_violations": {
+          "n": 2,
+          "mean": 0
+        },
+        "elapsed_model": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_model": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_model": {
+          "n": 0,
+          "mean": null
+        }
+      },
+      "southern_physical_metrics": {
+        "elapsed_s": {
+          "n": 0,
+          "mean": null
+        },
+        "distance_m": {
+          "n": 0,
+          "mean": null
+        },
+        "min_ship_clearance": {
+          "n": 0,
+          "mean": null
+        },
+        "reference_cross_track_mean_m": {
+          "n": 0,
+          "mean": null
+        },
+        "domain_time_s": {
+          "n": 0,
+          "mean": null
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "planner": {
+      "a": "sarl_reference",
+      "b": "sarl_theta",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    },
+    "goals": {
+      "a": "sarl_reference",
+      "b": "sarl_no_goals",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    },
+    "SARL_filter": {
+      "a": "sarl_reference",
+      "b": "sarl_filtered",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0.5,
+        "low": 0.0,
+        "high": 1.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    },
+    "ORCA_filter": {
+      "a": "orca_reference",
+      "b": "orca_filtered",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [],
+      "completion_time_s": {
+        "difference": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2,
+        "excluded": []
+      },
+      "fixed_reference_detour": {
+        "difference": -0.004919381050282556,
+        "low": -0.006496200334769164,
+        "high": -0.0033425617657959483,
+        "pairs": 2,
+        "excluded": []
+      },
+      "fixed_reference_tracking_m": {
+        "difference": -0.6500893569310895,
+        "low": -1.2520344581333007,
+        "high": -0.04814425572887826,
+        "pairs": 2,
+        "excluded": []
+      }
+    },
+    "MPC_filter": {
+      "a": "marine_mpc",
+      "b": "marine_mpc_unfiltered",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [],
+      "completion_time_s": {
+        "difference": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2,
+        "excluded": []
+      },
+      "fixed_reference_detour": {
+        "difference": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2,
+        "excluded": []
+      },
+      "fixed_reference_tracking_m": {
+        "difference": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2,
+        "excluded": []
+      }
+    },
+    "prediction": {
+      "a": "sarl_filtered",
+      "b": "sarl_cv_filter",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    },
+    "sensing": {
+      "a": "sarl_filtered",
+      "b": "sarl_degraded",
+      "success": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    },
+    "matched_marine_controller": {
+      "a": "marine_sarl",
+      "b": "marine_mpc",
+      "success": {
+        "difference": -1,
+        "low": -1.0,
+        "high": -1.0,
+        "pairs": 2
+      },
+      "collision": {
+        "difference": 0,
+        "low": 0.0,
+        "high": 0.0,
+        "pairs": 2
+      },
+      "excluded_joint_success": [
+        "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+        "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+      ],
+      "completion_time_s": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_detour": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      },
+      "fixed_reference_tracking_m": {
+        "pairs": 0,
+        "difference": null,
+        "low": null,
+        "high": null,
+        "excluded": [
+          "cbfcbdfe8b0eaafbe1e33da31a8d87b838d7b63dd739ffdbbc7b640477b38aef",
+          "daa1647ffd779bf03b0d7c779d1f02f3cc8353b74192d32c8997de2a5a14c23b"
+        ]
+      }
+    }
+  },
+  "timing": {
+    "direct_reference/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 0.07116600318113342,
+      "p95_ms": 0.07116600318113342,
+      "p99_ms": 0.07116600318113342,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 0.005959002010058612,
+      "p95_ms": 0.005959002010058612,
+      "p99_ms": 0.005959002010058612,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 0.02193749969592318,
+      "p95_ms": 0.027149997185915705,
+      "p99_ms": 0.027929996140301228,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.0011560005077626556,
+      "p95_ms": 0.0015499983419431371,
+      "p99_ms": 0.0016099979256978258,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=1/warmed/decision": {
+      "count": 27,
+      "mean_ms": 0.029052407491555507,
+      "p95_ms": 0.09082479518838225,
+      "p99_ms": 0.10596749474643728,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=1/warmed/inference": {
+      "count": 27,
+      "mean_ms": 0.0015031107102037855,
+      "p95_ms": 0.004045497189508749,
+      "p99_ms": 0.006806583696743469,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 0.09866699838312343,
+      "p95_ms": 0.09866699838312343,
+      "p99_ms": 0.09866699838312343,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 0.01158300437964499,
+      "p95_ms": 0.01158300437964499,
+      "p99_ms": 0.01158300437964499,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 0.05030175088904798,
+      "p95_ms": 0.05419365224952344,
+      "p99_ms": 0.05463873218104709,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.0015730001905467361,
+      "p95_ms": 0.0024151046090992163,
+      "p99_ms": 0.002550225253798999,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/warmed/decision": {
+      "count": 68,
+      "mean_ms": 0.05320711716194637,
+      "p95_ms": 0.07518969723605548,
+      "p99_ms": 0.1384345802216557,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=3/warmed/inference": {
+      "count": 68,
+      "mean_ms": 0.0011397206596002968,
+      "p95_ms": 0.001747901114868,
+      "p99_ms": 0.002110221612383611,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 0.08491650078212842,
+      "p95_ms": 0.09729194862302393,
+      "p99_ms": 0.09839198843110353,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 0.0087710031948518,
+      "p95_ms": 0.011301804261165671,
+      "p99_ms": 0.011526764355949126,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 0.03611962529248558,
+      "p95_ms": 0.05345185236365069,
+      "p99_ms": 0.05449037220387254,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 0.0013645003491546959,
+      "p95_ms": 0.0022483527573058377,
+      "p99_ms": 0.0025168748834403227,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/warmed/decision": {
+      "count": 95,
+      "mean_ms": 0.0463420944135195,
+      "p95_ms": 0.08761249628150831,
+      "p99_ms": 0.12638555970625032,
+      "deadline_misses": 0
+    },
+    "direct_reference/holonomic/traffic=all/warmed/inference": {
+      "count": 95,
+      "mean_ms": 0.0012429999371402357,
+      "p95_ms": 0.001970602897927165,
+      "p99_ms": 0.004993017209926626,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 3.1990409988793544,
+      "p95_ms": 3.1990409988793544,
+      "p99_ms": 3.1990409988793544,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 1.9964169987360947,
+      "p95_ms": 1.9964169987360947,
+      "p99_ms": 1.9964169987360947,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 3.163448249324574,
+      "p95_ms": 3.231808147029369,
+      "p99_ms": 3.2385280261951266,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 1.9838857515424024,
+      "p95_ms": 2.026406355071231,
+      "p99_ms": 2.0287812756578205,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/warmed/decision": {
+      "count": 143,
+      "mean_ms": 3.647952860239991,
+      "p95_ms": 4.969041603180813,
+      "p99_ms": 5.757911999244246,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=1/warmed/inference": {
+      "count": 143,
+      "mean_ms": 2.266495014171253,
+      "p95_ms": 3.208829196955776,
+      "p99_ms": 3.653647637693214,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 23.695333999057766,
+      "p95_ms": 23.695333999057766,
+      "p99_ms": 23.695333999057766,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 14.813709000009112,
+      "p95_ms": 14.813709000009112,
+      "p99_ms": 14.813709000009112,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 27.49258350013406,
+      "p95_ms": 32.41562320254161,
+      "p99_ms": 33.36125824294868,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 17.10968775114452,
+      "p95_ms": 21.45730269985506,
+      "p99_ms": 22.2425277394359,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/warmed/decision": {
+      "count": 119,
+      "mean_ms": 20.976975024763412,
+      "p95_ms": 31.02635379982529,
+      "p99_ms": 43.85933361874771,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=3/warmed/inference": {
+      "count": 119,
+      "mean_ms": 12.863539563144162,
+      "p95_ms": 17.91973750296165,
+      "p99_ms": 30.487812502105896,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 13.44718749896856,
+      "p95_ms": 22.670519349048845,
+      "p99_ms": 23.490371069055982,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 8.405062999372603,
+      "p95_ms": 14.172844399945461,
+      "p99_ms": 14.685536079996382,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 15.328015874729317,
+      "p95_ms": 30.83956480186316,
+      "p99_ms": 33.04604656281299,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 9.546786751343461,
+      "p95_ms": 20.148594300553665,
+      "p99_ms": 21.98078605957562,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/warmed/decision": {
+      "count": 262,
+      "mean_ms": 11.51876827084414,
+      "p95_ms": 26.98515684605808,
+      "p99_ms": 35.71045188073183,
+      "deadline_misses": 0
+    },
+    "marine_mpc/marine/traffic=all/warmed/inference": {
+      "count": 262,
+      "mean_ms": 7.07965646962078,
+      "p95_ms": 16.27257085528981,
+      "p99_ms": 23.464299380648296,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 2.3284580020117573,
+      "p95_ms": 2.3284580020117573,
+      "p99_ms": 2.3284580020117573,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 2.230209000117611,
+      "p95_ms": 2.230209000117611,
+      "p99_ms": 2.230209000117611,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 2.264489501612843,
+      "p95_ms": 2.373126799284364,
+      "p99_ms": 2.3859917590016266,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 2.233760251328931,
+      "p95_ms": 2.3439107048034202,
+      "p99_ms": 2.3571157453989144,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/warmed/decision": {
+      "count": 143,
+      "mean_ms": 3.63957925216894,
+      "p95_ms": 5.9259124973323205,
+      "p99_ms": 18.26691214155291,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=1/warmed/inference": {
+      "count": 143,
+      "mean_ms": 3.5983414755636742,
+      "p95_ms": 5.700354101281846,
+      "p99_ms": 18.164300361531804,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 13.85945799847832,
+      "p95_ms": 13.85945799847832,
+      "p99_ms": 13.85945799847832,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 13.774332997854799,
+      "p95_ms": 13.774332997854799,
+      "p99_ms": 13.774332997854799,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 16.5582395002275,
+      "p95_ms": 19.93077055340109,
+      "p99_ms": 20.462020513878088,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 16.44960424891906,
+      "p95_ms": 19.786029497845448,
+      "p99_ms": 20.308539497709717,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/warmed/decision": {
+      "count": 119,
+      "mean_ms": 14.21460123515508,
+      "p95_ms": 20.965808397158956,
+      "p99_ms": 58.2160056196151,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=3/warmed/inference": {
+      "count": 119,
+      "mean_ms": 14.12641494115472,
+      "p95_ms": 20.881196200207317,
+      "p99_ms": 58.12431512051241,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 8.093958000245038,
+      "p95_ms": 13.282907998654991,
+      "p99_ms": 13.744147998513654,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 8.002270998986205,
+      "p95_ms": 13.19712679796794,
+      "p99_ms": 13.658891757877427,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 9.411364500920172,
+      "p95_ms": 19.04535395260609,
+      "p99_ms": 20.284937193719088,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 9.341682250123995,
+      "p95_ms": 18.915179498071662,
+      "p99_ms": 20.13436949775496,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/warmed/decision": {
+      "count": 262,
+      "mean_ms": 8.442738091769515,
+      "p95_ms": 17.338796149851984,
+      "p99_ms": 44.54510548646751,
+      "deadline_misses": 0
+    },
+    "marine_mpc_unfiltered/marine/traffic=all/warmed/inference": {
+      "count": 262,
+      "mean_ms": 8.380176370240523,
+      "p95_ms": 17.252930955146436,
+      "p99_ms": 44.45733874221289,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 29.596667001897004,
+      "p95_ms": 29.596667001897004,
+      "p99_ms": 29.596667001897004,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 28.16454200365115,
+      "p95_ms": 28.16454200365115,
+      "p99_ms": 28.16454200365115,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 20.189593498798786,
+      "p95_ms": 26.76644364983076,
+      "p99_ms": 28.009488729585428,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 18.720896001468645,
+      "p95_ms": 25.39513125302619,
+      "p99_ms": 26.644826253614156,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 17.731177322818976,
+      "p95_ms": 22.77893740028958,
+      "p99_ms": 35.26866700107351,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 16.28771140745067,
+      "p95_ms": 21.12484199606114,
+      "p99_ms": 31.934360262239355,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 29.099333005433436,
+      "p95_ms": 29.099333005433436,
+      "p99_ms": 29.099333005433436,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 19.706791994394735,
+      "p95_ms": 19.706791994394735,
+      "p99_ms": 19.706791994394735,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 26.452656496985583,
+      "p95_ms": 26.917660744220484,
+      "p99_ms": 26.950165743764956,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 17.81807300176297,
+      "p95_ms": 18.09938125225017,
+      "p99_ms": 18.12597625219496,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/warmed/decision": {
+      "count": 395,
+      "mean_ms": 28.780028301153386,
+      "p95_ms": 36.68820439779663,
+      "p99_ms": 46.91198300235556,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=3/warmed/inference": {
+      "count": 395,
+      "mean_ms": 19.826625827887785,
+      "p95_ms": 25.054887300939285,
+      "p99_ms": 34.209133943368215,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 29.34800000366522,
+      "p95_ms": 29.571800302073825,
+      "p99_ms": 29.591693661932368,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 23.935666999022942,
+      "p95_ms": 27.74165450318833,
+      "p99_ms": 28.079964503558585,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 23.321124997892184,
+      "p95_ms": 27.843564697468537,
+      "p99_ms": 28.224912939112983,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 18.269484501615807,
+      "p95_ms": 23.868631253208147,
+      "p99_ms": 26.339526253650547,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/warmed/decision": {
+      "count": 810,
+      "mean_ms": 23.11919724435242,
+      "p95_ms": 33.46024009842949,
+      "p99_ms": 45.13282427469675,
+      "deadline_misses": 0
+    },
+    "marine_sarl/marine/traffic=all/warmed/inference": {
+      "count": 810,
+      "mean_ms": 18.013478316182347,
+      "p95_ms": 23.790164399906637,
+      "p99_ms": 33.832091779113384,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 1.2840420022257604,
+      "p95_ms": 1.2840420022257604,
+      "p99_ms": 1.2840420022257604,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 0.1434579971828498,
+      "p95_ms": 0.1434579971828498,
+      "p99_ms": 0.1434579971828498,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 0.7606772505823756,
+      "p95_ms": 0.9399902010045479,
+      "p99_ms": 0.9723652408865746,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.02019775092776399,
+      "p95_ms": 0.026045499544125047,
+      "p99_ms": 0.026975499640684575,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/warmed/decision": {
+      "count": 137,
+      "mean_ms": 1.6761992114913025,
+      "p95_ms": 3.0201750021660696,
+      "p99_ms": 11.902077882550554,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=1/warmed/inference": {
+      "count": 137,
+      "mean_ms": 0.04187043748598845,
+      "p95_ms": 0.08801660005701706,
+      "p99_ms": 0.15894648327957817,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 4.623375003575347,
+      "p95_ms": 4.623375003575347,
+      "p99_ms": 4.623375003575347,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 0.06579199543921277,
+      "p95_ms": 0.06579199543921277,
+      "p99_ms": 0.06579199543921277,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 4.800822998731746,
+      "p95_ms": 5.219199947168818,
+      "p99_ms": 5.275439987162827,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.024593749913037755,
+      "p95_ms": 0.03217060148017481,
+      "p99_ms": 0.033000521652866155,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/warmed/decision": {
+      "count": 109,
+      "mean_ms": 3.903514862265075,
+      "p95_ms": 6.458091402600982,
+      "p99_ms": 32.16127464082093,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=3/warmed/inference": {
+      "count": 109,
+      "mean_ms": 0.02232151385823931,
+      "p95_ms": 0.05675000284099944,
+      "p99_ms": 0.09941555908881129,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 2.953708502900554,
+      "p95_ms": 4.456408353507868,
+      "p99_ms": 4.5899816735618515,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 0.10462499631103128,
+      "p95_ms": 0.13957469709566794,
+      "p99_ms": 0.14268133716541342,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 2.780750124657061,
+      "p95_ms": 5.125466547178803,
+      "p99_ms": 5.256693307164824,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 0.022395750420400873,
+      "p95_ms": 0.0311080009851139,
+      "p99_ms": 0.032788001553853974,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/warmed/decision": {
+      "count": 246,
+      "mean_ms": 2.6630992356146406,
+      "p95_ms": 5.591270752120181,
+      "p99_ms": 28.517140998155813,
+      "deadline_misses": 0
+    },
+    "orca_filtered/holonomic/traffic=all/warmed/inference": {
+      "count": 246,
+      "mean_ms": 0.033208516041172774,
+      "p95_ms": 0.08474999594909605,
+      "p99_ms": 0.157454103100463,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 1.1572919975151308,
+      "p95_ms": 1.1572919975151308,
+      "p99_ms": 1.1572919975151308,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 1.0951670046779327,
+      "p95_ms": 1.0951670046779327,
+      "p99_ms": 1.0951670046779327,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 0.03786449815379456,
+      "p95_ms": 0.05399814726843032,
+      "p99_ms": 0.05663322641339618,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.013771001249551773,
+      "p95_ms": 0.021550001474679444,
+      "p99_ms": 0.02281000146467704,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/warmed/decision": {
+      "count": 137,
+      "mean_ms": 0.026749124721603564,
+      "p95_ms": 0.03100900212302803,
+      "p99_ms": 0.08454488241113639,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=1/warmed/inference": {
+      "count": 137,
+      "mean_ms": 0.008079371668728082,
+      "p95_ms": 0.010008005483541634,
+      "p99_ms": 0.022222997213248066,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 7.136332998925354,
+      "p95_ms": 7.136332998925354,
+      "p99_ms": 7.136332998925354,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 7.062458993459586,
+      "p95_ms": 7.062458993459586,
+      "p99_ms": 7.062458993459586,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 0.0688540003466187,
+      "p95_ms": 0.08633125071355607,
+      "p99_ms": 0.08916625047277194,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 0.016500001947861165,
+      "p95_ms": 0.02396430099906865,
+      "p99_ms": 0.02515926091291476,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/warmed/decision": {
+      "count": 109,
+      "mean_ms": 0.063441156029462,
+      "p95_ms": 0.09145840012934049,
+      "p99_ms": 0.15227800264256078,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=3/warmed/inference": {
+      "count": 109,
+      "mean_ms": 0.012515256875045086,
+      "p95_ms": 0.016616801440250125,
+      "p99_ms": 0.023328276292886585,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 4.146812498220243,
+      "p95_ms": 6.837380948854843,
+      "p99_ms": 7.076542588911252,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 4.078812999068759,
+      "p95_ms": 6.764094394020503,
+      "p99_ms": 7.0027860735717695,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 0.05335924925020663,
+      "p95_ms": 0.08160625111486296,
+      "p99_ms": 0.08822125055303331,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 0.015135501598706469,
+      "p95_ms": 0.02464145109115634,
+      "p99_ms": 0.025294690931332298,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/warmed/decision": {
+      "count": 246,
+      "mean_ms": 0.04300697599215872,
+      "p95_ms": 0.06615624806727283,
+      "p99_ms": 0.13532720258808695,
+      "deadline_misses": 0
+    },
+    "orca_reference/holonomic/traffic=all/warmed/inference": {
+      "count": 246,
+      "mean_ms": 0.010044865520307568,
+      "p95_ms": 0.015156254448811524,
+      "p99_ms": 0.024176896113203856,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 29.277458997967187,
+      "p95_ms": 29.277458997967187,
+      "p99_ms": 29.277458997967187,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 28.237124999577645,
+      "p95_ms": 28.237124999577645,
+      "p99_ms": 28.237124999577645,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 24.151666499165003,
+      "p95_ms": 25.231032949886867,
+      "p99_ms": 25.26357299015217,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 23.183072997198906,
+      "p95_ms": 24.31105624709744,
+      "p99_ms": 24.386311247362755,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 21.483814252939506,
+      "p95_ms": 34.41600010119144,
+      "p99_ms": 49.63215926385606,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 20.584882127667402,
+      "p95_ms": 31.812445597461114,
+      "p99_ms": 47.96670961732167,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 23.98745800019242,
+      "p95_ms": 23.98745800019242,
+      "p99_ms": 23.98745800019242,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 19.48991599783767,
+      "p95_ms": 19.48991599783767,
+      "p99_ms": 19.48991599783767,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 21.663947749402723,
+      "p95_ms": 21.908514250753797,
+      "p99_ms": 21.909069250614266,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 17.111999999542604,
+      "p95_ms": 17.526931250540656,
+      "p99_ms": 17.60158625060285,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/warmed/decision": {
+      "count": 395,
+      "mean_ms": 24.588897655632557,
+      "p95_ms": 33.234512402123045,
+      "p99_ms": 43.70798502553953,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=3/warmed/inference": {
+      "count": 395,
+      "mean_ms": 19.94725059755839,
+      "p95_ms": 26.80318310158327,
+      "p99_ms": 37.192233003734145,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 26.632458499079803,
+      "p95_ms": 29.01295894807845,
+      "p99_ms": 29.22455898798944,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 23.863520498707658,
+      "p95_ms": 27.799764549490646,
+      "p99_ms": 28.149652909560245,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 22.907807124283863,
+      "p95_ms": 25.176799549444695,
+      "p99_ms": 25.252726310063736,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 20.147536498370755,
+      "p95_ms": 24.185631246655248,
+      "p99_ms": 24.361226247274317,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/warmed/decision": {
+      "count": 810,
+      "mean_ms": 22.998021591289824,
+      "p95_ms": 33.858873247663716,
+      "p99_ms": 46.27134272428517,
+      "deadline_misses": 0
+    },
+    "sarl_cv_filter/holonomic/traffic=all/warmed/inference": {
+      "count": 810,
+      "mean_ms": 20.273938356811772,
+      "p95_ms": 30.217392004124118,
+      "p99_ms": 44.5531210581248,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 66.72750000143424,
+      "p95_ms": 66.72750000143424,
+      "p99_ms": 66.72750000143424,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 65.70279099832987,
+      "p95_ms": 65.70279099832987,
+      "p99_ms": 65.70279099832987,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 27.303521248541074,
+      "p95_ms": 34.5647063008073,
+      "p99_ms": 35.38964126062638,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 26.428124998346902,
+      "p95_ms": 33.78735444821359,
+      "p99_ms": 34.63190448812384,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 18.526708433935447,
+      "p95_ms": 26.269333101663484,
+      "p99_ms": 50.182197758695224,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 17.74044094702961,
+      "p95_ms": 25.299833203462182,
+      "p99_ms": 48.95949636164017,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 26.289959001587704,
+      "p95_ms": 26.289959001587704,
+      "p99_ms": 26.289959001587704,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 21.27758300048299,
+      "p95_ms": 21.27758300048299,
+      "p99_ms": 21.27758300048299,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 26.890020748396637,
+      "p95_ms": 34.545349999461905,
+      "p99_ms": 35.927569998966646,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 21.77955225124606,
+      "p95_ms": 29.334489304528685,
+      "p99_ms": 30.735664265594092,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/warmed/decision": {
+      "count": 395,
+      "mean_ms": 23.70959787564706,
+      "p95_ms": 27.690287495352088,
+      "p99_ms": 32.58956249410404,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=3/warmed/inference": {
+      "count": 395,
+      "mean_ms": 19.134837247930832,
+      "p95_ms": 22.03089999893563,
+      "p99_ms": 25.10456999501913,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 46.50872950151097,
+      "p95_ms": 64.70562295144191,
+      "p99_ms": 66.32312459143577,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 43.49018699940643,
+      "p95_ms": 63.48153059843753,
+      "p99_ms": 65.2585389183514,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 27.096770998468855,
+      "p95_ms": 36.03608749945124,
+      "p99_ms": 36.225717498964514,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 24.10383862479648,
+      "p95_ms": 33.528062600817066,
+      "p99_ms": 34.58004611864453,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/warmed/decision": {
+      "count": 810,
+      "mean_ms": 21.054166865387405,
+      "p95_ms": 27.466470498256953,
+      "p99_ms": 42.5335749693476,
+      "deadline_misses": 0
+    },
+    "sarl_degraded/holonomic/traffic=all/warmed/inference": {
+      "count": 810,
+      "mean_ms": 18.420424328333294,
+      "p95_ms": 23.62490639970927,
+      "p99_ms": 39.239627691567804,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 17.341040998871904,
+      "p95_ms": 17.341040998871904,
+      "p99_ms": 17.341040998871904,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 16.643292001390364,
+      "p95_ms": 16.643292001390364,
+      "p99_ms": 16.643292001390364,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 17.92867699805356,
+      "p95_ms": 19.886191845944268,
+      "p99_ms": 20.227471965845325,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 17.214666750078322,
+      "p95_ms": 19.14383940056723,
+      "p99_ms": 19.47793428065779,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 18.940303002393676,
+      "p95_ms": 23.875837600644438,
+      "p99_ms": 36.71104111868775,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 18.133021879493096,
+      "p95_ms": 23.09181599848671,
+      "p99_ms": 35.097366755944705,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 41.582208999898285,
+      "p95_ms": 41.582208999898285,
+      "p99_ms": 41.582208999898285,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 33.22191600454971,
+      "p95_ms": 33.22191600454971,
+      "p99_ms": 33.22191600454971,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 36.53879150078865,
+      "p95_ms": 42.00794185271661,
+      "p99_ms": 42.41192197332566,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 28.455166999265202,
+      "p95_ms": 33.32967949609156,
+      "p99_ms": 33.69306949534803,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/warmed/decision": {
+      "count": 395,
+      "mean_ms": 24.001505387552037,
+      "p95_ms": 31.57968759842332,
+      "p99_ms": 47.249049485544674,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=3/warmed/inference": {
+      "count": 395,
+      "mean_ms": 19.454164891168503,
+      "p95_ms": 25.4740295029478,
+      "p99_ms": 38.888391055515974,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 29.461624999385094,
+      "p95_ms": 40.370150599846966,
+      "p99_ms": 41.33979731988802,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 24.932604002970038,
+      "p95_ms": 32.392984804391745,
+      "p99_ms": 33.05612976451812,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 27.233734249421104,
+      "p95_ms": 41.33464165170153,
+      "p99_ms": 42.277261933122645,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 22.834916874671762,
+      "p95_ms": 32.724029497330775,
+      "p99_ms": 33.57193949559587,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/warmed/decision": {
+      "count": 810,
+      "mean_ms": 21.40842021490917,
+      "p95_ms": 27.98402515145425,
+      "p99_ms": 46.9718547817319,
+      "deadline_misses": 0
+    },
+    "sarl_filtered/holonomic/traffic=all/warmed/inference": {
+      "count": 810,
+      "mean_ms": 18.77728297777925,
+      "p95_ms": 24.174406402380555,
+      "p99_ms": 38.66273486535645,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 16.221999998379033,
+      "p95_ms": 16.221999998379033,
+      "p99_ms": 16.221999998379033,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 16.173625001101755,
+      "p95_ms": 16.173625001101755,
+      "p99_ms": 16.173625001101755,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 16.117083499921137,
+      "p95_ms": 16.73316880078346,
+      "p99_ms": 16.84353376076615,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 16.066395999587257,
+      "p95_ms": 16.692414350109175,
+      "p99_ms": 16.802849270170555,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 15.843753016912181,
+      "p95_ms": 17.19228390356875,
+      "p99_ms": 19.012404258246534,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 15.801832339928362,
+      "p95_ms": 17.143795702577336,
+      "p99_ms": 18.96597900253255,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 17.99770799698308,
+      "p95_ms": 17.99770799698308,
+      "p99_ms": 17.99770799698308,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 17.925666004884988,
+      "p95_ms": 17.925666004884988,
+      "p99_ms": 17.925666004884988,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 16.712541499146027,
+      "p95_ms": 16.88577940221876,
+      "p99_ms": 16.895989482291043,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 16.655208501106245,
+      "p95_ms": 16.82582945250033,
+      "p99_ms": 16.83589949279849,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/warmed/decision": {
+      "count": 83,
+      "mean_ms": 18.687267096626226,
+      "p95_ms": 22.9746666002029,
+      "p99_ms": 24.702150001248803,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=3/warmed/inference": {
+      "count": 83,
+      "mean_ms": 18.60985545789001,
+      "p95_ms": 22.879566704796154,
+      "p99_ms": 24.521285502414678,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 17.109853997681057,
+      "p95_ms": 17.90892259705288,
+      "p99_ms": 17.97995091699704,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 17.04964550299337,
+      "p95_ms": 17.838063954695826,
+      "p99_ms": 17.908145594847156,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 16.414812499533582,
+      "p95_ms": 16.88894605176756,
+      "p99_ms": 16.896622812200803,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 16.36080225034675,
+      "p95_ms": 16.835631351932534,
+      "p99_ms": 16.83785987268493,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/warmed/decision": {
+      "count": 498,
+      "mean_ms": 16.317672030197855,
+      "p95_ms": 19.321735694029485,
+      "p99_ms": 23.573508239060164,
+      "deadline_misses": 0
+    },
+    "sarl_no_goals/holonomic/traffic=all/warmed/inference": {
+      "count": 498,
+      "mean_ms": 16.26983619292197,
+      "p95_ms": 19.252214249718236,
+      "p99_ms": 23.488013002715878,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 51.26524999650428,
+      "p95_ms": 51.26524999650428,
+      "p99_ms": 51.26524999650428,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 51.20054200233426,
+      "p95_ms": 51.20054200233426,
+      "p99_ms": 51.20054200233426,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 24.705375000849017,
+      "p95_ms": 30.969460650158,
+      "p99_ms": 31.28982573012763,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 24.626239499411895,
+      "p95_ms": 30.87702324919519,
+      "p99_ms": 31.20013824911439,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 16.207595785388285,
+      "p95_ms": 21.060008900531088,
+      "p99_ms": 33.24161773911329,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 16.164298202644005,
+      "p95_ms": 21.000220598216387,
+      "p99_ms": 33.15865724318429,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 94.60566699999617,
+      "p95_ms": 94.60566699999617,
+      "p99_ms": 94.60566699999617,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 94.52912500273669,
+      "p95_ms": 94.52912500273669,
+      "p99_ms": 94.52912500273669,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 17.534104250444216,
+      "p95_ms": 18.240335697191767,
+      "p99_ms": 18.290800736867823,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 17.463448000853532,
+      "p95_ms": 18.15583125462581,
+      "p99_ms": 18.204866255182424,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/warmed/decision": {
+      "count": 83,
+      "mean_ms": 19.20629012014812,
+      "p95_ms": 25.19027889575227,
+      "p99_ms": 39.25245188103866,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=3/warmed/inference": {
+      "count": 83,
+      "mean_ms": 19.12783890389641,
+      "p95_ms": 25.110558701271657,
+      "p99_ms": 39.15897188096999,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 72.93545849825023,
+      "p95_ms": 92.43864614982158,
+      "p99_ms": 94.17226282996126,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 72.86483350253548,
+      "p95_ms": 92.36269585271657,
+      "p99_ms": 94.09583917273267,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 21.119739625646616,
+      "p95_ms": 30.43551885020861,
+      "p99_ms": 31.183037370137754,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 21.044843750132713,
+      "p95_ms": 30.33849824932986,
+      "p99_ms": 31.092433249141322,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/warmed/decision": {
+      "count": 498,
+      "mean_ms": 16.707378174514925,
+      "p95_ms": 22.93732309663028,
+      "p99_ms": 33.93245771243526,
+      "deadline_misses": 0
+    },
+    "sarl_reference/holonomic/traffic=all/warmed/inference": {
+      "count": 498,
+      "mean_ms": 16.658221652852742,
+      "p95_ms": 22.816591905939273,
+      "p99_ms": 33.87596001695782,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 24.607000006653834,
+      "p95_ms": 24.607000006653834,
+      "p99_ms": 24.607000006653834,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 24.550207999709528,
+      "p95_ms": 24.550207999709528,
+      "p99_ms": 24.550207999709528,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/transition/decision": {
+      "count": 4,
+      "mean_ms": 26.920416747088893,
+      "p95_ms": 29.65151254538796,
+      "p99_ms": 29.73420250506024,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/transition/inference": {
+      "count": 4,
+      "mean_ms": 26.855103998968843,
+      "p95_ms": 29.578889202457503,
+      "p99_ms": 29.65824424296443,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/warmed/decision": {
+      "count": 415,
+      "mean_ms": 16.878221900986386,
+      "p95_ms": 19.91764629856334,
+      "p99_ms": 23.46567837957992,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=1/warmed/inference": {
+      "count": 415,
+      "mean_ms": 16.831733115579855,
+      "p95_ms": 19.79401709977537,
+      "p99_ms": 23.14460000416148,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/cold_instance/decision": {
+      "count": 1,
+      "mean_ms": 22.297292001894675,
+      "p95_ms": 22.297292001894675,
+      "p99_ms": 22.297292001894675,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/cold_instance/inference": {
+      "count": 1,
+      "mean_ms": 22.219291000510566,
+      "p95_ms": 22.219291000510566,
+      "p99_ms": 22.219291000510566,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/transition/decision": {
+      "count": 4,
+      "mean_ms": 61.19273925105517,
+      "p95_ms": 133.26891605356644,
+      "p99_ms": 145.83301601342097,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/transition/inference": {
+      "count": 4,
+      "mean_ms": 61.10708300002443,
+      "p95_ms": 133.17361865047127,
+      "p99_ms": 145.7363237297977,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/warmed/decision": {
+      "count": 83,
+      "mean_ms": 18.375567313517212,
+      "p95_ms": 21.983275603997754,
+      "p99_ms": 25.880373122345087,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=3/warmed/inference": {
+      "count": 83,
+      "mean_ms": 18.292686782503104,
+      "p95_ms": 21.878496100543998,
+      "p99_ms": 25.691240057203583,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/cold_instance/decision": {
+      "count": 2,
+      "mean_ms": 23.452146004274255,
+      "p95_ms": 24.491514606415876,
+      "p99_ms": 24.583902926606243,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/cold_instance/inference": {
+      "count": 2,
+      "mean_ms": 23.384749500110047,
+      "p95_ms": 24.43366214974958,
+      "p99_ms": 24.52689882971754,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/transition/decision": {
+      "count": 8,
+      "mean_ms": 44.05657799907203,
+      "p95_ms": 112.32874945380894,
+      "p99_ms": 141.64498269346947,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/transition/inference": {
+      "count": 8,
+      "mean_ms": 43.98109349949664,
+      "p95_ms": 112.23577685159393,
+      "p99_ms": 141.54875537002223,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/warmed/decision": {
+      "count": 498,
+      "mean_ms": 17.127779469741522,
+      "p95_ms": 20.26694550186221,
+      "p99_ms": 23.557159998890697,
+      "deadline_misses": 0
+    },
+    "sarl_theta/holonomic/traffic=all/warmed/inference": {
+      "count": 498,
+      "mean_ms": 17.075225393400395,
+      "p95_ms": 20.217367050645407,
+      "p99_ms": 23.212389975451494,
+      "deadline_misses": 0
+    }
+  }
+}

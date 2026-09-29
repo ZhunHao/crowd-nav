@@ -115,7 +115,8 @@ def csv_rows(result: dict):
                        actual_vx=diagnostic['actual_velocity'][0]*velocity_scale,
                        actual_vy=diagnostic['actual_velocity'][1]*velocity_scale,
                        override=diagnostic['override'], no_feasible_action=diagnostic['no_feasible_action'],
-                       decision_ms=diagnostic['decision_ms'], deadline_miss=diagnostic['deadline_miss'],
+                       decision_ms=diagnostic['decision_ms'],
+                       deadline_miss=diagnostic['decision_ms'] > 1000*result['settings']['dt']*time_scale,
                        max_target_age_s=max(ages)*time_scale if ages else None,
                        ship_collision=diagnostic['ship_collision'], land_collision=diagnostic['land_collision'],
                        clearance_m=None if diagnostic['clearance'] is None else diagnostic['clearance']*length_scale)

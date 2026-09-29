@@ -86,3 +86,19 @@ def test_polygon_render_preserves_holes_and_multipolygon_components():
     second_island = pixel_at((12, 2))
     assert land != water_hole
     assert second_island == land
+
+
+@pytest.mark.parametrize('scaled,latency,expected', [(True, 300., False), (True, 501., True),
+                                                     (False, 300., True), (False, 250., False)])
+def test_csv_deadline_uses_physical_control_period(scaled, latency, expected):
+    from shipnav.export import csv_rows
+    result = execute(SeaMap((0, 0, 10, 10)).to_dict(), (2, 2), (4, 2), policy_name='direct', count=0)
+    if scaled:
+        result['map']['metadata']['model_scale'] = {'length_m': 10., 'speed_mps': 5.}
+    result['diagnostics'][0]['decision_ms'] = latency
+    result['diagnostics'][0]['deadline_miss'] = latency > 250.
+    original = json.loads(json.dumps(result))
+    rows = list(csv_rows(result))
+    assert rows[0]['deadline_miss'] is expected
+    assert 'deadline_miss' not in rows[-1]
+    assert json.loads(json.dumps(result)) == original
