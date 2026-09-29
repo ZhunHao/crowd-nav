@@ -1,7 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Event
-from math import ceil
+from bisect import bisect_right
+from time import monotonic
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QComboBox, QFileDialog, QSpinBox)
@@ -38,7 +39,8 @@ class Window(QWidget):
         self.sea = scaled(sea, self.profile)
         self.start, self.goal = default_endpoints(self.sea, self.clearance)
         self.result, self.future, self.corner = None, None, None
-        self.job_kind, self.replay_index, self.replay_step = '', 0, 1
+        self.job_kind, self.replay_index = '', -1
+        self.replay_started, self.replay_rate, self.replay_times = 0., 1, []
         self.cancel_event = Event()
         self.pool = ThreadPoolExecutor(max_workers=1)
         layout, toolbar, options = QVBoxLayout(self), QHBoxLayout(), QHBoxLayout()
@@ -269,24 +271,31 @@ class Window(QWidget):
             self.set_busy(False)
 
     def replay(self):
-        if self.result is not None:
+        if self.result is not None and self.result['frames']:
             _, T = units(self.result['map'])
-            interval = 1000*self.result['settings']['dt']*T/REPLAY_SPEEDS[self.replay_speed.currentIndex()]
-            # Redraws cannot keep up below ~40 ms; skip frames instead of falling behind.
-            self.replay_step = max(1, ceil(40/interval))
-            self.replay_index = 0
-            self.playback.start(round(interval*self.replay_step))
+            # Snapshot the physical clock and selected rate when Replay starts.
+            self.replay_rate = REPLAY_SPEEDS[self.replay_speed.currentIndex()]
+            self.replay_times = [f['t']*T for f in self.result['frames']]
+            interval = 1000*self.result['settings']['dt']*T/self.replay_rate
+            self.replay_index = -1
+            self.replay_started = monotonic()
+            self.playback.start(max(40, round(interval)))
             self.next_frame()
 
     def next_frame(self):
-        if self.result is None or self.replay_index >= len(self.result['frames']):
+        if self.result is None or not self.replay_times:
             self.playback.stop()
             return
-        last = len(self.result['frames'])-1
-        draw(self.ax, self.result, self.replay_index)
-        self.canvas.draw_idle()
-        self.replay_index = last if self.replay_index < last < self.replay_index+self.replay_step \
-            else self.replay_index+self.replay_step
+        # A slow render delays callbacks. Select by elapsed time, dropping stale
+        # frames instead of stretching the requested replay speed.
+        elapsed = max(0., monotonic()-self.replay_started)*self.replay_rate
+        index = max(0, bisect_right(self.replay_times, elapsed)-1)
+        if index != self.replay_index:
+            draw(self.ax, self.result, index)
+            self.canvas.draw_idle()
+            self.replay_index = index
+        if index == len(self.result['frames'])-1:
+            self.playback.stop()
 
     def export(self):
         if self.result is None or self.future is not None:

@@ -171,26 +171,49 @@ def test_toolbar_navigation_does_not_edit_scene(qtbot, mode, navigation):
     window.close()
 
 
-@pytest.mark.parametrize('speed', [0, 1, 2, 3])
-def test_replay_uses_recorded_trace_and_draws_final_frame(qtbot, monkeypatch, speed):
+@pytest.mark.parametrize('speed,rate', [(0, 1), (1, 10), (2, 50), (3, 200)])
+@pytest.mark.parametrize('profile,time_scale', [('model', 1), ('harbour_craft', 2)])
+def test_replay_delayed_callbacks_follow_elapsed_time_and_keep_terminal_frame(
+        qtbot, monkeypatch, speed, rate, profile, time_scale):
     import shipnav.gui as gui
+    from shipnav.scale import PROFILES, scaled
+    # A partial last tick catches rounding/stride logic that loses the terminal frame.
+    sea = scaled(SeaMap((0, 0, 24*PROFILES[profile].length, 24*PROFILES[profile].length)),
+                 PROFILES[profile])
+    result = execute(sea.to_dict(), (2, 2), (4, 2), policy_name='direct', count=0, limit=1.4)
+    assert [f['t'] for f in result['frames']] == [0, .25, .5, .75, 1., 1.25, 1.4]
     window = Window(SeaMap((0, 0, 24, 24)),
                     runner=lambda *args, **kwargs: pytest.fail('Replay must not run simulation'))
     qtbot.addWidget(window)
-    result = execute(window.sea.to_dict(), (2, 2), (4, 2),
-                     policy_name='direct', count=0)
     window.result = result
-    drawn = []
-    monkeypatch.setattr(gui, 'draw', lambda ax, value, frame: drawn.append((value, frame)))
+    clock = [0.]
+    monkeypatch.setattr(gui, 'monotonic', lambda: clock[0], raising=False)
+    original_draw, drawn = gui.draw, []
+    def capture(ax, value, frame):
+        original_draw(ax, value, frame)
+        drawn.append((value, frame))
+    monkeypatch.setattr(gui, 'draw', capture)
     window.replay_speed.setCurrentIndex(speed)
     window.replay()
+    assert drawn[-1] == (result, 0)
     assert window.playback.interval() >= 40
-    assert window.replay_step >= 1
-    for _ in range(len(result['frames']) + 1):
-        window.next_frame()
-    assert drawn[0] == (result, 0)
-    assert drawn[-1] == (result, len(result['frames']) - 1)
+    # Changing the selection during playback must not rewrite its snapshotted rate.
+    window.replay_speed.setCurrentIndex((speed+1)%4)
+    # A delayed callback catches up to model t=.5 rather than merely incrementing once.
+    clock[0] = .6*time_scale/rate
+    window.next_frame()
+    assert drawn[-1] == (result, 2)
+    # Another rendering delay skips all obsolete frames and keeps the last complete tick.
+    clock[0] = 1.39*time_scale/rate
+    window.next_frame()
+    assert drawn[-1] == (result, 5)
+    assert window.playback.isActive()
+    # Overshooting the fractional final tick must render it once and stop.
+    clock[0] = 1.5*time_scale/rate
+    window.next_frame()
+    assert drawn[-1] == (result, 6)
     assert not window.playback.isActive()
+    assert window.ax.get_title().startswith(f'timeout — {1.4*time_scale:.1f} s')
     window.close()
 
 
