@@ -178,3 +178,14 @@ def test_video_speedup_keeps_terminal_frame_and_caps_fps():
     indices, fps = video_frames(result, speedup=18.)
     assert indices[0] == 0 and indices[-1] == 4190 and fps <= 30
     assert len(indices)/fps == pytest.approx(1047.5*2/18, rel=.01)
+
+
+def test_frozen_real_map_scenario_reuses_its_recorded_planner_settings(tmp_path):
+    from shipnav.benchmark import benchmark
+    from shipnav.scenarios import make_scenario
+    sea = to_model(SeaMap.load('maps/singapore-ubin.json'), PROFILES['harbour_craft'])
+    scene = make_scenario(sea, (-200, 50), (-250, 50), 0, 0)
+    rows = benchmark([scene], '', tmp_path, {'direct': dict(policy_name='direct')})
+    run = json.loads(next(tmp_path.glob('*-direct.json')).read_text())
+    assert rows[0]['status'] == 'success'
+    assert run['settings']['resolution'] == 5. and run['settings']['clearance'] == 1.5
