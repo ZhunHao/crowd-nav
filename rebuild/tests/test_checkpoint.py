@@ -73,3 +73,35 @@ def test_penalty_rises_on_violation_and_stays_nonnegative():
     assert update_penalty(0., 0., 1.) == 0.
     with pytest.raises(ValueError):
         update_penalty(0., float('nan'), 1.)
+
+
+def _two_checkpoints(tmp_path):
+    model = tiny_model()
+    older = save_checkpoint(model, tmp_path, 'chunk-0000', {'chunk': 0})
+    model.num_timesteps = 64
+    newer = save_checkpoint(model, tmp_path, 'chunk-0001', {'chunk': 1})
+    return older, newer
+
+
+def test_latest_checkpoint_skips_newer_folder_missing_a_payload_file(tmp_path):
+    older, newer = _two_checkpoints(tmp_path)
+    (newer/'policy.zip').unlink()  # half-synced: manifest landed before policy.zip
+    assert latest_checkpoint(tmp_path) == older
+    with pytest.raises(ValueError, match='incomplete'):
+        verify_checkpoint(newer)
+
+
+@pytest.mark.parametrize('content', ['', '{"num_timesteps": 64, "fi', '[]', '{"num_timesteps": 64}'])
+def test_latest_checkpoint_skips_newer_folder_with_corrupt_manifest(tmp_path, content):
+    older, newer = _two_checkpoints(tmp_path)
+    (newer/'manifest.json').write_text(content)
+    assert latest_checkpoint(tmp_path) == older
+    with pytest.raises(ValueError, match='incomplete'):
+        verify_checkpoint(newer)
+
+
+def test_latest_checkpoint_still_raises_on_hash_mismatch_in_complete_folder(tmp_path):
+    older, newer = _two_checkpoints(tmp_path)
+    (newer/'state.pt').write_bytes(b'tampered')
+    with pytest.raises(ValueError, match='hash'):
+        latest_checkpoint(tmp_path)

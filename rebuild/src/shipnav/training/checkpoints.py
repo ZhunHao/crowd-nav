@@ -45,9 +45,30 @@ def save_checkpoint(model, root, name, metadata):
     return final
 
 
+class IncompleteCheckpointError(ValueError):
+    """The folder lacks a usable manifest or one of its payload files (e.g. a half-synced copy)."""
+
+
+def _read_manifest(directory):
+    try:
+        manifest = json.loads((directory/'manifest.json').read_text())
+    except (OSError, ValueError) as error:  # JSONDecodeError and UnicodeDecodeError are ValueErrors
+        raise IncompleteCheckpointError(f'Checkpoint incomplete: unreadable manifest in {directory}: {error}') from error
+    files = manifest.get('files') if isinstance(manifest, dict) else None
+    if (not isinstance(files, dict) or not all(isinstance(files.get(n), str) for n in FILES)
+            or not isinstance(manifest.get('num_timesteps'), int)):
+        raise IncompleteCheckpointError(f'Checkpoint incomplete: malformed manifest in {directory}')
+    return manifest
+
+
 def verify_checkpoint(directory):
+    """Return the manifest. Raise IncompleteCheckpointError (a ValueError) for a missing/malformed
+    manifest or missing payload file, and a plain ValueError mentioning 'hash' for corruption."""
     directory = Path(directory)
-    manifest = json.loads((directory/'manifest.json').read_text())
+    manifest = _read_manifest(directory)
+    missing = [n for n in FILES if not (directory/n).is_file()]
+    if missing:
+        raise IncompleteCheckpointError(f'Checkpoint incomplete: missing {", ".join(missing)} in {directory}')
     for name in FILES:
         if sha256((directory/name).read_bytes()).hexdigest() != manifest['files'][name]:
             raise ValueError(f'Checkpoint hash mismatch: {name}')
@@ -75,8 +96,13 @@ def latest_checkpoint(root):
         return None
     complete = []
     for path in root.iterdir():
-        if path.is_dir() and not path.name.startswith('.') and (path/'manifest.json').is_file():
-            complete.append((verify_checkpoint(path)['num_timesteps'], path.name, path))
+        if not path.is_dir() or path.name.startswith('.'):
+            continue
+        try:
+            manifest = verify_checkpoint(path)
+        except IncompleteCheckpointError:
+            continue  # never a checkpoint; a hash mismatch (corruption) still propagates
+        complete.append((manifest['num_timesteps'], path.name, path))
     return max(complete)[2] if complete else None
 
 
