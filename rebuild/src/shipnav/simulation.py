@@ -107,10 +107,20 @@ def swept_clearance(a: Point, b: Point, ship: Traffic, time: float, dt: float, r
     return min(values)
 
 
-def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy: Policy,
-                dt: float = .25, limit: float = 100, radius: float = .5,
-                speed: float = 1.0, cancel: Callable[[], bool] = lambda: False, *, observer=None,
-                filtered=False, uncertainty=True, dynamics='holonomic') -> dict:
+def episode_steps(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy=None,
+                  dt: float = .25, limit: float = 100, radius: float = .5,
+                  speed: float = 1.0, cancel: Callable[[], bool] = lambda: False, *, observer=None,
+                  filtered=False, uncertainty=True, dynamics='holonomic', record=True,
+                  terminal_packet=False):
+    """One episode as a generator paused at every nominal-action boundary.
+
+    Yields a decision packet and expects `(nominal_velocity, controller_ms)` back via
+    `send`; time spent by the caller between yield and send is excluded from
+    decision latency. Returns `(result, terminal)`, where `terminal` is the final
+    packet when `terminal_packet` is set (one extra observation) and None otherwise.
+    `policy` is used only for its optional `set_context` hook and `solver_failed`
+    flag. `record=False` (training) keeps outcomes but drops frames/diagnostics.
+    """
     if not all(isfinite(v) and v > 0 for v in (dt, limit, radius, speed)):
         raise ValueError('Episode parameters must be positive and finite')
     if not route or any(not sea.clear(p, p, radius) for p in route):
@@ -138,13 +148,23 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         raise ValueError('Unknown dynamics')
     position, velocity, time, index = route[0], (0.0, 0.0), 0.0, 1
     minimum, latencies, frames, travelled = float('inf'), [], [], 0.0
+    tick, last = 0, None
 
-    def record():
-        frames.append({'t': time, 'position': list(position), 'velocity': list(velocity),
-                       'goal_index': min(index, len(route)-1),
-                       'traffic': [list(ship.at(time)[0]) for ship in traffic]})
+    def record_frame():
+        if record:
+            frames.append({'t': time, 'position': list(position), 'velocity': list(velocity),
+                           'goal_index': min(index, len(route)-1),
+                           'traffic': [list(ship.at(time)[0]) for ship in traffic]})
 
-    record()
+    def packet(perceived, step):
+        goal_index = min(index, len(route)-1)
+        return {'position': position, 'velocity': velocity, 'goal': route[goal_index],
+                'goal_index': goal_index, 'final': goal_index == len(route)-1,
+                'neighbours': [(s['position'], s['velocity'], s['radius']) for s in perceived],
+                'observed': perceived, 'radius': radius, 'speed': speed, 'dt': step, 't': time,
+                'vessel': vessel, 'sea': sea, 'last': last}
+
+    record_frame()
     status = 'success' if len(route) == 1 else 'running'
     while status == 'running':
         if cancel():
@@ -155,15 +175,16 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             break
         step = min(dt, limit-time)
         began = perf_counter()
-        perceived = observer.observe(traffic, time, len(frames)-1)
+        perceived = observer.observe(traffic, time, tick)
         steps = horizon_steps(step, dynamics, speed)
         predictions = predict(perceived, step, steps=steps, uncertainty=uncertainty)
-        neighbours = [(s['position'], s['velocity'], s['radius']) for s in perceived]
         if hasattr(policy, 'set_context'):
             policy.set_context(sea, vessel, predictions, steps=steps, final=index == len(route)-1)
-        inference_start = perf_counter()
-        nominal = tuple(policy(position, velocity, route[index], neighbours, radius, speed, step))
-        latencies.append((perf_counter()-inference_start)*1000)
+        perception_ms = (perf_counter()-began)*1000
+        nominal, controller_ms = yield packet(perceived, step)
+        resumed = perf_counter()
+        nominal = tuple(nominal)
+        latencies.append(float(controller_ms))
         if len(nominal) != 2 or not all(isfinite(x) for x in nominal) or hypot(*nominal) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         motion = motion_from(vessel, speed) if vessel is not None else None
@@ -173,14 +194,18 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
                           goal=route[index], final=index == len(route)-1) if filtered else {
             'executed': nominal, 'override': False, 'no_feasible_action': None, 'path': [], 'predicted_clearance': None}
         velocity = tuple(decision['executed'])
-        decision_ms = (perf_counter()-began)*1000
+        decision_ms = perception_ms + float(controller_ms) + (perf_counter()-resumed)*1000
         # Soft wall-clock indicator only: a Python worker thread makes no hard real-time
         # guarantee, so this flags a missed step budget rather than enforcing one.
-        diagnostics.append({'t': time, 'observed': perceived, 'predictions': predictions,
-                            'nominal': nominal, **decision,
-                            'decision_ms': decision_ms,
-                            'deadline_miss': decision_ms > step*1000,
-                            'solver_failed': bool(getattr(policy, 'solver_failed', False))})
+        # Time the caller spends between yield and send is excluded; the controller's
+        # own time arrives as `controller_ms`.
+        entry = {'t': time, 'observed': perceived, 'predictions': predictions,
+                 'nominal': nominal, **decision,
+                 'decision_ms': decision_ms,
+                 'deadline_miss': decision_ms > step*1000,
+                 'solver_failed': bool(getattr(policy, 'solver_failed', False))}
+        if record:
+            diagnostics.append(entry)
         if len(velocity) != 2 or not all(isfinite(x) for x in velocity) or hypot(*velocity) > speed+1e-6:
             raise ValueError('Policy returned invalid velocity')
         next_position = tuple(x + step*v for x, v in zip(position, velocity))
@@ -188,8 +213,8 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             vessel = advance(vessel, velocity, step, max_speed=speed)
             next_position = (vessel.x, vessel.y)
             velocity = tuple((b-a)/step for a, b in zip(position, next_position))
-            diagnostics[-1]['heading'] = vessel.heading
-            diagnostics[-1]['speed'] = vessel.speed
+            entry['heading'] = vessel.heading
+            entry['speed'] = vessel.speed
         for ship in traffic:
             if hasattr(ship, 'advance'):
                 ship.advance(time, step, position)
@@ -199,8 +224,8 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         land_hit = not sea.clear(position, next_position, radius)
         ship_hit = clearance <= 0
         collision = ship_hit or land_hit
-        diagnostics[-1].update(land_collision=land_hit, ship_collision=ship_hit, actual_velocity=velocity,
-                               clearance=clearance if isfinite(clearance) else None)
+        entry.update(land_collision=land_hit, ship_collision=ship_hit, actual_velocity=velocity,
+                     clearance=clearance if isfinite(clearance) else None)
         # Target/target and target/land validity is scored separately from ego
         # performance: it reflects the scenario's traffic realism, not a
         # safety intervention or collision attributable to the ego's policy.
@@ -210,8 +235,10 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         target_land_invalid = any(not sea.clear(p, p, r) for p, r in zip(target_positions, target_radii))
         pair_clearances = [dist(target_positions[i], target_positions[j])-target_radii[i]-target_radii[j]
                            for i in range(len(target_positions)) for j in range(i+1, len(target_positions))]
-        diagnostics[-1].update(target_land_invalid=target_land_invalid,
-                               target_target_min_clearance=min(pair_clearances) if pair_clearances else None)
+        entry.update(target_land_invalid=target_land_invalid,
+                     target_target_min_clearance=min(pair_clearances) if pair_clearances else None)
+        last = {'clearance': clearance if isfinite(clearance) else None, 'dt': step,
+                'collision': collision, 'land_collision': land_hit, 'ship_collision': ship_hit}
         travelled += dist(position, next_position)
         position, time = next_position, time+step
         if collision:
@@ -220,7 +247,8 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
             index += 1
             if index == len(route):
                 status = 'success'
-        record()
+        tick += 1
+        record_frame()
     result = {'status': status, 'elapsed': time, 'distance': travelled,
               'min_dynamic_clearance': minimum if isfinite(minimum) else None,
               'inference_ms': latencies, 'frames': frames, 'diagnostics': diagnostics}
@@ -236,4 +264,26 @@ def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy:
         result['terminal_speed'] = vessel.speed
         result['runout_min_clearance'] = None if swept is None else min(
             sea.minimum_clearance(a, b) for a, b in zip(swept, swept[1:] or swept)) - radius
-    return result
+    terminal = packet(observer.observe(traffic, time, tick), dt) if terminal_packet else None
+    return result, terminal
+
+
+def run_episode(sea: SeaMap, route: list[Point], traffic: list[Traffic], policy: Policy,
+                dt: float = .25, limit: float = 100, radius: float = .5,
+                speed: float = 1.0, cancel: Callable[[], bool] = lambda: False, **kwargs) -> dict:
+    """GUI/CLI driver: time each policy call and feed it to the step engine."""
+    engine = episode_steps(sea, route, traffic, policy, dt, limit, radius, speed, cancel, **kwargs)
+    try:
+        packet = next(engine)
+        while True:
+            started = perf_counter()
+            if hasattr(policy, 'act'):
+                action = policy.act(packet)
+            else:
+                action = policy(packet['position'], packet['velocity'], packet['goal'],
+                                packet['neighbours'], radius, speed, packet['dt'])
+            packet = engine.send((action, (perf_counter()-started)*1000))
+    except StopIteration as ended:
+        return ended.value[0]
+    finally:
+        engine.close()
