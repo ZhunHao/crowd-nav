@@ -16,7 +16,7 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
             policy_name: str = 'sarl', global_goals: bool = True, seed: int = 0,
             count: int = 5, cancel=lambda: False, *, scenario=None, planner='astar_smooth',
             filtered=False, uncertainty=True, observation=None, dynamics='holonomic',
-            resolution=1., clearance=.7, limit=None, placement='uniform') -> dict:
+            resolution=1., clearance=.7, limit=None, placement='uniform', learned_dir=None) -> dict:
     if scenario is not None:
         validate_scenario(scenario)
     validate_observation(observation or {})
@@ -47,8 +47,14 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
         policy = MPC()
     elif policy_name == 'direct':
         policy = Direct()
+    elif policy_name == 'ppo':
+        if dynamics != 'marine':
+            raise ValueError('Trained PPO policies require marine dynamics')
+        from shipnav.training.adapter import ModernLearned
+        policy = ModernLearned(Path(learned_dir or model_dir))
+        hashes = policy.hashes
     else:
-        raise ValueError('Policy must be sarl, orca, mpc or direct')
+        raise ValueError('Policy must be sarl, orca, mpc, direct or ppo')
     observer = Observer(seed=scenario['seed'],**(observation or {}))
     # Scaled real maps get three times the nominal route time; synthetic maps retain
     # their legacy 100 s default, including previously timed-out long routes.
@@ -74,7 +80,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--map', type=Path, default=Path('maps/harbour.json'))
     parser.add_argument('--model', default='../CrowdNav-20250813-DIP/crowd_nav/data/output_trained')
-    parser.add_argument('--policy', choices=['sarl', 'orca', 'mpc', 'direct'], default='sarl')
+    parser.add_argument('--policy', choices=['sarl', 'orca', 'mpc', 'direct', 'ppo'], default='sarl')
     parser.add_argument('--start', type=float, nargs=2, default=(2, 2))
     parser.add_argument('--goal', type=float, nargs=2, default=(22, 22))
     parser.add_argument('--seed', type=int, default=0)

@@ -88,7 +88,7 @@ class Window(QWidget):
         self.mode.addItems(['Set start', 'Set goal', 'Add land (two corners)'])
         self.mode.currentIndexChanged.connect(self.clear_corner)
         self.policy = QComboBox()
-        self.policy.addItems(['sarl', 'orca', 'mpc', 'direct'])
+        self.policy.addItems(['sarl', 'orca', 'mpc', 'direct', 'ppo'])
         self.count = QSpinBox()
         self.count.setRange(0, 15)
         self.count.setValue(5)
@@ -283,7 +283,7 @@ class Window(QWidget):
         self.status.setText(f'Map loaded with vessel profile {profile.name}; select valid start and goal')
 
     def load_model(self):
-        directory = QFileDialog.getExistingDirectory(self, 'Folder with policy.config and rl_model.pth')
+        directory = QFileDialog.getExistingDirectory(self, 'Model folder (SARL: policy.config + rl_model.pth; PPO checkpoint: manifest.json + policy.zip)')
         if directory:
             self.model_dir = directory
             self.invalidate()

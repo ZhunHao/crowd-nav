@@ -338,3 +338,9 @@ def test_malformed_map_root_preserves_scene_and_valid_load_recovers(qtbot, tmp_p
         assert window.status.text().startswith('Map loaded with vessel profile model')
     finally:
         window.close()
+
+
+def test_policy_menu_offers_trained_ppo(qtbot):
+    window = Window(SeaMap((0, 0, 24, 24)))
+    qtbot.addWidget(window)
+    assert 'ppo' in [window.policy.itemText(i) for i in range(window.policy.count())]
