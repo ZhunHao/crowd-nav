@@ -20,6 +20,7 @@ from shipnav.benchmark import VARIANTS, benchmark
 from shipnav.scenarios import scenario_hash
 from shipnav.scale import units
 from shipnav.service import execute
+from shipnav.training.checkpoints import verify_checkpoint
 
 ROOT = Path(__file__).resolve().parents[1]
 PAIRS = [('sarl_reference', 'sarl_theta', 'planner'), ('sarl_reference', 'sarl_no_goals', 'goals'),
@@ -38,7 +39,19 @@ def verify_limit(run, expected):
         raise ValueError('Recorded episode limit differs from frozen shared budget')
 
 
-def run_unit(scenario, entry, name, model, output):
+def expected_model_hashes(data, name, variants=None):
+    """Model file hashes a trace of variant `name` must record: SARL, a selected PPO checkpoint, or none."""
+    variants = VARIANTS if variants is None else variants
+    policy = variants[name].get('policy_name')
+    if policy == 'sarl':
+        return data['identities']['model']
+    if policy == 'ppo':
+        return data['identities']['learned'][name]
+    return {}
+
+
+def run_unit(scenario, entry, name, model, output, variants=None):
+    variants = VARIANTS if variants is None else variants
     output = Path(output)
     if shutil.disk_usage(output).free < 400*1024**2:
         raise RuntimeError('Below 400 MiB headroom; pause without discarding evidence')
@@ -48,9 +61,11 @@ def run_unit(scenario, entry, name, model, output):
     limit = max(100., 3*reference_length) if 'model_scale' in scenario['map']['metadata'] else 100.
 
     def matched_runner(*args, **kwargs):
+        if kwargs.get('learned_dir'):  # frozen as a path relative to rebuild/; the recorded config stays as frozen
+            kwargs['learned_dir'] = str(ROOT/kwargs['learned_dir'])
         return execute(*args, **kwargs, limit=limit)
 
-    [row] = benchmark([scenario], model, output, {name: VARIANTS[name]}, runner=matched_runner)
+    [row] = benchmark([scenario], model, output, {name: variants[name]}, runner=matched_runner)
     run = json.loads((output/row['trace_file']).read_text())
     verify_limit(run, limit)
     row['shared_limit_model'] = limit
@@ -60,7 +75,7 @@ def run_unit(scenario, entry, name, model, output):
                reference_cross_track_model=(row['reference_cross_track_mean_m']/length_scale
                                             if row['reference_cross_track_mean_m'] is not None else None))
     row.update(scenario_id=entry['id'], family=scenario['family'], seed=scenario['seed'],
-               traffic_count=len(scenario['traffic']), dynamics=VARIANTS[name].get('dynamics', 'holonomic'),
+               traffic_count=len(scenario['traffic']), dynamics=variants[name].get('dynamics', 'holonomic'),
                deadline_ms=250*units(scenario['map'])[1], timing=timing_samples(run),
                wall_s=time.monotonic()-began)
     row['archive'] = archive(output/row['trace_file'])
@@ -72,9 +87,11 @@ def run_unit(scenario, entry, name, model, output):
     return row
 
 
-def summary(rows):
+def summary(rows, variants=None, pairs=None):
+    variants = VARIANTS if variants is None else variants
+    pairs = PAIRS if pairs is None else pairs
     result = {'rows': len(rows), 'variants': {}, 'comparisons': {}, 'timing': {}}
-    for name in VARIANTS:
+    for name in variants:
         subset = [r for r in rows if r['variant'] == name]
         if not subset:
             continue
@@ -103,7 +120,7 @@ def summary(rows):
             values = [r[metric] for r in subset if r['family'] == 'southern_corridor' and r.get(metric) is not None
                       and (metric != 'elapsed_s' or r['status'] == 'success')]
             result['variants'][name]['southern_physical_metrics'][metric] = {'n': len(values), 'mean': mean(values) if values else None}
-    for a, b, label in PAIRS:
+    for a, b, label in pairs:
         result['comparisons'][label] = {'a': a, 'b': b, **compare(rows, a, b)}
     groups = defaultdict(lambda: [[], []])
     for row in rows:
@@ -117,8 +134,24 @@ def summary(rows):
     return result
 
 
-def verify_frozen_identities(data, model):
+def verify_learned_identities(data, variants):
+    """Every PPO arm must have a frozen checkpoint whose files still match its manifest and the stored hashes."""
+    learned = data['identities'].get('learned', {})
+    ppo = {name for name, config in variants.items() if config.get('policy_name') == 'ppo'}
+    if set(learned) != ppo:
+        raise ValueError('Frozen learned checkpoint identity mismatch: arms differ from variants')
+    for name in sorted(ppo):
+        try:
+            manifest = verify_checkpoint(ROOT/variants[name]['learned_dir'])
+        except ValueError as error:
+            raise ValueError(f'Frozen learned checkpoint identity mismatch: {name}: {error}') from error
+        if manifest['files'] != learned[name]:
+            raise ValueError('Frozen learned checkpoint identity mismatch: '+name)
+
+
+def verify_frozen_identities(data, model, variants=None):
     """Reject a changed implementation, lock, manifest or checkpoint before reuse."""
+    variants = VARIANTS if variants is None else variants
     expected = {**data['source_sha256'], data['manifest']: data['manifest_sha256'],
                 data['original_manifest']: data['original_manifest_sha256'],
                 'uv.lock': data['identities']['lock_sha256']}
@@ -130,13 +163,15 @@ def verify_frozen_identities(data, model):
         path = Path(model)/name
         if not path.is_file() or sha256(path.read_bytes()).hexdigest() != digest:
             raise ValueError('Frozen checkpoint identity mismatch: '+name)
-    if data['variants'] != VARIANTS:
+    if data['variants'] != variants:
         raise ValueError('Frozen variant identity mismatch')
+    verify_learned_identities(data, variants)
 
 
-def bind_output(output, protocol, entries, create=True):
+def bind_output(output, protocol, entries, create=True, variants=None):
     """A directory belongs to one protocol and one scenario/variant grid."""
-    binding = {'protocol': protocol, 'scenarios': entries, 'variants': VARIANTS}
+    variants = VARIANTS if variants is None else variants
+    binding = {'protocol': protocol, 'scenarios': entries, 'variants': variants}
     path = output/'run-identity.json'
     if path.exists():
         if json.loads(path.read_text()) != binding:
@@ -147,12 +182,13 @@ def bind_output(output, protocol, entries, create=True):
         dump(path, binding)
 
 
-def validate_rows(rows, entries, output, protocol, data=None, complete=False):
+def validate_rows(rows, entries, output, protocol, data=None, complete=False, variants=None):
     """Validate partial resumes; final audit additionally requires the entire grid."""
+    variants = VARIANTS if variants is None else variants
     by_hash = {e['scenario_hash']: e for e in entries}
     if len(by_hash) != len(entries):
         raise ValueError('Duplicate frozen scenario identities')
-    expected = {(h, name) for h in by_hash for name in VARIANTS}
+    expected = {(h, name) for h in by_hash for name in variants}
     seen = set()
     for row in rows:
         pair = (row['scenario_hash'], row['variant'])
@@ -167,7 +203,7 @@ def validate_rows(rows, entries, output, protocol, data=None, complete=False):
             if row.get(field) != entry[key]:
                 raise ValueError('Journal scenario metadata mismatch: '+field)
         run = load_verified(output, row['archive'])
-        if (run['scenario_hash'], run['variant']) != pair or run['variant_config'] != VARIANTS[pair[1]]:
+        if (run['scenario_hash'], run['variant']) != pair or run['variant_config'] != variants[pair[1]]:
             raise ValueError('Trace scenario/variant identity mismatch')
         if (row['trace_hash'] != row['archive']['raw_sha256'] or
                 row['trace_file'] != row['archive']['file'] or row['status'] != run['status']):
@@ -178,7 +214,7 @@ def validate_rows(rows, entries, output, protocol, data=None, complete=False):
             if row['shared_limit_model'] != limit:
                 raise ValueError('Journal shared limit mismatch')
             if run.get('settings'):
-                if (run.get('model_hashes') != data['identities']['model'] or
+                if (run.get('model_hashes') != expected_model_hashes(data, pair[1], variants) or
                         run.get('provenance', {}).get('uv_lock_sha256') != data['identities']['lock_sha256']):
                     raise ValueError('Trace model/lock identity mismatch')
         scenario = load_verified(output, row['scenario_archive'])
@@ -192,37 +228,41 @@ def validate_rows(rows, entries, output, protocol, data=None, complete=False):
         raise ValueError('Final audit requires the complete scenario/variant grid')
 
 
-def execute_matrix(entries, manifest_dir, model, output, protocol=None, data=None):
+def execute_matrix(entries, manifest_dir, model, output, protocol=None, data=None, variants=None, pairs=None):
+    # Only non-default tables are forwarded, so the baseline path keeps its exact call shapes.
+    run_args = {} if variants is None else {'variants': variants}
+    summary_args = {**run_args, **({} if pairs is None else {'pairs': pairs})}
+    variants = VARIANTS if variants is None else variants
     if protocol is not None:
         if data is None or entries != data['scenarios']['test']:
             raise ValueError('Frozen protocol scenario identity mismatch')
-        verify_frozen_identities(data, model)
+        verify_frozen_identities(data, model, variants=variants)
     output.mkdir(parents=True, exist_ok=True)
-    bind_output(output, protocol, entries)
+    bind_output(output, protocol, entries, variants=variants)
     journal = output/'rows.jsonl'
     rows = [json.loads(line) for line in journal.read_text().splitlines()] if journal.exists() else []
-    validate_rows(rows, entries, output, protocol, data)
+    validate_rows(rows, entries, output, protocol, data, variants=variants)
     finished = {(r['scenario_hash'], r['variant']) for r in rows}
     order = list(entries)
     random.Random(9127).shuffle(order)
     for i, entry in enumerate(order):
         scenario = load_verified(manifest_dir, entry)
-        names = list(VARIANTS)
+        names = list(variants)
         names = names[i % len(names):]+names[:i % len(names)]
         for name in names:
             if (entry['scenario_hash'], name) in finished:
                 continue
-            row = run_unit(scenario, entry, name, model, output)
+            row = run_unit(scenario, entry, name, model, output, **run_args)
             row['protocol'] = protocol
-            validate_rows([row], entries, output, protocol, data)
+            validate_rows([row], entries, output, protocol, data, variants=variants)
             with journal.open('a') as stream:
                 stream.write(json.dumps(row, allow_nan=False)+'\n')
                 stream.flush()
             rows.append(row)
-            print(f'{len(rows)}/{len(entries)*len(VARIANTS)} {entry["id"]} {name} {row["status"]} free_MiB={shutil.disk_usage(output).free//1024**2}', flush=True)
-    validate_rows(rows, entries, output, protocol, data, complete=True)
+            print(f'{len(rows)}/{len(entries)*len(variants)} {entry["id"]} {name} {row["status"]} free_MiB={shutil.disk_usage(output).free//1024**2}', flush=True)
+    validate_rows(rows, entries, output, protocol, data, complete=True, variants=variants)
     dump(output/'metrics.json', rows)
-    result = summary(rows)
+    result = summary(rows, **summary_args)
     result['protocol'] = protocol
     dump(output/'summary.json', result)
     return result
