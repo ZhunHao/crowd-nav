@@ -186,6 +186,7 @@ def build_harness(tmp_path):
     (tmp_path/'trainer.py').write_text(FAKE_TRAINER.format(tests=str(ROOT/'tests')))
     scripts = {
         'aws': f'#!/bin/bash\necho "$*" >> "$AWS_LOG"\n'
+               f'if [[ -n "${{AWS_FAIL_MATCH:-}}" && "$4" == *"$AWS_FAIL_MATCH"* ]]; then exit 1; fi\n'
                f'if [[ "$4" == */status.json ]]; then\n'
                f'    n=$(cat "$AWS_COUNT" 2>/dev/null || echo 0)\n'
                f'    if ((n < ${{AWS_FAIL_STATUS:-0}})); then echo $((n+1)) > "$AWS_COUNT"; exit 1; fi\n'
@@ -335,3 +336,35 @@ def test_status_upload_failure_after_three_attempts_is_a_failure(harness):
     done, _, uploads, _ = run(AWS_FAIL_STATUS='99')
     assert done.returncode == 1 and 'status.json upload failed' in done.stderr
     assert [dst for _, dst in uploads].count('s3://bucket/prefix/status.json') == 3
+
+
+def test_failed_payload_upload_never_leads_to_a_manifest_in_the_best_effort_path(terminable):
+    """EXIT-trap publish runs as `publish_latest || true`, where errexit is off: it must still stop at the failure."""
+    start, results, out, ready = terminable
+    proc = start(FAKE_HANG_AT_CHUNK='1', AWS_FAIL_MATCH='partial-0001-150/policy.zip')
+    try:
+        deadline = time.monotonic()+60
+        while not ready.exists():
+            assert proc.poll() is None and time.monotonic() < deadline, 'fake trainer never started'
+            time.sleep(.05)
+        os.kill(proc.pid, signal.SIGTERM)
+        proc.communicate(timeout=60)
+    finally:
+        if proc.poll() is None:
+            os.killpg(proc.pid, signal.SIGKILL)
+    _, uploads, status = results()
+    assert proc.returncode == 143 and status == {'state': 'terminated', 'exit_code': 143}
+    assert published(uploads, 'partial-0001-150') == ['policy.zip']  # attempted, failed, nothing after it
+    assert published(uploads, 'chunk-0000')[-1] == 'manifest.json'  # the earlier, healthy checkpoint is whole
+    assert uploads[-1][1] == 's3://bucket/prefix/status.json'
+
+
+@pytest.mark.parametrize('failing', ['policy.zip', 'state.pt', 'rng.json'])
+def test_failed_payload_upload_in_the_loop_fails_the_run_without_a_manifest(harness, failing):
+    run, _ = harness
+    done, targets, uploads, status = run(AWS_FAIL_MATCH=f'chunk-0000/{failing}')
+    assert done.returncode != 0 and targets == [1]
+    assert 'manifest.json' not in published(uploads, 'chunk-0000')
+    assert published(uploads, 'chunk-0000')[-1] == failing
+    assert status == {'state': 'failed', 'exit_code': done.returncode}
+    assert uploads[-1][1] == 's3://bucket/prefix/status.json'

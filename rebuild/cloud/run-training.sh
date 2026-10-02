@@ -18,11 +18,12 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mkdir -p "$SHIPNAV_OUTPUT"
 state=failed
 publish() {  # payload first, manifest last: a manifest in S3 means a complete checkpoint
-    local dir=$1 name; name=$(basename "$dir")
-    aws s3 cp "$dir/policy.zip" "$SHIPNAV_S3_URI/checkpoints/$name/policy.zip" --only-show-errors
-    aws s3 cp "$dir/state.pt" "$SHIPNAV_S3_URI/checkpoints/$name/state.pt" --only-show-errors
-    aws s3 cp "$dir/rng.json" "$SHIPNAV_S3_URI/checkpoints/$name/rng.json" --only-show-errors
-    aws s3 cp "$dir/manifest.json" "$SHIPNAV_S3_URI/checkpoints/$name/manifest.json" --only-show-errors
+    # Explicit `|| return 1`: callers use `publish_latest || true`, which disables errexit inside this body.
+    local dir=$1 name f; name=$(basename "$dir")
+    for f in policy.zip state.pt rng.json; do
+        aws s3 cp "$dir/$f" "$SHIPNAV_S3_URI/checkpoints/$name/$f" --only-show-errors || return 1
+    done
+    aws s3 cp "$dir/manifest.json" "$SHIPNAV_S3_URI/checkpoints/$name/manifest.json" --only-show-errors || return 1
 }
 published=  # last checkpoint folder uploaded successfully, so the EXIT trap does not re-upload it
 publish_latest() {  # chunk-* and partial-* alike: the checkpoint the trainer would resume from
@@ -31,7 +32,9 @@ publish_latest() {  # chunk-* and partial-* alike: the checkpoint the trainer wo
 from shipnav.training.checkpoints import latest_checkpoint
 latest = latest_checkpoint(sys.argv[1])
 print(latest if latest else "")' "$SHIPNAV_OUTPUT")
-    if [[ -n "$newest" && "$newest" != "$published" ]]; then publish "$newest"; published=$newest; fi
+    if [[ -z "$newest" || "$newest" == "$published" ]]; then return 0; fi
+    publish "$newest" || return 1
+    published=$newest  # only after every upload, manifest included, succeeded
 }
 upload_status() {  # S3 status.json is the source of truth: bounded retry, then fail
     local attempt
