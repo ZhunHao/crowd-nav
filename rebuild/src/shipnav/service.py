@@ -1,13 +1,11 @@
 from hashlib import sha256
-from math import dist
 from pathlib import Path
 import json
 from shipnav.maps import SeaMap, canonical_json
-from shipnav.planning import astar, smooth
-from shipnav.simulation import CourseChangeTraffic, run_episode
-from shipnav.scenarios import make_scenario, load_traffic, scenario_hash, validate_observation, validate_scenario
+from shipnav.episode import build_traffic, episode_limit, plan_route
+from shipnav.simulation import run_episode
+from shipnav.scenarios import make_scenario, scenario_hash, validate_observation, validate_scenario
 from shipnav.observations import Observer
-from shipnav.theta import theta_star
 from shipnav.policies import Direct, Learned, Reciprocal
 from shipnav.provenance import provenance
 
@@ -25,29 +23,17 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
     sea = SeaMap.from_dict(map_data)
     if placement not in ('uniform', 'corridor'):
         raise ValueError('Placement must be uniform or corridor')
-    if planner == 'astar_smooth':
-        route = smooth(sea,astar(sea,tuple(start),tuple(goal),clearance,resolution),clearance)
-    elif planner == 'theta':
-        route = theta_star(sea,tuple(start),tuple(goal),clearance,resolution)
-    else:
-        raise ValueError('Unknown planner')
+    route = plan_route(sea, start, goal, planner, resolution, clearance)
     if scenario is None:
         # Corridor traffic is timed on the A*-smoothed reference route whichever planner
         # runs, so planner comparisons share identical traffic.
         reference = None if placement == 'uniform' else route if planner == 'astar_smooth' else \
-            smooth(sea,astar(sea,tuple(start),tuple(goal),clearance,resolution),clearance)
+            plan_route(sea, start, goal, 'astar_smooth', resolution, clearance)
         scenario = make_scenario(sea,start,goal,count,seed,corridor=reference)
     if (canonical_json(SeaMap.from_dict(scenario['map']).to_dict()) != canonical_json(sea.to_dict())
             or tuple(scenario['start'])!=tuple(start) or tuple(scenario['goal'])!=tuple(goal)):
         raise ValueError('Scenario map/endpoints differ from run request')
-    traffic = load_traffic(scenario)
-    if scenario.get('traffic_mode')=='reactive':
-        from shipnav.reactive import ReactiveTraffic
-        if any(isinstance(s, CourseChangeTraffic) for s in traffic):
-            raise ValueError('Reactive traffic mode does not support course_change entries')
-        traffic = [ReactiveTraffic(s,sea) for s in traffic]
-    elif scenario.get('traffic_mode')!='scripted':
-        raise ValueError('Unknown traffic model')
+    traffic = build_traffic(scenario, sea)
     goals = route if global_goals or len(route) == 1 else [tuple(start), tuple(goal)]
     hashes = {}
     if policy_name == 'sarl':
@@ -66,9 +52,8 @@ def execute(map_data: dict, start: tuple, goal: tuple, model_dir: str = '',
     observer = Observer(seed=scenario['seed'],**(observation or {}))
     # Scaled real maps get three times the nominal route time; synthetic maps retain
     # their legacy 100 s default, including previously timed-out long routes.
-    length = sum(dist(a, b) for a, b in zip(route, route[1:]))
     if limit is None:
-        limit = max(100., 3*length) if 'model_scale' in map_data['metadata'] else 100.
+        limit = episode_limit(map_data, route)
     result = run_episode(sea,goals,traffic,policy,limit=limit,cancel=cancel,observer=observer,filtered=filtered,uncertainty=uncertainty,dynamics=dynamics)
     settings = {'seed': scenario['seed'], 'planner': planner, 'filtered': filtered, 'uncertainty': uncertainty, 'observation': observation or {}, 'dynamics': dynamics, 'requested_traffic': count,
                 'actual_traffic': len(traffic), 'policy': policy_name,
