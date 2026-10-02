@@ -1,0 +1,17 @@
+{
+  "failures": [],
+  "generator": "shipnav.training.scenarios",
+  "schema": 1,
+  "splits": {
+    "select": {
+      "count": 200,
+      "file": "select.jsonl.gz",
+      "sha256": "eba4d2c737c76fb9356ace404cbf25ed0a57fbddb54a9a64e677f1344af6227b"
+    },
+    "train": {
+      "count": 5000,
+      "file": "train.jsonl.gz",
+      "sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747"
+    }
+  }
+}
