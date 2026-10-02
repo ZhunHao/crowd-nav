@@ -6,6 +6,9 @@ import json
 
 WORK = '/opt/shipnav'
 UV_SYNC = 'uv sync --locked --extra train --extra maps'
+# systemd waits this long after TERM before SIGKILL: the trainer's 120 s kill-after (run-training.sh) plus
+# time for the partial-checkpoint upload and the status retries.
+STOP_TIMEOUT_S = 300
 
 
 def _check(s):
@@ -41,7 +44,8 @@ def commands(kind, s):
         setenv = ' '.join(f'--setenv={k}={quote(str(v))}' for k, v in env.items())
         body = ['set -euo pipefail', f'sudo shutdown -h +{minutes}',
                 f"sudo systemd-run --unit={quote('shipnav-'+s['run_id'])} --property=RuntimeMaxSec={minutes*60} "
-                f'--working-directory={WORK}/rebuild {setenv} /bin/bash {WORK}/rebuild/cloud/run-training.sh']
+                f'--property=TimeoutStopSec={STOP_TIMEOUT_S} --working-directory={WORK}/rebuild {setenv} '
+                f'/bin/bash {WORK}/rebuild/cloud/run-training.sh']
         timeout = 600
     else:
         raise ValueError('kind must be setup, smoke or start')

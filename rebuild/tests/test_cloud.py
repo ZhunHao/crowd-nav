@@ -2,7 +2,10 @@ from hashlib import sha256
 from pathlib import Path
 import json
 import os
+import shlex
+import signal
 import stat
+import time
 import subprocess
 import sys
 import textwrap
@@ -41,6 +44,10 @@ def test_ssm_documents_set_timeouts_and_quote_values():
     script = '\n'.join(start['commands'])
     assert 'systemd-run' in script and 'shutdown -h +' in script
     assert quote('s3://example-bucket/a b; rm -rf /') in script and '\nrm -rf' not in script
+    assert '--property=TimeoutStopSec=300 ' in script  # outlasts the trainer's 120 s kill-after plus uploads
+    unit = shlex.split(next(line for line in start['commands'] if 'systemd-run' in line))
+    assert 'SHIPNAV_S3_URI=s3://example-bucket/a b; rm -rf /' in ' '.join(unit)  # quoting survives splitting
+    assert any(w == '--setenv=SHIPNAV_S3_URI=s3://example-bucket/a b; rm -rf /' for w in unit)
     with pytest.raises(ValueError):
         commands('start', {**SETTINGS, 'seconds': 0})
     with pytest.raises(ValueError):
@@ -149,7 +156,19 @@ FAKE_TRAINER = textwrap.dedent('''
             raise SystemExit('partial beyond --chunks')
         first = m['chunk']+(1 if m['complete_chunk'] else 0)
     stop_at = int(os.environ.get('FAKE_STOP_AT_CHUNK', -1))
+    hang_at = int(os.environ.get('FAKE_HANG_AT_CHUNK', -1))
     for chunk in range(first, chunks):
+        if chunk == hang_at:  # "running": on TERM save a partial checkpoint and exit 3, like the real trainer
+            import signal, time
+            def on_term(*_):
+                signal.signal(signal.SIGTERM, signal.SIG_IGN)  # a repeat TERM is harmless
+                make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50)
+                raise SystemExit(3)
+            signal.signal(signal.SIGTERM, on_term)
+            Path(os.environ['FAKE_READY']).write_text('ready')
+            for _ in range(600):  # at most 30 s: never hangs the suite
+                time.sleep(0.05)
+            raise SystemExit(99)
         if chunk == stop_at:
             make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50)
             raise SystemExit(3)
@@ -159,36 +178,58 @@ FAKE_TRAINER = textwrap.dedent('''
 ''')
 
 
-@pytest.fixture
-def harness(tmp_path):
-    """Stub aws (logs calls, captures status.json), timeout (drops its options) and a fake trainer."""
+def build_harness(tmp_path):
+    """Stub aws (logs calls, captures status.json, can fail it N times), timeout (drops its options) and a fake trainer."""
     bin_dir, out, captured = tmp_path/'bin', tmp_path/'out', tmp_path/'captured'
     for d in (bin_dir, out, captured):
         d.mkdir()
     (tmp_path/'trainer.py').write_text(FAKE_TRAINER.format(tests=str(ROOT/'tests')))
     scripts = {
         'aws': f'#!/bin/bash\necho "$*" >> "$AWS_LOG"\n'
-               f'[[ "$4" == */status.json ]] && cp "$3" {captured}/status.json\nexit 0\n',
+               f'if [[ "$4" == */status.json ]]; then\n'
+               f'    n=$(cat "$AWS_COUNT" 2>/dev/null || echo 0)\n'
+               f'    if ((n < ${{AWS_FAIL_STATUS:-0}})); then echo $((n+1)) > "$AWS_COUNT"; exit 1; fi\n'
+               f'    cp "$3" {captured}/status.json\nfi\nexit 0\n',
         'timeout': '#!/bin/bash\nwhile [[ "$1" == --* ]]; do shift; done\nshift\nexec "$@"\n',
         'python': f'#!/bin/bash\nif [[ "$1" == -m && "$2" == shipnav.training.train ]]; then\n'
                   f'    exec {sys.executable} {tmp_path}/trainer.py "${{@:3}}"\nfi\nexec {sys.executable} "$@"\n'}
     for name, body in scripts.items():
         (bin_dir/name).write_text(body)
         (bin_dir/name).chmod((bin_dir/name).stat().st_mode | stat.S_IXUSR)
-    env = {'PATH': f'{bin_dir}:/usr/bin:/bin', 'AWS_LOG': str(tmp_path/'aws.log'), 'FAKE_LOG': str(tmp_path/'trainer.log'),
+    env = {'PATH': f'{bin_dir}:/usr/bin:/bin', 'AWS_LOG': str(tmp_path/'aws.log'), 'AWS_COUNT': str(tmp_path/'aws.count'),
+           'FAKE_LOG': str(tmp_path/'trainer.log'), 'FAKE_READY': str(tmp_path/'ready'), 'SHIPNAV_RETRY_SLEEP': '0',
            'SHIPNAV_PYTHON': str(bin_dir/'python'), 'SHIPNAV_SCENARIOS': 'scenarios', 'SHIPNAV_OUTPUT': str(out),
            'SHIPNAV_S3_URI': 's3://bucket/prefix', 'SHIPNAV_SEED': '0', 'SHIPNAV_VARIANT': 'ppo', 'SHIPNAV_CHUNKS': '3',
            'SHIPNAV_ENVS': '8', 'SHIPNAV_DEVICE': 'cpu', 'SHIPNAV_SECONDS': '36000'}
 
-    def run(**overrides):
-        done = subprocess.run(['bash', str(RUNNER)], capture_output=True, text=True, env={**env, **overrides})
+    def results():
         trainer_log = tmp_path/'trainer.log'
         targets = ([json.loads(line)['chunks'] for line in trainer_log.read_text().splitlines()]
                    if trainer_log.exists() else [])
         uploads = [line.split()[2:4] for line in (tmp_path/'aws.log').read_text().splitlines()]
-        status = json.loads((captured/'status.json').read_text())
-        return done, targets, uploads, status
+        status_file = captured/'status.json'
+        return targets, uploads, json.loads(status_file.read_text()) if status_file.exists() else None
+
+    def run(**overrides):
+        done = subprocess.run(['bash', str(RUNNER)], capture_output=True, text=True, env={**env, **overrides})
+        return (done, *results())
+
+    def start(**overrides):  # own session, so os.killpg can stand in for systemd's control-group TERM
+        return subprocess.Popen(['bash', str(RUNNER)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                env={**env, **overrides}, start_new_session=True)
+    return run, start, results, out, tmp_path/'ready'
+
+
+@pytest.fixture
+def harness(tmp_path):
+    run, _, _, out, _ = build_harness(tmp_path)
     return run, out
+
+
+@pytest.fixture
+def terminable(tmp_path):
+    _, start, results, out, ready = build_harness(tmp_path)
+    return start, results, out, ready
 
 
 def published(uploads, name):
@@ -251,3 +292,46 @@ def test_runner_uploads_failed_status_when_the_trainer_fails(harness):
     (out/'chunk-0000'/'policy.zip').write_bytes(b'tampered')  # hash mismatch propagates from latest_checkpoint
     done, _, _, status = run()
     assert done.returncode != 0 and status['state'] == 'failed' and status['exit_code'] == done.returncode
+
+
+def terminate_while_training(terminable, group):
+    start, results, out, ready = terminable
+    proc = start(FAKE_HANG_AT_CHUNK='1')
+    try:
+        deadline = time.monotonic()+60
+        while not ready.exists():
+            assert proc.poll() is None and time.monotonic() < deadline, 'fake trainer never started'
+            time.sleep(.05)
+        (os.killpg if group else os.kill)(proc.pid, signal.SIGTERM)
+        stdout, stderr = proc.communicate(timeout=60)
+    finally:
+        if proc.poll() is None:
+            os.killpg(proc.pid, signal.SIGKILL)
+    return proc.returncode, stderr, *results(), out
+
+
+@pytest.mark.parametrize('group', [False, True], ids=['runner-only', 'whole-group'])
+def test_runner_publishes_partial_and_a_true_status_when_terminated(terminable, group):
+    code, stderr, targets, uploads, status, out = terminate_while_training(terminable, group)
+    assert code == 143, stderr
+    assert targets == [1, 2] and status == {'state': 'terminated', 'exit_code': 143}
+    assert (out/'partial-0001-150').is_dir() and not (out/'chunk-0001').exists()
+    partial = [i for i, (_, dst) in enumerate(uploads) if '/checkpoints/partial-0001-150/' in dst]
+    assert [Path(uploads[i][1]).name for i in partial] == ['policy.zip', 'state.pt', 'rng.json', 'manifest.json']
+    assert len(partial) == 4  # published once: the EXIT trap does not repeat an upload that succeeded
+    assert uploads[-1][1] == 's3://bucket/prefix/status.json' and partial[-1] < len(uploads)-1
+
+
+def test_status_upload_is_retried_then_succeeds(harness, tmp_path):
+    run, _ = harness
+    done, _, uploads, status = run(AWS_FAIL_STATUS='2')
+    assert done.returncode == 0, done.stderr
+    assert status == {'state': 'complete', 'exit_code': 0}
+    assert [dst for _, dst in uploads].count('s3://bucket/prefix/status.json') == 3
+
+
+def test_status_upload_failure_after_three_attempts_is_a_failure(harness):
+    run, _ = harness
+    done, _, uploads, _ = run(AWS_FAIL_STATUS='99')
+    assert done.returncode == 1 and 'status.json upload failed' in done.stderr
+    assert [dst for _, dst in uploads].count('s3://bucket/prefix/status.json') == 3
