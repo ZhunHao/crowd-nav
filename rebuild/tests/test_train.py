@@ -71,3 +71,77 @@ def test_worker_factory_ignores_sigterm_only_in_a_subprocess(corpus, monkeypatch
         assert signal.getsignal(signal.SIGTERM) == signal.SIG_IGN
     finally:
         signal.signal(signal.SIGTERM, previous)
+
+
+ROLLOUT = 2048
+
+
+@pytest.fixture
+def stop_after(monkeypatch):
+    """Set STOP from inside the callback once more than `steps` env steps were taken (no timing)."""
+    original = train.EpisodeStats._on_step
+
+    def install(steps):
+        def hooked(self):
+            if self.num_timesteps > steps:
+                train.STOP.set()
+            return original(self)
+        monkeypatch.setattr(train.EpisodeStats, '_on_step', hooked)
+    yield install
+    train.STOP.clear()
+
+
+def long_args(corpus, output, *extra):
+    return args(corpus, output, *extra, '--chunk-steps', str(2*ROLLOUT))  # argparse keeps the last occurrence
+
+
+def test_mid_chunk_stop_saves_rollout_aligned_partial_then_resume_hits_the_boundary(corpus, tmp_path, stop_after, monkeypatch):
+    out = tmp_path/'e'
+    stop_after(ROLLOUT+5)
+    status = train.main(long_args(corpus, out, '--variant', 'ppo', '--chunks', '1'))
+    assert status['state'] == 'stopped' and status['num_timesteps'] == ROLLOUT
+    assert sorted(p.name for p in out.iterdir() if p.is_dir()) == [f'partial-0000-{ROLLOUT}']
+    partial = verify_checkpoint(out/f'partial-0000-{ROLLOUT}')
+    assert partial['complete_chunk'] is False and partial['chunk'] == 0 and partial['num_timesteps'] == ROLLOUT
+    train.STOP.clear()
+    monkeypatch.undo()
+    status = train.main(long_args(corpus, out, '--variant', 'ppo', '--chunks', '1', '--resume'))
+    manifest = verify_checkpoint(out/'chunk-0000')
+    assert status['state'] == 'complete' and manifest['num_timesteps'] == 2*ROLLOUT and manifest['complete_chunk'] is True
+    rows = [json.loads(line) for line in (out/'curve.jsonl').read_text().splitlines()]
+    assert [(r['chunk'], r['complete_chunk'], r['num_timesteps']) for r in rows] == [(0, False, ROLLOUT), (0, True, 2*ROLLOUT)]
+
+
+def test_zero_step_stop_is_a_partial_and_resumes_to_a_complete_chunk(corpus, tmp_path):
+    out = tmp_path/'f'
+    train.STOP.set()
+    try:
+        assert train.main(args(corpus, out, '--variant', 'ppo', '--chunks', '1'))['state'] == 'stopped'
+    finally:
+        train.STOP.clear()
+    assert (out/'partial-0000-0').is_dir() and not (out/'chunk-0000').exists()
+    status = train.main(args(corpus, out, '--variant', 'ppo', '--chunks', '1', '--resume'))
+    assert status['state'] == 'complete' and verify_checkpoint(out/'chunk-0000')['num_timesteps'] == 128
+
+
+def test_repeated_zero_progress_stop_is_idempotent(corpus, tmp_path):
+    out = tmp_path/'g'
+    train.STOP.set()
+    try:
+        for extra in ((), ('--resume',)):
+            assert train.main(args(corpus, out, '--variant', 'ppo', '--chunks', '1', *extra))['state'] == 'stopped'
+    finally:
+        train.STOP.clear()
+    assert len((out/'curve.jsonl').read_text().splitlines()) == 2
+
+
+def test_lagrangian_partial_keeps_the_multiplier(corpus, tmp_path, stop_after):
+    out = tmp_path/'h'
+    train.main(long_args(corpus, out, '--variant', 'ppo_lagrangian', '--budget', '0', '--chunks', '1'))
+    carried = verify_checkpoint(out/'chunk-0000')['penalty_next']
+    stop_after(3*ROLLOUT+5)
+    status = train.main(long_args(corpus, out, '--variant', 'ppo_lagrangian', '--budget', '0', '--chunks', '2', '--resume'))
+    partial = verify_checkpoint(out/f'partial-0001-{3*ROLLOUT}')
+    assert status['state'] == 'stopped' and partial['complete_chunk'] is False
+    assert partial['penalty_used'] == carried and partial['penalty_next'] == partial['penalty_used']
+

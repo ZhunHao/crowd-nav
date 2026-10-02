@@ -30,9 +30,18 @@ IDENTITY = ('variant', 'seed', 'envs', 'chunk_steps', 'env_config', 'scenario_ma
 
 
 class EpisodeStats(BaseCallback):
-    def __init__(self, deadline):
+    """Collects completed-episode costs; stops at the next env step on SIGTERM or deadline.
+
+    `trained` is num_timesteps at the end of the last completed rollout. SB3 calls on_rollout_end only after a
+    rollout is fully collected, and train() follows it, so `trained` counts exactly the steps the policy was
+    updated on. An interrupted rollout is discarded by SB3, so the trainer rolls num_timesteps back to it."""
+    def __init__(self, deadline, start=0):
         super().__init__()
         self.deadline, self.costs, self.statuses, self.interrupted = deadline, [], [], False
+        self.trained = start
+
+    def _on_rollout_end(self):
+        self.trained = self.model.num_timesteps
 
     def _on_step(self):
         for info in self.locals['infos']:
@@ -98,10 +107,13 @@ def main(argv=None):
     last = latest_checkpoint(a.output) if a.resume else None
     if not a.resume and latest_checkpoint(a.output):
         raise SystemExit('Output already has checkpoints; use --resume or a new directory')
-    penalty = verify_checkpoint(last)['penalty_next'] if last else 0.
+    resumed = verify_checkpoint(last) if last else None
+    if resumed and not resumed['complete_chunk'] and resumed['chunk'] >= a.chunks:
+        raise SystemExit('Latest checkpoint is a partial chunk beyond --chunks; raise --chunks or use a new directory')
+    penalty = resumed['penalty_next'] if resumed else 0.
     config = EnvConfig(observation=a.observation, filtered=not a.no_filter, penalty=penalty)
     ident = identity(a, EnvConfig(observation=a.observation, filtered=not a.no_filter))
-    if last and {k: verify_checkpoint(last)[k] for k in IDENTITY} != ident:
+    if resumed and {k: resumed[k] for k in IDENTITY} != ident:
         raise SystemExit('Resume configuration differs from the checkpoint')
     scenarios = load_split(a.scenarios, 'train')
     env = make_vec_env(lambda: make_env(scenarios, config), n_envs=a.envs, seed=a.seed,
@@ -111,31 +123,41 @@ def main(argv=None):
             model = PPO.load(last/'policy.zip', env=env, device=a.device)
             restore_rng(last)
             env.seed(a.seed*1_000_003+model.num_timesteps)
-            first = verify_checkpoint(last)['chunk']+1
+            first = resumed['chunk']+(1 if resumed['complete_chunk'] else 0)  # a partial chunk is re-entered
         else:
             model = PPO('MlpPolicy', env, seed=a.seed, device=a.device, n_steps=a.n_steps, batch_size=BATCH)
             first = 0
         state = 'complete'
         for chunk in range(first, a.chunks):
-            began, stats = time.monotonic(), EpisodeStats(deadline)
+            began, target = time.monotonic(), (chunk+1)*a.chunk_steps
+            stats = EpisodeStats(deadline, model.num_timesteps)
+            if not chunk*a.chunk_steps <= model.num_timesteps < target:
+                raise RuntimeError(f'chunk {chunk} cannot start at num_timesteps={model.num_timesteps}')
             if STOP.is_set() or time.monotonic() >= deadline:
                 stats.interrupted = True  # stop before learning: save a zero-step partial checkpoint
             else:
                 env.env_method('set_penalty', penalty)
-                model.learn(a.chunk_steps, reset_num_timesteps=False, callback=stats)
+                model.learn(target-model.num_timesteps, reset_num_timesteps=False, callback=stats)
             done = not stats.interrupted
+            if done and model.num_timesteps != target:
+                raise RuntimeError(f'chunk {chunk} ended at {model.num_timesteps}, not {target}')
             used = penalty
-            if a.variant == 'ppo_lagrangian' and stats.costs:
-                penalty = update_penalty(penalty, mean(stats.costs), a.budget)
-            save_checkpoint(model, a.output, f'chunk-{chunk:04d}', {
-                **ident, 'chunk': chunk, 'complete_chunk': done, 'penalty_used': used, 'penalty_next': penalty,
-                'budget': a.budget, 'observation_schema': SCHEMA, 'action_schema': ACTION_SCHEMA,
-                'dynamics': 'marine', 'device': a.device, 'resume_mode': 'restart-equivalent',
-                'versions': {'torch': torch.__version__, 'stable_baselines3': stable_baselines3.__version__,
-                             'gymnasium': gymnasium.__version__},
-                'provenance': provenance(ident, ROOT)})
+            if done:  # one multiplier update per logical chunk, from this segment's completed episodes
+                if a.variant == 'ppo_lagrangian' and stats.costs:
+                    penalty = update_penalty(penalty, mean(stats.costs), a.budget)
+            else:  # drop the interrupted rollout so recorded steps equal trained steps
+                model.num_timesteps = stats.trained
+            name = f'chunk-{chunk:04d}' if done else f'partial-{chunk:04d}-{model.num_timesteps}'
+            if done or not (a.output/name).exists():  # a repeat zero-progress stop re-states the same partial
+                save_checkpoint(model, a.output, name, {
+                    **ident, 'chunk': chunk, 'complete_chunk': done, 'penalty_used': used, 'penalty_next': penalty,
+                    'budget': a.budget, 'observation_schema': SCHEMA, 'action_schema': ACTION_SCHEMA,
+                    'dynamics': 'marine', 'device': a.device, 'resume_mode': 'restart-equivalent',
+                    'versions': {'torch': torch.__version__, 'stable_baselines3': stable_baselines3.__version__,
+                                 'gymnasium': gymnasium.__version__},
+                    'provenance': provenance(ident, ROOT)})
             with (a.output/'curve.jsonl').open('a') as stream:
-                stream.write(json.dumps({'chunk': chunk, 'num_timesteps': model.num_timesteps,
+                stream.write(json.dumps({'chunk': chunk, 'complete_chunk': done, 'num_timesteps': model.num_timesteps,
                     'episodes': len(stats.costs), 'mean_episode_cost': mean(stats.costs) if stats.costs else None,
                     'success_rate': stats.statuses.count('success')/len(stats.statuses) if stats.statuses else None,
                     'collision_rate': stats.statuses.count('collision')/len(stats.statuses) if stats.statuses else None,
