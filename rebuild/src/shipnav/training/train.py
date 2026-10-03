@@ -120,6 +120,7 @@ def main(argv=None):
                        vec_env_cls=SubprocVecEnv if a.envs > 1 else DummyVecEnv)
     try:
         if last:
+            # PPO.load unpickles policy.zip: acceptable only here, for our own output directory (see checkpoints.py)
             model = PPO.load(last/'policy.zip', env=env, device=a.device)
             restore_rng(last)
             env.seed(a.seed*1_000_003+model.num_timesteps)

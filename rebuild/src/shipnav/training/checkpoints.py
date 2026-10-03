@@ -2,8 +2,9 @@
 
 RNG state avoids pickle: Python/NumPy generators go to rng.json and torch
 generator tensors to state.pt, loaded with `weights_only=True`. SB3's
-policy.zip still deserialises objects on load, so only load hash-verified
-checkpoints that this project produced; never load a policy.zip from elsewhere.
+policy.zip still deserialises objects (cloudpickle) when loaded with `PPO.load`, which a manifest hash
+does not make safe: `PPO.load` is limited to `train.py --resume` on the trainer's own output directory.
+Everything else (service, GUI, CLI) loads only the weights through `shipnav.training.adapter.ModernLearned`.
 """
 from hashlib import sha256
 from math import isfinite
