@@ -17,8 +17,8 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 import torch
 
 from shipnav.provenance import provenance
-from shipnav.training.checkpoints import (latest_checkpoint, restore_rng, save_checkpoint,
-                                          update_penalty, verify_checkpoint)
+from shipnav.training.checkpoints import (DEFAULT_CHUNK_STEPS, latest_checkpoint, restore_rng,
+                                          save_checkpoint, update_penalty, verify_checkpoint)
 from shipnav.training.env import EnvConfig, NavigationEnv
 from shipnav.training.observation import ACTION_SCHEMA, SCHEMA
 from shipnav.training.scenarios import load_split
@@ -68,7 +68,7 @@ def parse(argv):
     p.add_argument('--variant', choices=('ppo', 'ppo_lagrangian'), required=True)
     p.add_argument('--budget', type=float)
     p.add_argument('--chunks', type=int, required=True)
-    p.add_argument('--chunk-steps', type=int, default=20480)
+    p.add_argument('--chunk-steps', type=int, default=DEFAULT_CHUNK_STEPS)
     p.add_argument('--envs', type=int, default=8)
     p.add_argument('--device', choices=('cpu', 'cuda', 'mps'), default='cpu')
     p.add_argument('--max-seconds', type=float, required=True)

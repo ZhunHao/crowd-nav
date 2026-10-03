@@ -9,11 +9,14 @@ UV_SYNC = 'uv sync --locked --extra train --extra maps'
 # systemd waits this long after TERM before SIGKILL: the trainer's 120 s kill-after (run-training.sh) plus
 # time for the partial-checkpoint upload and the status retries.
 STOP_TIMEOUT_S = 300
+VARIANTS = ('ppo', 'ppo_lagrangian')
 
 
 def _check(s):
     if not s['seconds'] > 0 or s['chunks'] < 1 or s['envs'] < 1:
         raise ValueError('Positive seconds, chunks and envs required')
+    if s['variant'] not in VARIANTS or not isinstance(s['seed'], int) or isinstance(s['seed'], bool) or s['seed'] < 0:
+        raise ValueError('variant must be ppo or ppo_lagrangian and seed a non-negative integer')
     if s['variant'] == 'ppo_lagrangian' and s.get('budget') is None:
         raise ValueError('ppo_lagrangian needs the preregistered budget')
 
@@ -37,7 +40,8 @@ def commands(kind, s):
     elif kind == 'start':
         minutes = int(s['seconds']//60) + 30  # training deadline + upload grace
         env = {'SHIPNAV_PYTHON': f'{WORK}/rebuild/.venv/bin/python', 'SHIPNAV_SCENARIOS': f'{WORK}/rebuild/scenarios/training',
-               'SHIPNAV_OUTPUT': f'{WORK}/out', 'SHIPNAV_S3_URI': f"s3://{s['bucket']}/{s['prefix']}",
+               'SHIPNAV_OUTPUT': f"{WORK}/out/{s['variant']}/seed{s['seed']}",  # one directory per run: sequential runs never mix
+               'SHIPNAV_S3_URI': f"s3://{s['bucket']}/{s['prefix']}",
                'SHIPNAV_SEED': s['seed'], 'SHIPNAV_VARIANT': s['variant'], 'SHIPNAV_CHUNKS': s['chunks'],
                'SHIPNAV_ENVS': s['envs'], 'SHIPNAV_DEVICE': s['device'], 'SHIPNAV_SECONDS': int(s['seconds']),
                'SHIPNAV_BUDGET': '' if s.get('budget') is None else s['budget']}

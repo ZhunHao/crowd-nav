@@ -25,9 +25,11 @@ publish() {  # payload first, manifest last: a manifest in S3 means a complete c
     done
     aws s3 cp "$dir/manifest.json" "$SHIPNAV_S3_URI/checkpoints/$name/manifest.json" --only-show-errors || return 1
 }
+verified=0  # set once resume_target.py has confirmed the output directory belongs to this run
 published=  # last checkpoint folder uploaded successfully, so the EXIT trap does not re-upload it
 publish_latest() {  # chunk-* and partial-* alike: the checkpoint the trainer would resume from
     local newest
+    if ((!verified)); then return 0; fi  # never publish a checkpoint whose ownership is unchecked
     newest=$("$SHIPNAV_PYTHON" -c 'import sys
 from shipnav.training.checkpoints import latest_checkpoint
 latest = latest_checkpoint(sys.argv[1])
@@ -49,7 +51,7 @@ finish() {
     trap '' TERM  # a second TERM (shutdown -h after systemctl stop) must not interrupt the uploads
     if [[ "$state" != complete ]]; then publish_latest || true; fi  # best effort, before the status says so
     printf '{"state":"%s","exit_code":%d}\n' "$state" "$code" > "$SHIPNAV_OUTPUT/run-status.json"
-    aws s3 cp "$SHIPNAV_OUTPUT/curve.jsonl" "$SHIPNAV_S3_URI/curve.jsonl" --only-show-errors || true
+    if ((verified)); then aws s3 cp "$SHIPNAV_OUTPUT/curve.jsonl" "$SHIPNAV_S3_URI/curve.jsonl" --only-show-errors || true; fi
     if ! upload_status; then
         echo "status.json upload failed after 3 attempts" >&2
         exit $((code==0 ? 1 : code))
@@ -70,8 +72,14 @@ trap on_term TERM
 start=$SECONDS
 budget=()
 if [[ -n "${SHIPNAV_BUDGET:-}" ]]; then budget=(--budget "$SHIPNAV_BUDGET"); fi
+chunk_steps=()
+if [[ -n "${SHIPNAV_CHUNK_STEPS:-}" ]]; then chunk_steps=(--chunk-steps "$SHIPNAV_CHUNK_STEPS"); fi
 # First target from the latest local checkpoint: none -> 1, partial chunk c -> c+1, complete chunk c -> c+2.
-first=$("$SHIPNAV_PYTHON" "$here/resume_target.py" "$SHIPNAV_OUTPUT")
+# It refuses (non-zero exit, status failed, nothing published) a checkpoint left by another variant/seed/settings,
+# and a count that is "complete" without a complete chunk-(CHUNKS-1).
+first=$("$SHIPNAV_PYTHON" "$here/resume_target.py" "$SHIPNAV_OUTPUT" --variant "$SHIPNAV_VARIANT" \
+    --seed "$SHIPNAV_SEED" --envs "$SHIPNAV_ENVS" --chunks "$SHIPNAV_CHUNKS" ${chunk_steps[@]+"${chunk_steps[@]}"} ${budget[@]+"${budget[@]}"})
+verified=1
 publish_latest  # idempotent: covers a checkpoint saved just before a stop that never reached S3
 if ((first>SHIPNAV_CHUNKS)); then state=complete; exit 0; fi  # already complete
 for ((target=first; target<=SHIPNAV_CHUNKS; target++)); do
@@ -82,7 +90,7 @@ for ((target=first; target<=SHIPNAV_CHUNKS; target++)); do
     timeout --signal=TERM --kill-after=120s "$remaining" "$SHIPNAV_PYTHON" -m shipnav.training.train \
         --scenarios "$SHIPNAV_SCENARIOS" --output "$SHIPNAV_OUTPUT" --seed "$SHIPNAV_SEED" \
         --variant "$SHIPNAV_VARIANT" --chunks "$target" --envs "$SHIPNAV_ENVS" --device "$SHIPNAV_DEVICE" \
-        --max-seconds "$remaining" --resume ${budget[@]+"${budget[@]}"} &
+        --max-seconds "$remaining" --resume ${chunk_steps[@]+"${chunk_steps[@]}"} ${budget[@]+"${budget[@]}"} &
     trainer_pid=$!
     wait "$trainer_pid" || code=$?
     trainer_pid=

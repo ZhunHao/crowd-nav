@@ -77,7 +77,10 @@ def test_runner_script_parses_and_requires_settings(tmp_path):
 
 # ---- Ruling B: first --chunks target after an instance stop/start ------------------------------------------
 
-def make_checkpoint(root, name, chunk, complete, steps):
+RUN_IDENTITY = {'variant': 'ppo', 'seed': 0, 'envs': 8, 'chunk_steps': 20480, 'budget': None}
+
+
+def make_checkpoint(root, name, chunk, complete, steps, **identity):
     """A verifiable checkpoint folder (payload hashes match) without training a model."""
     directory = Path(root)/name
     directory.mkdir(parents=True)
@@ -85,7 +88,7 @@ def make_checkpoint(root, name, chunk, complete, steps):
     for n, data in payload.items():
         (directory/n).write_bytes(data)
     (directory/'manifest.json').write_text(json.dumps({
-        'chunk': chunk, 'complete_chunk': complete, 'num_timesteps': steps,
+        **RUN_IDENTITY, **identity, 'chunk': chunk, 'complete_chunk': complete, 'num_timesteps': steps,
         'files': {n: sha256(data).hexdigest() for n, data in payload.items()}}))
     return directory
 
@@ -148,6 +151,9 @@ FAKE_TRAINER = textwrap.dedent('''
     out, chunks = Path(value('--output')), int(value('--chunks'))
     with open(os.environ['FAKE_LOG'], 'a') as log:
         log.write(json.dumps({{'chunks': chunks, 'resume': '--resume' in argv}})+'\\n')
+    ident = dict(variant=value('--variant'), seed=int(value('--seed')), envs=int(value('--envs')),
+                 chunk_steps=int(value('--chunk-steps')) if '--chunk-steps' in argv else 20480,
+                 budget=float(value('--budget')) if '--budget' in argv else None)
     last = latest_checkpoint(out)
     first = 0
     if last:
@@ -162,7 +168,7 @@ FAKE_TRAINER = textwrap.dedent('''
             import signal, time
             def on_term(*_):
                 signal.signal(signal.SIGTERM, signal.SIG_IGN)  # a repeat TERM is harmless
-                make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50)
+                make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50, **ident)
                 raise SystemExit(3)
             signal.signal(signal.SIGTERM, on_term)
             Path(os.environ['FAKE_READY']).write_text('ready')
@@ -170,9 +176,9 @@ FAKE_TRAINER = textwrap.dedent('''
                 time.sleep(0.05)
             raise SystemExit(99)
         if chunk == stop_at:
-            make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50)
+            make_checkpoint(out, f'partial-{{chunk:04d}}-{{chunk*100+50}}', chunk, False, chunk*100+50, **ident)
             raise SystemExit(3)
-        make_checkpoint(out, f'chunk-{{chunk:04d}}', chunk, True, (chunk+1)*100)
+        make_checkpoint(out, f'chunk-{{chunk:04d}}', chunk, True, (chunk+1)*100, **ident)
         with (out/'curve.jsonl').open('a') as stream:
             stream.write(json.dumps({{'chunk': chunk}})+'\\n')
 ''')
@@ -368,3 +374,72 @@ def test_failed_payload_upload_in_the_loop_fails_the_run_without_a_manifest(harn
     assert published(uploads, 'chunk-0000')[-1] == failing
     assert status == {'state': 'failed', 'exit_code': done.returncode}
     assert uploads[-1][1] == 's3://bucket/prefix/status.json'
+
+
+# ---- C1: a checkpoint from another run is never published, resumed from or reported complete ---------------
+
+EXPECTED = {'variant': 'ppo', 'seed': 0, 'envs': 8, 'chunk_steps': 20480, 'budget': None}
+
+
+@pytest.mark.parametrize('field, other', [('variant', 'ppo_lagrangian'), ('seed', 1), ('envs', 4),
+                                          ('chunk_steps', 2048), ('budget', 30.)])
+def test_first_target_refuses_a_checkpoint_from_another_run(tmp_path, field, other):
+    make_checkpoint(tmp_path, 'chunk-0000', 0, True, 100, **{field: other})
+    with pytest.raises(ValueError, match=field):
+        first_target(tmp_path, expected=EXPECTED)
+    assert first_target(tmp_path) == 2  # without the run's settings only the chunk bookkeeping is checked
+
+
+def test_first_target_accepts_a_checkpoint_of_this_run(tmp_path):
+    make_checkpoint(tmp_path, 'chunk-0000', 0, True, 100)
+    assert first_target(tmp_path, expected=EXPECTED, chunks=3) == 2
+
+
+def test_first_target_is_complete_only_with_a_complete_final_chunk(tmp_path):
+    for c in range(3):
+        make_checkpoint(tmp_path, f'chunk-{c:04d}', c, True, (c+1)*100)
+    assert first_target(tmp_path, expected=EXPECTED, chunks=3) == 4
+    lone = tmp_path/'lone'
+    make_checkpoint(lone, 'partial-0003-350', 3, False, 350)
+    with pytest.raises(ValueError, match='beyond'):  # a count above --chunks is not "complete" without chunk-0002
+        first_target(lone, expected=EXPECTED, chunks=3)
+
+
+def test_first_target_cli_passes_the_run_settings(tmp_path):
+    make_checkpoint(tmp_path, 'chunk-0000', 0, True, 100, seed=1)
+    cli = [sys.executable, str(ROOT/'cloud/resume_target.py'), str(tmp_path), '--variant', 'ppo', '--seed', '0',
+           '--envs', '8', '--chunks', '3']
+    done = subprocess.run(cli, capture_output=True, text=True)
+    assert done.returncode != 0 and 'seed' in done.stderr
+    ok = subprocess.run(cli[:6]+['1']+cli[7:], capture_output=True, text=True)
+    assert ok.returncode == 0 and ok.stdout.strip() == '2', ok.stderr
+
+
+def test_runner_refuses_a_foreign_checkpoint_and_publishes_nothing(harness):
+    run, out = harness
+    for c in range(3):
+        make_checkpoint(out, f'chunk-{c:04d}', c, True, (c+1)*100, seed=7)  # another run's finished output
+    (out/'curve.jsonl').write_text('{"chunk": 2}\n')
+    done, targets, uploads, status = run()
+    assert done.returncode != 0 and 'seed' in done.stderr
+    assert targets == [] and status == {'state': 'failed', 'exit_code': done.returncode}
+    assert [dst for _, dst in uploads] == ['s3://bucket/prefix/status.json']  # no checkpoint, no foreign curve
+
+
+def test_runner_does_not_report_complete_without_a_complete_final_chunk(harness):
+    run, out = harness
+    make_checkpoint(out, 'partial-0002-250', 2, False, 250)  # beyond SHIPNAV_CHUNKS=2, chunk-0001 never finished
+    done, targets, uploads, status = run(SHIPNAV_CHUNKS='2')
+    assert done.returncode != 0 and targets == [] and status['state'] == 'failed'
+    assert not any('/checkpoints/' in dst for _, dst in uploads)
+
+
+def test_start_document_gives_each_run_its_own_output_directory():
+    def output(settings):
+        unit = shlex.split(next(line for line in commands('start', settings)['commands'] if 'systemd-run' in line))
+        return next(w.split('=', 2)[2] for w in unit if w.startswith('--setenv=SHIPNAV_OUTPUT='))
+    first, second = output(SETTINGS), output({**SETTINGS, 'seed': 1})
+    assert first == '/opt/shipnav/out/ppo/seed0' and second == '/opt/shipnav/out/ppo/seed1'
+    assert output({**SETTINGS, 'variant': 'ppo_lagrangian', 'budget': 30.}) == '/opt/shipnav/out/ppo_lagrangian/seed0'
+    with pytest.raises(ValueError):
+        commands('start', {**SETTINGS, 'variant': '../x'})

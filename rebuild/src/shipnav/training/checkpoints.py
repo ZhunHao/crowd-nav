@@ -17,6 +17,7 @@ import numpy as np
 import torch
 
 FILES = ('policy.zip', 'state.pt', 'rng.json')
+DEFAULT_CHUNK_STEPS = 20480  # the trainer's --chunk-steps default; cloud/resume_target.py compares against it
 
 
 def _rng_json():
