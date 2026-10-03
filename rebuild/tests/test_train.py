@@ -157,3 +157,27 @@ def test_manifest_records_the_source_commit(corpus, tmp_path, monkeypatch):
     assert verify_checkpoint(tmp_path/'env'/'chunk-0000')['source_commit'] == 'a'*40
     train.main(args(corpus, tmp_path/'flag', '--variant', 'ppo', '--chunks', '1', '--source-commit', 'b'*40))
     assert verify_checkpoint(tmp_path/'flag'/'chunk-0000')['source_commit'] == 'b'*40
+
+
+def test_deadline_path_saves_a_partial_checkpoint_and_exits_with_code_three(corpus, tmp_path):
+    out = tmp_path/'deadline'
+    # --max-seconds 1 is below the checkpoint grace, so the deadline has passed before the first rollout
+    status = train.main(args(corpus, out, '--variant', 'ppo', '--chunks', '2', '--max-seconds', '1'))
+    assert status['state'] == 'deadline' and status['num_timesteps'] == 0
+    assert json.loads((out/'status.json').read_text())['state'] == 'deadline'
+    manifest = verify_checkpoint(out/'partial-0000-0')
+    assert manifest['complete_chunk'] is False and manifest['chunk'] == 0 and not (out/'chunk-0000').exists()
+    assert train.run(args(corpus, tmp_path/'exit', '--variant', 'ppo', '--chunks', '2', '--max-seconds', '1')) == 3
+    assert train.run(args(corpus, tmp_path/'done', '--variant', 'ppo', '--chunks', '1')) == 0
+
+
+def test_module_entry_point_exits_three_on_the_deadline_and_zero_when_complete(corpus, tmp_path):
+    import subprocess
+    import sys
+
+    def cli(name, *extra):
+        return subprocess.run([sys.executable, '-m', 'shipnav.training.train',
+                               *args(corpus, tmp_path/name, '--variant', 'ppo', '--chunks', '1', *extra)],
+                              capture_output=True, text=True).returncode
+    assert cli('late', '--max-seconds', '1') == 3
+    assert cli('whole') == 0

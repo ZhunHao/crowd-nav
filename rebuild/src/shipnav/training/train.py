@@ -175,5 +175,10 @@ def main(argv=None):
         signal.signal(signal.SIGTERM, previous)
 
 
+def run(argv=None):
+    """Process exit code: 0 when every chunk completed, 3 when stopped (signal or deadline) with a partial checkpoint."""
+    return 0 if main(argv)['state'] == 'complete' else 3
+
+
 if __name__ == '__main__':
-    raise SystemExit(0 if main()['state'] == 'complete' else 3)
+    raise SystemExit(run())
