@@ -90,3 +90,45 @@ def test_inputs_are_validated():
     env.reset(seed=1)
     with pytest.raises(ValueError):
         env.step([np.inf, 0.])
+
+
+def test_episode_cost_equals_the_metrics_exposure_of_a_replayed_recorded_run(monkeypatch):
+    """The cost the trainer constrains is the domain time that the evaluation reports (unscaled scenario, traffic)."""
+    import shipnav.training.env as training_env
+    from shipnav.episode import build_traffic, episode_limit
+    from shipnav.metrics import _exposure
+    from shipnav.observations import Observer
+    from shipnav.scale import units
+    from shipnav.simulation import episode_steps
+    from shipnav.training.observation import action_to_velocity
+    seeds = []
+
+    class Recording(Observer):
+        def __init__(self, seed, **options):
+            seeds.append(seed)
+            super().__init__(seed=seed, **options)
+
+    monkeypatch.setattr(training_env, 'Observer', Recording)
+    alongside = {**scene(), 'traffic': [{'start': [2., 3.3], 'goal': [22., 3.3], 'speed': .3, 'radius': .6},
+                                        {'start': [22., 9.], 'goal': [2., 9.], 'speed': .4, 'radius': .6}]}
+    config = EnvConfig(filtered=False)
+    env = NavigationEnv([alongside], config)
+    env.reset(seed=3)
+    commands, info = [], {}
+    while 'episode_cost' not in info:
+        action = [1., 0.]
+        commands.append(action_to_velocity(action, env.packet['speed']))
+        *_, info = env.step(action)
+    assert info['episode_cost'] > 0.  # the scenario really exposes the ego to the domain
+    sea = SeaMap.from_dict(alongside['map'])
+    engine = episode_steps(sea, env.route, build_traffic(alongside, sea), None,
+                           limit=episode_limit(alongside['map'], env.route), observer=Observer(seed=seeds[0]),
+                           filtered=False, dynamics='marine', record=True, terminal_packet=True)
+    next(engine)
+    try:
+        for command in commands:
+            engine.send((command, 0.))
+    except StopIteration as ended:
+        replay = ended.value[0]
+    assert replay['status'] == info['status']
+    assert _exposure(replay, *units(alongside['map'])) == pytest.approx(info['episode_cost'], abs=1e-9)

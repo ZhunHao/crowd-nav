@@ -39,3 +39,14 @@ def test_committed_corpus_matches_its_manifest():
     manifest = json.loads((ROOT/'scenarios/training/manifest.json').read_text())
     assert manifest['splits']['train']['count'] >= 4_900
     assert len(load_split(ROOT/'scenarios/training', 'select')) == manifest['splits']['select']['count']
+
+
+def test_committed_train_split_verifies_and_stays_inside_its_seed_range():
+    manifest = json.loads((ROOT/'scenarios/training/manifest.json').read_text())
+    scenarios = load_split(ROOT/'scenarios/training', 'train')  # verifies the file hash and the count
+    seeds = [s['seed'] for s in scenarios]
+    assert len(scenarios) == manifest['splits']['train']['count']
+    assert all(seed in TRAIN_SEEDS for seed in seeds) and len(set(seeds)) == len(seeds)
+    assert all(s['split'] == 'train' for s in scenarios)
+    hashes, frozen_seeds = frozen_identities(ROOT)
+    assert not set(seeds) & frozen_seeds and not {scenario_hash(s) for s in scenarios} & hashes
