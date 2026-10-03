@@ -48,7 +48,10 @@ def encode(packet):
                    min(o['margin'], AGE_BOUND)/AGE_BOUND, 1.]
     values += [0.]*(TARGET_FEATURES*(MAX_TARGETS-len(targets)))
     values += [r/RANGE for r in ray_lengths(packet['sea'], p, packet['radius'])]
-    return np.asarray(values, dtype=np.float32)
+    encoded = np.asarray(values, dtype=np.float32)
+    if not np.isfinite(encoded).all():
+        raise ValueError('Observation has a non-finite feature; every schema-1 feature must be finite')
+    return encoded
 
 
 def action_to_velocity(action, speed):

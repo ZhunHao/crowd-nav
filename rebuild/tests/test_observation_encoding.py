@@ -48,3 +48,24 @@ def test_action_transform_clips_to_the_unit_disk_and_rejects_bad_input():
     assert action_to_velocity([0., 0.], 1.) == (0., 0.)
     with pytest.raises(ValueError):
         action_to_velocity([np.nan, 0.], 1.)
+
+
+def test_golden_vector_for_one_fixed_packet():
+    """Literal schema-1 values (the rays also agree with the analytic wall distances to the bisection tolerance)."""
+    values = encode(packet())
+    ego = [1., 0., 1., .5, 0., 0., 1., 1.]  # goal direction, goal range, velocity/speed, sin/cos heading, final
+    target = [.15, 0., -.5, 0., .3, 0., 0., 1.]  # offset/20, velocity/2, radius/2, age/5, margin/5, mask
+    rays = [.924805, 1., 1., 1., .924805, .587891, .317383, .243164,
+            .224609, .243164, .317383, .243164, .224609, .243164, .317383, .587891]
+    assert values.shape == (120,)
+    assert values[:8] == pytest.approx(ego, abs=1e-6)
+    assert values[8:16] == pytest.approx(target, abs=1e-6)
+    assert not values[16:104].any()  # eleven empty target slots
+    assert values[104:] == pytest.approx(rays, abs=1e-6)
+
+
+@pytest.mark.parametrize('overrides', [{'goal': (float('nan'), 5.)}, {'position': (float('nan'), 5.)},
+                                       {'goal': (float('inf'), 5.)}])
+def test_a_non_finite_feature_is_an_error_not_an_observation(overrides):
+    with pytest.raises(ValueError, match='finite'):
+        encode(packet(**overrides))
