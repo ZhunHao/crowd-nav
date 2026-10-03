@@ -3,8 +3,11 @@ from pathlib import Path
 import argparse
 import json
 
+from identifiers import check_run_id
+
 
 def request(ami, instance_type, subnet, group, profile, root, run_id, hours, volume_gib):
+    check_run_id(run_id)
     if not hours > 0 or not volume_gib > 0:
         raise ValueError('Positive wall time and volume size required')
     tags = [{'Key': 'Project', 'Value': 'shipnav'}, {'Key': 'RunId', 'Value': run_id},

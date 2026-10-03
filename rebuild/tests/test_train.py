@@ -151,7 +151,7 @@ def test_manifest_records_the_source_commit(corpus, tmp_path, monkeypatch):
     monkeypatch.delenv('SHIPNAV_SOURCE_COMMIT', raising=False)
     train.main(args(corpus, tmp_path/'git', '--variant', 'ppo', '--chunks', '1'))
     local = verify_checkpoint(tmp_path/'git'/'chunk-0000')
-    assert local['source_commit'] == local['provenance']['git_revision'] and local['source_commit']  # no env: git
+    assert local['source_commit'] == local['provenance']['git_revision']  # no env var or flag: the git revision (None without .git)
     monkeypatch.setenv('SHIPNAV_SOURCE_COMMIT', 'a'*40)  # the EC2 host has no .git: the runbook passes the commit
     train.main(args(corpus, tmp_path/'env', '--variant', 'ppo', '--chunks', '1'))
     assert verify_checkpoint(tmp_path/'env'/'chunk-0000')['source_commit'] == 'a'*40

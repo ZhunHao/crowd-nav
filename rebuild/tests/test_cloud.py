@@ -17,12 +17,12 @@ sys.path.insert(0, str(ROOT/'cloud'))
 from budget import estimate  # noqa: E402
 from prepare_launch import request  # noqa: E402
 from resume_target import first_target  # noqa: E402
-from ssm_commands import commands  # noqa: E402
+from ssm_commands import check_training_config, commands  # noqa: E402
 from shlex import quote  # noqa: E402
 
 SETTINGS = {'bucket': 'example-bucket', 'prefix': 'shipnav/run-1', 'seed': 0, 'variant': 'ppo',
             'chunks': 40, 'envs': 8, 'device': 'cpu', 'seconds': 36000, 'run_id': 'run-1', 'budget': None,
-            'uv_version': '0.0.0'}
+            'uv_version': '0.0.0', 'region': 'eu-west-1', 'source_commit': '0123456789abcdef0123456789abcdef01234567'}
 RUNNER = ROOT/'cloud/run-training.sh'
 
 
@@ -443,3 +443,86 @@ def test_start_document_gives_each_run_its_own_output_directory():
     assert output({**SETTINGS, 'variant': 'ppo_lagrangian', 'budget': 30.}) == '/opt/shipnav/out/ppo_lagrangian/seed0'
     with pytest.raises(ValueError):
         commands('start', {**SETTINGS, 'variant': '../x'})
+
+
+# ---- Task 13 hardening: run ids, systemd ordering, explicit HOME / uv path / region, pilot, commit, cross-check ----
+
+def unit_words(settings):
+    return shlex.split(next(line for line in commands('start', settings)['commands'] if 'systemd-run' in line))
+
+
+@pytest.mark.parametrize('bad', ['', 'run 1', 'run_1', 'run-1; rm -rf /', 'x'*65, '../run', 'run\n1', 7])
+def test_run_id_is_validated_everywhere(bad):
+    with pytest.raises(ValueError, match='run_id'):
+        commands('start', {**SETTINGS, 'run_id': bad})
+    with pytest.raises(ValueError, match='run_id'):
+        request('ami-0', 't', 's', 'g', 'p', '/dev/xvda', bad, 10., 60)
+    assert commands('start', {**SETTINGS, 'run_id': 'A-z-0'*12+'ab'})  # 62 characters are fine
+
+
+def test_unit_waits_for_the_network_and_has_an_explicit_home_region_and_commit():
+    unit = unit_words(SETTINGS)
+    assert '--property=After=network-online.target' in unit and '--property=Wants=network-online.target' in unit
+    assert '--setenv=HOME=/root' in unit and '--setenv=AWS_DEFAULT_REGION=eu-west-1' in unit
+    assert f"--setenv=SHIPNAV_SOURCE_COMMIT={SETTINGS['source_commit']}" in unit
+    assert any(w.startswith('--setenv=SHIPNAV_OUTPUT=') for w in unit)
+
+
+@pytest.mark.parametrize('kind', ['setup', 'smoke', 'pilot'])
+def test_documents_set_home_and_region_before_using_them(kind):
+    lines = commands(kind, SETTINGS)['commands']
+    assert lines[:3] == ['set -euo pipefail', 'export HOME=/root', 'export AWS_DEFAULT_REGION=eu-west-1']
+
+
+def test_uv_is_installed_to_and_run_from_an_explicit_path():
+    script = '\n'.join(commands('setup', SETTINGS)['commands'])
+    assert 'UV_INSTALL_DIR=/usr/local/bin' in script and 'UV_NO_MODIFY_PATH=1' in script
+    assert '$HOME' not in script and 'command -v uv' not in script
+    assert '/usr/local/bin/uv python install 3.14' in script and '/usr/local/bin/uv sync --locked' in script
+
+
+@pytest.mark.parametrize('field, bad', [('region', 'eu west 1'), ('region', 'Europe'), ('source_commit', 'abc123'),
+                                        ('source_commit', 'g'*40)])
+def test_region_and_source_commit_are_required_and_validated(field, bad):
+    for settings in ({**SETTINGS, field: bad}, {k: v for k, v in SETTINGS.items() if k != field}):
+        with pytest.raises((ValueError, KeyError)):
+            commands('start', settings)
+
+
+def test_pilot_document_runs_the_pilot_and_uploads_its_json():
+    pilot = commands('pilot', SETTINGS)
+    assert pilot['executionTimeout'] == ['3600']
+    script = '\n'.join(pilot['commands'])
+    assert 'tools/training_pilot.py' in script and '--devices cpu' in script
+    assert '--output /opt/shipnav/out/pilot-run-1.json' in script
+    assert 'aws s3 cp /opt/shipnav/out/pilot-run-1.json s3://example-bucket/shipnav/run-1/pilot-run-1.json' in script
+    assert (ROOT/'tools/training_pilot.py').is_file()
+
+
+CONFIG = {'seeds': [0, 1, 2], 'variants': ['ppo', 'ppo_lagrangian'], 'chunks': 40, 'envs': 8, 'budget_domain_s': 12.5,
+          'source_commit': SETTINGS['source_commit']}
+
+
+@pytest.fixture
+def config_file(tmp_path):
+    path = tmp_path/'training_config.json'
+    path.write_text(json.dumps(CONFIG))
+    return path
+
+
+def test_settings_agreeing_with_the_frozen_configuration_pass(config_file):
+    check_training_config({**SETTINGS, 'chunks': 40}, config_file)
+    check_training_config({**SETTINGS, 'chunks': 40, 'variant': 'ppo_lagrangian', 'budget': 12.5, 'seed': 2}, config_file)
+
+
+@pytest.mark.parametrize('over, word', [({'chunks': 20}, 'chunks'), ({'envs': 4}, 'envs'), ({'seed': 3}, 'seed'),
+                                        ({'variant': 'ppo_lagrangian', 'budget': 3.}, 'budget'),
+                                        ({'budget': 12.5}, 'budget'),  # ppo takes no budget
+                                        ({'source_commit': 'f'*40}, 'source_commit')])
+def test_settings_that_disagree_with_the_frozen_configuration_are_refused(config_file, over, word):
+    with pytest.raises(ValueError, match=word):
+        check_training_config({**SETTINGS, 'chunks': 40, **over}, config_file)
+
+
+def test_without_a_frozen_configuration_nothing_is_cross_checked(tmp_path):
+    check_training_config({**SETTINGS, 'chunks': 3}, tmp_path/'missing.json')
