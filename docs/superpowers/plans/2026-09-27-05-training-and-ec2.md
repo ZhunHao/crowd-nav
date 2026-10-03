@@ -2548,7 +2548,7 @@ git commit -m "feat: add EC2 launch, SSM and checkpoint-publishing tooling"
 
 ### Task 14: EC2 execution runbook (AWS CLI only)
 
-This task launches paid resources. Before running any command marked **paid**, record these in `cloud/local/run.json` and confirm them explicitly: AWS profile/account, region, total spending limit, maximum wall time, S3 bucket/prefix, instance type, and volume size. Singapore is the user's timezone, not a chosen AWS region. Every command below uses the selected existing `AWS_PROFILE` and `AWS_REGION`.
+This task launches paid resources. The account is used with the root user by the user's choice; AWS recommends an IAM role or user instead, but no change is required here. Before running any command marked **paid**, record these in `cloud/local/run.json` and confirm them explicitly: AWS profile/account, region, total spending limit, maximum wall time, S3 bucket/prefix, instance type, and volume size. Singapore is the user's timezone, not a chosen AWS region. Every command below uses the selected existing `AWS_PROFILE` and `AWS_REGION`.
 
 **Discover and price (read-only)**
 
@@ -2594,16 +2594,17 @@ Check the owner, x86_64 architecture, root device name, and minimum volume size,
 
 **Launch (paid)**
 
-- [ ] Package the source. Confirm the commit exists, then upload only `rebuild/` implementation, locks and `scenarios/training` (no venvs, results, docs, PDFs or credentials):
+- [ ] Package the source. Archive the commit that `evidence/retraining/training_config.json` recorded as `source_commit` (every checkpoint carries it and the protocol freezer requires it to match; use `HEAD` only when no configuration is frozen yet). Confirm the commit exists, then upload only `rebuild/` implementation, tools, locks and `scenarios/training` (no venvs, results, docs, PDFs or credentials):
 
 ```bash
-git archive --format=tar.gz -o cloud/local/source.tar.gz HEAD rebuild/src rebuild/cloud rebuild/tests rebuild/scenarios/training rebuild/pyproject.toml rebuild/uv.lock
+export SHIPNAV_SOURCE_COMMIT=$(git rev-parse "$(python -c "import json;print(json.load(open('rebuild/evidence/retraining/training_config.json'))['source_commit'])" 2>/dev/null || echo HEAD)")
+git archive --format=tar.gz -o cloud/local/source.tar.gz "$SHIPNAV_SOURCE_COMMIT" rebuild/src rebuild/cloud rebuild/tools rebuild/tests rebuild/scenarios/training rebuild/pyproject.toml rebuild/uv.lock
 (cd cloud/local && sha256sum source.tar.gz > source.sha256)
 aws s3 cp cloud/local/source.tar.gz "s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/source.tar.gz"
 aws s3 cp cloud/local/source.sha256 "s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/source.sha256"
 ```
 
-The `git archive` paths are repository-relative (run it from the repository root, or use `git -C ..` from `rebuild/`). The tests need `tests/fixtures/engine_parity.json`, which this includes.
+The `git archive` paths are repository-relative (run it from the repository root, or use `git -C ..` from `rebuild/`). The tests need `tests/fixtures/engine_parity.json`, which this includes; `rebuild/tools` is there for the throughput pilot. The EC2 host has no `.git`, so the archived commit is passed to the trainer as `source_commit` (below) and recorded in every checkpoint manifest.
 
 - [ ] Generate the request, check permission with `--dry-run`, and launch. `--dry-run` exits non-zero with `DryRunOperation` when permission is sufficient; treat `UnauthorizedOperation` or any other error as a stop.
 
@@ -2631,7 +2632,7 @@ Universal-target format: [EventBridge Scheduler docs](https://docs.aws.amazon.co
 
 **Set up, verify, pilot (paid)**
 
-- [ ] Write `cloud/local/settings.json` (keys as in `tests/test_cloud.py::SETTINGS`; `uv_version` is the local `uv --version` number, so the host installs the same uv). For `KIND` in `setup`, then `smoke`, run `python cloud/ssm_commands.py "$KIND" --settings cloud/local/settings.json`, then:
+- [ ] Write `cloud/local/settings.json` (keys as in `tests/test_cloud.py::SETTINGS`, including `region` (the `AWS_REGION` in use) and `source_commit` (`git rev-parse` of the archived commit, i.e. `$SHIPNAV_SOURCE_COMMIT`); `uv_version` is the local `uv --version` number, so the host installs the same uv). When `evidence/retraining/training_config.json` exists, `cloud/ssm_commands.py` refuses settings whose `chunks`, `envs`, `variant`, `seed`, `budget` (`ppo_lagrangian` only; `null` for `ppo`) or `source_commit` disagree with it, so edit the settings per run rather than the configuration. `run_id` is 1-64 letters, digits or hyphens. For `KIND` in `setup`, then `smoke`, run `python cloud/ssm_commands.py "$KIND" --settings cloud/local/settings.json`, then:
 
 ```bash
 aws ssm send-command --document-name AWS-RunShellScript --instance-ids "$SHIPNAV_INSTANCE_ID" \
@@ -2643,11 +2644,11 @@ aws ssm get-command-invocation --command-id "$SHIPNAV_COMMAND_ID" --instance-id 
 ```
 
 An SSM status of `Success` means the step succeeded only when `ResponseCode` is 0.
-- [ ] Run `tools/training_pilot.py` through a one-off SSM command (executionTimeout 3600). Download the JSON, then compute cost per million env steps = `price / (learn_steps_per_s × 3600) × 1e6` for each shortlisted type. Choose the cheapest type that finishes inside the wall-time limit. If it differs from the pilot instance, stop and terminate the pilot instance, and repeat the launch with the chosen type.
+- [ ] Run the throughput pilot with the `pilot` document (`python cloud/ssm_commands.py pilot --settings cloud/local/settings.json`, then `send-command` as above; it runs `tools/training_pilot.py`, executionTimeout 3600, writes `/opt/shipnav/out/pilot-$SHIPNAV_RUN_ID.json` and copies it to `s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/pilot-$SHIPNAV_RUN_ID.json`). Download the JSON, then compute cost per million env steps = `price / (learn_steps_per_s × 3600) × 1e6` for each shortlisted type. Choose the cheapest type that finishes inside the wall-time limit. If it differs from the pilot instance, stop and terminate the pilot instance, and repeat the launch with the chosen type.
 - [ ] **Stop/resume pilot:**
   1. Start a 3-chunk run (`start` document).
   2. After `chunk-0000` appears in S3, `aws ec2 stop-instances`, wait for `instance-stopped`, then `start-instances`.
-  3. Re-send the `start` document with the same output prefix. The runner resumes from the latest local verified checkpoint, and the EBS volume persisted.
+  3. Re-arm the stop schedule first (an `at()` schedule fires once, so create a new one for the remaining wall time), then check `systemctl is-active shipnav-$SHIPNAV_RUN_ID` through SSM and re-send the `start` document with the same output prefix only when it is not `active` (never start a second unit over a running one). The runner resumes from the latest local verified checkpoint (`cloud/resume_target.py` maps `chunk-NNNN` / `partial-NNNN-<steps>` to the next `--chunks` target), and the EBS volume persisted.
   4. Confirm `status.json` says `complete` and the timesteps continue without a gap.
   5. Download one checkpoint and run `ModernLearned` locally on CPU through the service.
 
@@ -2655,7 +2656,7 @@ An SSM status of `Success` means the step succeeded only when `ResponseCode` is 
 
 **Train every seed (paid)**
 
-- [ ] For each `variant × seed` in `training_config.json`, start one run (sequentially on one instance, or one instance per run within the approved budget), each with its own `--prefix .../<variant>/seed<k>`. Monitor only `status.json` and `curve.jsonl` in S3. A successful process exit is not a performance claim.
+- [ ] For each `variant × seed` in `training_config.json`, start one run (sequentially on one instance, or one instance per run within the approved budget), each with its own S3 prefix `.../<variant>/seed<k>`. Every run writes to its own host directory `/opt/shipnav/out/<variant>/seed<k>`, and the runner refuses a latest checkpoint whose variant, seed, envs, chunk size or budget differ from the run's settings, so sequential runs on one instance cannot publish or report each other's checkpoints. After a stop/start, re-arm the stop schedule and do not re-send `start` while `systemctl is-active shipnav-<run_id>` reports `active`. Monitor only `status.json` and `curve.jsonl` in S3. A successful process exit is not a performance claim.
 - [ ] Record per run: instance type, region, AMI, GPU/driver/CUDA (if any), lock hash, code commit, corpus hash, seed, steps/s, runtime, estimated cost, SSM command IDs and checkpoint hashes, all in `cloud/local/runs.jsonl`.
 
 **Download, verify and clean up**
@@ -2664,10 +2665,12 @@ An SSM status of `Success` means the step succeeded only when `ResponseCode` is 
 
 ```bash
 aws s3 sync "s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/checkpoints" "results/train/$VARIANT/seed$SEED"
+aws s3 cp "s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/curve.jsonl" "results/train/$VARIANT/seed$SEED/curve.jsonl"
+aws s3 cp "s3://$SHIPNAV_BUCKET/$SHIPNAV_RUN_PREFIX/status.json" "results/train/$VARIANT/seed$SEED/status.json"
 python -c "import sys;from pathlib import Path;from shipnav.training.checkpoints import verify_checkpoint;[print(d.name, verify_checkpoint(d)['num_timesteps']) for d in sorted(Path(sys.argv[1]).iterdir()) if (d/'manifest.json').is_file()]" "results/train/$VARIANT/seed$SEED"
 ```
 
-Never compare S3 ETags with SHA256; the manifest hashes are authoritative.
+Never compare S3 ETags with SHA256; the manifest hashes are authoritative. Checkpoint folders are `chunk-NNNN` (complete) and `partial-NNNN-<steps>` (interrupted); only complete ones are selectable, and `select_checkpoints.py` and the protocol freezer require a complete final chunk, identical settings across the run, and the frozen `source_commit`.
 
 - [ ] Stop the instance (`aws ec2 stop-instances`, then `wait instance-stopped`). If any run is incomplete, keep the stopped disk until recovery is decided.
 - [ ] After verified recovery, terminate only the recorded instance and wait, then delete the stop schedule:
