@@ -114,3 +114,91 @@ def test_evaluate_aggregates_rates_and_rejects_empty_split(monkeypatch):
     assert result == {'success_rate': .5, 'collision_rate': .25, 'mean_domain_s': 2.}
     with pytest.raises(ValueError, match='empty'):
         evaluate(Path('chunk-0000'), [], True)
+
+
+# ---- select(): identity, final chunk and portable paths ----
+
+from hashlib import sha256  # noqa: E402
+import json  # noqa: E402
+import os  # noqa: E402
+import select_checkpoints  # noqa: E402
+
+COMMIT = 'abc123'
+CONFIG = {'chunks': 3, 'chunk_steps': 20480, 'envs': 8, 'filtered': True, 'observation': {}, 'budget_domain_s': 12.5,
+          'corpus_sha256': {'train': 'train-sha'}, 'source_commit': COMMIT,
+          'selection': {'split': 'select', 'every_chunks': 1, 'include_last': True, 'collision_max': .05}}
+
+
+def write_checkpoint(run, chunk, **over):
+    directory = Path(run)/f'chunk-{chunk:04d}'
+    directory.mkdir(parents=True)
+    files = {}
+    for name in ('policy.zip', 'state.pt', 'rng.json'):
+        data = f'{directory}{name}'.encode()
+        (directory/name).write_bytes(data)
+        files[name] = sha256(data).hexdigest()
+    manifest = {'files': files, 'num_timesteps': (chunk+1)*10, 'variant': 'ppo', 'seed': 0, 'envs': 8,
+                'chunk_steps': 20480, 'env_config': {'filtered': True, 'observation': {}},
+                'scenario_manifest_sha256': 'train-sha', 'chunk': chunk, 'complete_chunk': True, 'budget': None,
+                'source_commit': COMMIT, **over}
+    (directory/'manifest.json').write_text(json.dumps(manifest))
+    return directory
+
+
+@pytest.fixture
+def run(tmp_path):
+    run = tmp_path/'results/train/ppo/seed0'
+    for chunk in range(3):
+        write_checkpoint(run, chunk)
+    return run
+
+
+def selected(run, root, **kwargs):
+    return select_checkpoints.select(run, CONFIG, root=root, load=lambda *_: [{}],
+                                     assess=lambda d, *_: {'success_rate': int(d.name[-4:])/10, 'collision_rate': 0., 'mean_domain_s': 1.},
+                                     **kwargs)
+
+
+def test_select_stores_the_path_relative_to_rebuild_whatever_the_cwd(run, tmp_path, monkeypatch):
+    monkeypatch.chdir(run)  # a caller's cwd must not leak into the stored path
+    best = selected(run, tmp_path)
+    assert best['path'] == 'results/train/ppo/seed0/chunk-0002' and best['chunk'] == 2
+    stored = json.loads((run/'selection.json').read_text())
+    assert [c['path'] for c in stored['candidates']] == [f'results/train/ppo/seed0/chunk-000{c}' for c in range(3)]
+    monkeypatch.chdir(tmp_path/'results')
+    assert selected(Path('train/ppo/seed0'), tmp_path)['path'] == 'results/train/ppo/seed0/chunk-0002'
+
+
+@pytest.mark.parametrize('field, over', [('seed', {'seed': 1}), ('envs', {'envs': 4}), ('chunk_steps', {'chunk_steps': 1}),
+                                         ('env_config', {'env_config': {'filtered': False, 'observation': {}}}),
+                                         ('scenario_manifest_sha256', {'scenario_manifest_sha256': 'x'}),
+                                         ('variant', {'variant': 'ppo_lagrangian'})])
+def test_select_refuses_a_run_directory_with_mixed_identity(run, tmp_path, field, over):
+    write_checkpoint(run, 3, **over)
+    with pytest.raises(ValueError, match=f'mixes.*{field}'):
+        selected(run, tmp_path)
+    assert not (run/'selection.json').exists()
+
+
+def test_select_refuses_a_run_that_does_not_match_the_training_configuration(tmp_path):
+    other = tmp_path/'results/train/ppo/seed0'
+    for chunk in range(3):
+        write_checkpoint(other, chunk, scenario_manifest_sha256='another-corpus')
+    with pytest.raises(ValueError, match='frozen training configuration.*scenario_manifest_sha256'):
+        selected(other, tmp_path)
+
+
+def test_select_refuses_a_run_that_has_not_reached_the_final_chunk(tmp_path):
+    short = tmp_path/'results/train/ppo/seed0'
+    for chunk in range(2):
+        write_checkpoint(short, chunk)
+    with pytest.raises(ValueError, match='final chunk chunk-0002'):
+        selected(short, tmp_path)
+
+
+def test_select_checks_the_run_against_the_slot_it_sits_in(tmp_path):
+    wrong = tmp_path/'results/train/ppo/seed4'  # the checkpoints say seed 0
+    for chunk in range(3):
+        write_checkpoint(wrong, chunk)
+    with pytest.raises(ValueError, match='seed'):
+        selected(wrong, tmp_path)

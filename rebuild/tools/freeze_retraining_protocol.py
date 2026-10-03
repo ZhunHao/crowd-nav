@@ -1,7 +1,9 @@
 """Preregister the held-out retraining evaluation: write evidence/retraining/protocol.json.
 
 Run once, after every training run has a selection.json and before any held-out
-evaluation, from a clean checkout. Commit the output, then pass its commit and SHA256
+evaluation, from a clean checkout. Every selected checkpoint must belong to the frozen
+training configuration (variant, seed, settings, corpus, budget, source commit) and src/
+must be unchanged since that commit. Commit the output, then pass its commit and SHA256
 to retrain_eval.py. Selected checkpoint directories are stored relative to rebuild/
 when they live under it (portable); a checkpoint elsewhere keeps its absolute path.
 """
@@ -11,11 +13,11 @@ from math import isfinite
 from pathlib import Path
 import argparse
 import json
-import os
 import subprocess
 
 from retrain_eval import COMPARATORS, LEARNED, arm_name, learned_variants
 from shipnav.training.checkpoints import verify_checkpoint
+from training_identity import check_source_unchanged, final_chunk_problem, manifest_problems, portable
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT/'evidence/retraining/protocol.json'
@@ -49,17 +51,9 @@ def source_hashes(root=ROOT):
     return {name: file_sha256(root/name) for name in names}
 
 
-def portable(path, root=ROOT):
-    """Rebuild-relative POSIX path when `path` lies under `root`, else the absolute path (no symlink resolution)."""
-    path = Path(os.path.normpath(root/path))  # an absolute `path` replaces `root`
-    try:
-        return path.relative_to(os.path.normpath(root)).as_posix()
-    except ValueError:
-        return path.as_posix()
-
-
-def load_selection(root, variant, seed, verify=verify_checkpoint):
-    """One run's chosen checkpoint: {'path', 'files'}, refusing a missing or inconsistent selection."""
+def load_selection(root, variant, seed, training, verify=verify_checkpoint):
+    """One run's chosen checkpoint: {'path', 'files'}, refusing a missing selection or one that is not a
+    complete checkpoint of this run under the frozen training configuration."""
     run = f'{variant}/seed{seed}'
     file = Path(root)/'results/train'/variant/f'seed{seed}'/'selection.json'
     if not file.is_file():
@@ -73,6 +67,13 @@ def load_selection(root, variant, seed, verify=verify_checkpoint):
         raise ValueError(f'Selected checkpoint for {run} failed verification: {error}') from error
     if manifest['files'] != selection['files']:
         raise ValueError(f'Selected checkpoint for {run} differs from its selection.json file hashes')
+    problems = manifest_problems(manifest, training, variant, seed)
+    final = final_chunk_problem(file.parent, training, verify)
+    if final:
+        problems.append(final)
+    if problems:
+        raise ValueError(f'Selected checkpoint for {run} does not match the frozen training configuration: '
+                         + '; '.join(problems))
     return {'path': portable(selection['path'], Path(root)), 'files': selection['files']}
 
 
@@ -80,7 +81,13 @@ def load_selections(root, training, verify=verify_checkpoint):
     """{(variant, seed): {'path', 'files'}} for every learned variant and training seed."""
     if tuple(training['variants']) != LEARNED:
         raise ValueError(f'Training config variants {training["variants"]} differ from {list(LEARNED)}')
-    return {(v, s): load_selection(root, v, s, verify) for v in LEARNED for s in training['seeds']}
+    selections = {(v, s): load_selection(root, v, s, training, verify) for v in LEARNED for s in training['seeds']}
+    owner = {}
+    for run, selection in selections.items():
+        first = owner.setdefault(selection['files']['policy.zip'], run)
+        if first != run:
+            raise ValueError(f'Runs {first[0]}/seed{first[1]} and {run[0]}/seed{run[1]} selected the same checkpoint')
+    return selections
 
 
 def build_protocol(*, baseline, manifest, manifest_sha256, training, selections, source_sha256, lock_sha256,
@@ -146,6 +153,7 @@ def main():
     training = json.loads(TRAINING_CONFIG.read_text())
     baseline = json.loads(BASELINE_PROTOCOL.read_text())
     try:
+        check_source_unchanged(training['source_commit'], ROOT)
         selections = load_selections(ROOT, training)
         model_hashes = {name: file_sha256(SARL_DIR/name) for name in baseline['identities']['model']
                         if (SARL_DIR/name).is_file()}

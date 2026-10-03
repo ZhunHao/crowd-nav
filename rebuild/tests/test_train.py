@@ -145,3 +145,15 @@ def test_lagrangian_partial_keeps_the_multiplier(corpus, tmp_path, stop_after):
     assert status['state'] == 'stopped' and partial['complete_chunk'] is False
     assert partial['penalty_used'] == carried and partial['penalty_next'] == partial['penalty_used']
 
+
+
+def test_manifest_records_the_source_commit(corpus, tmp_path, monkeypatch):
+    monkeypatch.delenv('SHIPNAV_SOURCE_COMMIT', raising=False)
+    train.main(args(corpus, tmp_path/'git', '--variant', 'ppo', '--chunks', '1'))
+    local = verify_checkpoint(tmp_path/'git'/'chunk-0000')
+    assert local['source_commit'] == local['provenance']['git_revision'] and local['source_commit']  # no env: git
+    monkeypatch.setenv('SHIPNAV_SOURCE_COMMIT', 'a'*40)  # the EC2 host has no .git: the runbook passes the commit
+    train.main(args(corpus, tmp_path/'env', '--variant', 'ppo', '--chunks', '1'))
+    assert verify_checkpoint(tmp_path/'env'/'chunk-0000')['source_commit'] == 'a'*40
+    train.main(args(corpus, tmp_path/'flag', '--variant', 'ppo', '--chunks', '1', '--source-commit', 'b'*40))
+    assert verify_checkpoint(tmp_path/'flag'/'chunk-0000')['source_commit'] == 'b'*40

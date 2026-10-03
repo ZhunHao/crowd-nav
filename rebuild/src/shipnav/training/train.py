@@ -5,6 +5,7 @@ from statistics import mean
 from threading import Event
 import argparse
 import json
+import os
 import signal
 import time
 
@@ -17,7 +18,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 import torch
 
 from shipnav.provenance import provenance
-from shipnav.training.checkpoints import (DEFAULT_CHUNK_STEPS, latest_checkpoint, restore_rng,
+from shipnav.training.checkpoints import (DEFAULT_CHUNK_STEPS, IDENTITY, latest_checkpoint, restore_rng,
                                           save_checkpoint, update_penalty, verify_checkpoint)
 from shipnav.training.env import EnvConfig, NavigationEnv
 from shipnav.training.observation import ACTION_SCHEMA, SCHEMA
@@ -26,7 +27,6 @@ from shipnav.training.scenarios import load_split
 STOP = Event()
 ROLLOUT, BATCH, CHECKPOINT_GRACE_S = 2048, 64, 120.
 ROOT = Path(__file__).resolve().parents[4]  # repository root, as service._ROOT
-IDENTITY = ('variant', 'seed', 'envs', 'chunk_steps', 'env_config', 'scenario_manifest_sha256')
 
 
 class EpisodeStats(BaseCallback):
@@ -73,6 +73,8 @@ def parse(argv):
     p.add_argument('--device', choices=('cpu', 'cuda', 'mps'), default='cpu')
     p.add_argument('--max-seconds', type=float, required=True)
     p.add_argument('--resume', action='store_true')
+    p.add_argument('--source-commit', default=os.environ.get('SHIPNAV_SOURCE_COMMIT') or None,
+                   help='Revision recorded in each manifest; the EC2 host has no .git, so the runbook passes it')
     p.add_argument('--no-filter', action='store_true')
     p.add_argument('--observation', type=json.loads, default={})
     a = p.parse_args(argv)
@@ -150,13 +152,14 @@ def main(argv=None):
                 model.num_timesteps = stats.trained
             name = f'chunk-{chunk:04d}' if done else f'partial-{chunk:04d}-{model.num_timesteps}'
             if done or not (a.output/name).exists():  # a repeat zero-progress stop re-states the same partial
+                prov = provenance(ident, ROOT)
                 save_checkpoint(model, a.output, name, {
-                    **ident, 'chunk': chunk, 'complete_chunk': done, 'penalty_used': used, 'penalty_next': penalty,
+                    **ident, 'source_commit': a.source_commit or prov['git_revision'], 'chunk': chunk, 'complete_chunk': done, 'penalty_used': used, 'penalty_next': penalty,
                     'budget': a.budget, 'observation_schema': SCHEMA, 'action_schema': ACTION_SCHEMA,
                     'dynamics': 'marine', 'device': a.device, 'resume_mode': 'restart-equivalent',
                     'versions': {'torch': torch.__version__, 'stable_baselines3': stable_baselines3.__version__,
                                  'gymnasium': gymnasium.__version__},
-                    'provenance': provenance(ident, ROOT)})
+                    'provenance': prov})
             with (a.output/'curve.jsonl').open('a') as stream:
                 stream.write(json.dumps({'chunk': chunk, 'complete_chunk': done, 'num_timesteps': model.num_timesteps,
                     'episodes': len(stats.costs), 'mean_episode_cost': mean(stats.costs) if stats.costs else None,

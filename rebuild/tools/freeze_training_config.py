@@ -15,10 +15,13 @@ from shipnav.scale import map_options
 from shipnav.service import execute
 from shipnav.training.scenarios import load_split
 from shipnav.training.train import ROLLOUT
+from training_identity import dirty_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT/'evidence/retraining/training_config.json'
 CHUNK_STEPS = 20480
+# Everything the training runs execute or are checked against: tracked changes and untracked files alike.
+FROZEN_INPUTS = ('src', 'tools', 'cloud', 'scenarios/training', 'pyproject.toml', 'uv.lock')
 
 
 def check_arguments(chunks, envs, seeds):
@@ -60,8 +63,10 @@ if __name__ == '__main__':
     check_arguments(a.chunks, a.envs, a.seeds)
     if OUTPUT.exists():
         raise SystemExit(f'{OUTPUT.relative_to(ROOT)} already exists; a frozen configuration is never overwritten')
-    if subprocess.check_output(['git', 'status', '--porcelain', 'src', 'scenarios/training'], cwd=ROOT).strip():
-        raise SystemExit('Commit source and corpus before freezing the training configuration')
+    dirty = dirty_paths(ROOT, FROZEN_INPUTS)
+    if dirty:
+        raise SystemExit('Commit source, tools, cloud scripts, corpus and lockfile before freezing the training '
+                         'configuration (clean tree required):\n'+'\n'.join(dirty))
     budget, budget_n, mpc_statuses = domain_budget(load_split(ROOT/'scenarios/training', 'select'))
     corpus = json.loads((ROOT/'scenarios/training/manifest.json').read_text())
     config = {

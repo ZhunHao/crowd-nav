@@ -18,6 +18,7 @@ import numpy as np
 import torch
 
 FILES = ('policy.zip', 'state.pt', 'rng.json')
+IDENTITY = ('variant', 'seed', 'envs', 'chunk_steps', 'env_config', 'scenario_manifest_sha256')  # one run's settings
 DEFAULT_CHUNK_STEPS = 20480  # the trainer's --chunk-steps default; cloud/resume_target.py compares against it
 
 
