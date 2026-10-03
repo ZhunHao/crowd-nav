@@ -339,3 +339,55 @@ def test_training_config_freezer_requires_a_clean_tree_over_every_frozen_input(t
     (tmp_path/'tools/new.py').write_text('untracked')
     dirty = ' '.join(dirty_paths(tmp_path, config_freezer.FROZEN_INPUTS))
     assert all(name in dirty for name in ('tools/b.py', 'cloud/c.sh', 'uv.lock', 'tools/new.py'))
+
+
+# ---- constraint-budget analysis ----
+
+from retrain_eval import REAL_MAP_FAMILIES, constraint_report  # noqa: E402
+
+
+def exposure_rows():
+    entries = [{'scenario_hash': 'a', 'family': 'crossing'}, {'scenario_hash': 'b', 'family': 'head_on'},
+               {'scenario_hash': 'c', 'family': 'southern_corridor'}]
+    domain = {  # variant -> {scenario: domain_time_s}
+        'marine_mpc': {'a': 1., 'b': 9., 'c': 100.},
+        'ppo_s0_filtered': {'a': 6., 'b': 7., 'c': 100.},          # 2 of 2 synthetic over a budget of 5
+        'ppo_s1_filtered': {'a': 5., 'b': 1., 'c': 0.},            # exactly at the budget is not a violation
+        'ppo_lagrangian_s0_filtered': {'a': None, 'b': 2., 'c': 3.},  # unevaluated is neither over nor zero
+        'ppo_lagrangian_s1_filtered': {'a': 0., 'b': 0., 'c': 0.}}
+    rows = [{'variant': v, 'scenario_hash': h, 'domain_time_s': d} for v, per in domain.items() for h, d in per.items()]
+    protocol = {'targets': {'constraint_cost_budget': 5.}, 'training': {'seeds': [0, 1]}}
+    return rows, protocol, entries
+
+
+def test_constraint_report_counts_violations_per_arm_and_per_seed():
+    rows, protocol, entries = exposure_rows()
+    report = constraint_report(rows, protocol, entries)
+    assert report['budget_domain_s'] == 5.
+    assert report['arms']['marine_mpc']['synthetic'] == {'n': 2, 'n_unevaluated': 0, 'violation_rate': .5,
+                                                         'mean_domain_time_s': 5.}
+    assert report['arms']['ppo_s0_filtered']['synthetic']['violation_rate'] == 1.
+    assert report['arms']['ppo_s1_filtered']['synthetic']['violation_rate'] == 0.
+    unevaluated = report['arms']['ppo_lagrangian_s0_filtered']['synthetic']
+    assert (unevaluated['n'], unevaluated['n_unevaluated'], unevaluated['violation_rate']) == (2, 1, 0.)
+    assert report['learned_by_seed']['ppo/filtered'] == {'violation_rate_by_seed': {'0': 1., '1': 0.},
+                                                         'mean_violation_rate': .5}
+    assert set(report['learned_by_seed']) == {f'{v}/{f}' for v in ('ppo', 'ppo_lagrangian')
+                                              for f in ('filtered', 'unfiltered')}
+    assert report['learned_by_seed']['ppo/unfiltered']['mean_violation_rate'] is None  # arm absent in this table
+
+
+def test_constraint_report_keeps_real_map_scenarios_apart_and_not_comparable():
+    rows, protocol, entries = exposure_rows()
+    arms = constraint_report(rows, protocol, entries)['arms']
+    real = arms['ppo_s0_filtered']['real_map']
+    assert (real['n'], real['violation_rate'], real['mean_domain_time_s'], real['comparable']) == (1, 1., 100., False)
+    assert 'not comparable' in real['note']
+    assert arms['marine_mpc']['synthetic']['n'] == 2  # the 100 s real-map exposure is not in the synthetic mean
+    json.dumps(arms, allow_nan=False)
+
+
+def test_real_map_families_are_those_of_the_frozen_manifest():
+    manifest = json.loads((Path(freezer.ROOT)/freezer.MANIFEST).read_text())
+    families = {e['family'] for e in manifest['splits']['test']}
+    assert set(REAL_MAP_FAMILIES) <= families and len(families) > len(REAL_MAP_FAMILIES)
