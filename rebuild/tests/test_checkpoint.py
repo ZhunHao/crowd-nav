@@ -1,3 +1,4 @@
+from pathlib import Path
 import json
 import random
 
@@ -105,3 +106,19 @@ def test_latest_checkpoint_still_raises_on_hash_mismatch_in_complete_folder(tmp_
     (newer/'state.pt').write_bytes(b'tampered')
     with pytest.raises(ValueError, match='hash'):
         latest_checkpoint(tmp_path)
+
+
+def test_files_and_directories_are_synced_in_durable_order(tmp_path, monkeypatch):
+    """Staged files and the staging directory reach disk before the atomic rename, the parent after it."""
+    from shipnav.training import checkpoints
+    events = []
+    real_rename = checkpoints.os.rename
+    monkeypatch.setattr(checkpoints, '_fsync', lambda path: events.append(('sync', Path(path))))
+    monkeypatch.setattr(checkpoints.os, 'rename', lambda a, b: (events.append(('rename', Path(a))), real_rename(a, b)))
+    final = save_checkpoint(tiny_model(), tmp_path, 'chunk-0000', {})
+    rename = next(i for i, (kind, _) in enumerate(events) if kind == 'rename')
+    staging = events[rename][1]
+    before = [path for kind, path in events[:rename] if kind == 'sync']
+    assert [p.name for p in before if p.parent == staging] == ['policy.zip', 'state.pt', 'rng.json', 'manifest.json']
+    assert before[-1] == staging  # the staging directory entry list is durable just before the rename
+    assert [path for kind, path in events[rename+1:]] == [tmp_path] and final.is_dir()

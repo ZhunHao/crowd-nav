@@ -29,6 +29,15 @@ def _rng_json():
             'numpy': [name, key.tolist(), int(pos), int(has_gauss), float(cached)]}
 
 
+def _fsync(path):
+    """Flush a file's data, or a directory's entries, to stable storage."""
+    descriptor = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
 def save_checkpoint(model, root, name, metadata):
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
@@ -44,7 +53,11 @@ def save_checkpoint(model, root, name, metadata):
     files = {n: sha256((staging/n).read_bytes()).hexdigest() for n in FILES}
     manifest = {**metadata, 'num_timesteps': model.num_timesteps, 'files': files}
     (staging/'manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False)+'\n')
+    for name in (*FILES, 'manifest.json'):  # durable before the rename publishes the folder, even across a power loss
+        _fsync(staging/name)
+    _fsync(staging)
     os.rename(staging, final)
+    _fsync(root)
     return final
 
 
