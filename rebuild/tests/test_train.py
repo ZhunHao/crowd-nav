@@ -181,3 +181,36 @@ def test_module_entry_point_exits_three_on_the_deadline_and_zero_when_complete(c
                               capture_output=True, text=True).returncode
     assert cli('late', '--max-seconds', '1') == 3
     assert cli('whole') == 0
+
+
+def test_reentrant_sigterm_does_not_deadlock_stop_flag(corpus, tmp_path):
+    """systemd and timeout can deliver TERM while Event.set still holds its lock."""
+    import subprocess
+    import sys
+    import textwrap
+    script = textwrap.dedent('''
+        import signal
+        import sys
+        from shipnav.training import train
+        original = train.make_vec_env
+        previous = signal.getsignal(signal.SIGTERM)
+        hits = []
+        def trace(frame, event, arg):
+            if event == 'call' and frame.f_code.co_name == 'notify' and frame.f_locals.get('self') is train.STOP._cond:
+                hits.append(True)
+                signal.raise_signal(signal.SIGTERM)
+            return trace
+        def interrupt(*args, **kwargs):
+            sys.settrace(trace)
+            signal.raise_signal(signal.SIGTERM)
+            sys.settrace(None)
+            return original(*args, **kwargs)
+        train.make_vec_env = interrupt
+        assert train.main(sys.argv[1:])['state'] == 'stopped'
+        assert hits == [True]
+        assert signal.getsignal(signal.SIGTERM) is previous
+    ''')
+    result = subprocess.run([sys.executable, '-c', script,
+                             *args(corpus, tmp_path/'nested-term', '--variant', 'ppo', '--chunks', '1')],
+                            capture_output=True, text=True, timeout=20)
+    assert result.returncode == 0, result.stdout+result.stderr

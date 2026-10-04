@@ -101,9 +101,15 @@ def write_status(output, state, **fields):
     return status
 
 
+def request_stop(signum, frame):
+    """Ignore duplicate TERM before touching Event's non-reentrant lock."""
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    STOP.set()
+
+
 def main(argv=None):
     a = parse(argv)
-    previous = signal.signal(signal.SIGTERM, lambda *_: STOP.set())
+    previous = signal.signal(signal.SIGTERM, request_stop)
     deadline = time.monotonic()+a.max_seconds-CHECKPOINT_GRACE_S
     a.output.mkdir(parents=True, exist_ok=True)
     last = latest_checkpoint(a.output) if a.resume else None
