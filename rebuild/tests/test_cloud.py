@@ -56,7 +56,10 @@ def test_ssm_documents_set_timeouts_and_quote_values():
 
 def test_smoke_document_runs_existing_qt_free_test_files():
     script = '\n'.join(commands('smoke', SETTINGS)['commands'])
-    assert '-p no:pytestqt' in script
+    from importlib.metadata import entry_points
+    qt_plugins = [ep.name for ep in entry_points(group='pytest11') if ep.value == 'pytestqt.plugin']
+    assert qt_plugins, 'The locked pytest-qt package must be installed'
+    assert all(f'-p no:{name}' in script for name in qt_plugins)
     listed = [word for word in script.split() if word.startswith('tests/')]
     assert listed and all((ROOT/name).is_file() for name in listed)
     for name in listed:

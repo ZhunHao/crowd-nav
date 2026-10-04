@@ -74,7 +74,7 @@ def commands(kind, s):
     elif kind == 'smoke':
         body = [*base, f'cd {WORK}/rebuild', 'nvidia-smi || true',
                 '.venv/bin/python -c "import torch;print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"',
-                'MPLBACKEND=Agg .venv/bin/python -m pytest -p no:pytestqt -q tests/test_training_env.py '
+                'MPLBACKEND=Agg .venv/bin/python -m pytest -p no:pytest-qt -q tests/test_training_env.py '
                 'tests/test_checkpoint.py tests/test_train.py tests/test_modern_learned.py']
         timeout = 3600
     elif kind == 'pilot':
