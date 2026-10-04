@@ -529,3 +529,14 @@ def test_settings_that_disagree_with_the_frozen_configuration_are_refused(config
 
 def test_without_a_frozen_configuration_nothing_is_cross_checked(tmp_path):
     check_training_config({**SETTINGS, 'chunks': 3}, tmp_path/'missing.json')
+
+
+def test_setup_version_probe_does_not_close_producer_pipe_early(tmp_path):
+    probe = next(line for line in commands('setup', SETTINGS)['commands'] if line.startswith('ldd '))
+    fake = tmp_path/'ldd'
+    fake.write_text('#!/bin/bash\nfor ((i=0;i<10000;i++)); do printf "GNU libc version details\\n"; done\n')
+    fake.chmod(0o755)
+    result = subprocess.run(['bash', '-o', 'pipefail', '-c', probe],
+                            env={**os.environ, 'PATH': str(tmp_path)+os.pathsep+os.environ['PATH']},
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr

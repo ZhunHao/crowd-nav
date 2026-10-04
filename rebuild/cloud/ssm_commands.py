@@ -66,7 +66,7 @@ def commands(kind, s):
     if kind == 'setup':
         body = [*base, f'mkdir -p {WORK} && cd {WORK}',
                 f'aws s3 cp {uri}/source.tar.gz source.tar.gz', f'aws s3 cp {uri}/source.sha256 source.sha256',
-                'sha256sum -c source.sha256', 'tar -xzf source.tar.gz', 'ldd --version | head -1',
+                'sha256sum -c source.sha256', 'tar -xzf source.tar.gz', 'ldd --version',
                 f"[ -x {UV} ] || curl -LsSf {quote('https://astral.sh/uv/'+s['uv_version']+'/install.sh')} "
                 f'| env UV_INSTALL_DIR={UV_DIR} UV_NO_MODIFY_PATH=1 sh',
                 f'cd rebuild && {UV} python install 3.14 && {UV} {UV_SYNC}']
