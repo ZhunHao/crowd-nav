@@ -1,0 +1,2 @@
+{"chunk": 0, "complete_chunk": true, "num_timesteps": 20480, "episodes": 55, "mean_episode_cost": 1.7954545454545454, "success_rate": 0.23636363636363636, "collision_rate": 0.05454545454545454, "penalty_used": 0.0, "penalty_next": 0.0, "wall_s": 67.19251619300007}
+{"chunk": 1, "complete_chunk": true, "num_timesteps": 40960, "episodes": 85, "mean_episode_cost": 6.314705882352941, "success_rate": 0.7411764705882353, "collision_rate": 0.023529411764705882, "penalty_used": 0.0, "penalty_next": 0.0, "wall_s": 70.80526612800003}

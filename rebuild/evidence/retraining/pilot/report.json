@@ -1,0 +1,453 @@
+{
+  "kind": "pilot-only",
+  "source_commit": "be1cd8c1ee73d30c9f875d9731a45388e6b80d0e",
+  "throughput_source_commit": "0a4747506852867bdcec5fe97931d55dd67ef689",
+  "instance_type": "c6a.4xlarge",
+  "region": "ap-southeast-1",
+  "image": "ami-01a395a37625fb28c",
+  "uv_lock_sha256": "0634316d78689442e4f1bccb9b345cfda401b0696d3804fc2711fb2357badd79",
+  "seed": 0,
+  "variant": "ppo",
+  "chunks": 3,
+  "envs": 8,
+  "corpus_sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747",
+  "throughput": {
+    "host": "ip-172-31-39-27.ap-southeast-1.compute.internal",
+    "platform": "Linux-6.18.51-120.163.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "cpus": 16,
+    "torch": "2.14.0+cu130",
+    "cuda": "13.0",
+    "cuda_available": false,
+    "env_steps_per_s": {
+      "false": 592.9627281850821,
+      "true": 64.94342740079676
+    },
+    "learn_steps_per_s": {
+      "cpu/envs=1": 64.46962148426272,
+      "cpu/envs=2": 104.39567142546426,
+      "cpu/envs=4": 166.940396469497,
+      "cpu/envs=8": 307.2873737538364
+    }
+  },
+  "elapsed_hours_upper_bound": 0.6456704394444445,
+  "estimated_cost_usd": {
+    "compute": 0.455585062072,
+    "ebs": 0.18936986301369865,
+    "s3": 0.025,
+    "extra": 1.0,
+    "total": 1.6699549250856986
+  },
+  "ssm_commands": [
+    {
+      "kind": "setup",
+      "id": "ff8105dc-4310-4124-8bcc-ab054331dd27"
+    },
+    {
+      "kind": "inspect-host",
+      "id": "96315594-3ebc-4b83-950a-644c03148eb5"
+    },
+    {
+      "kind": "smoke",
+      "id": "db49d6ec-218e-4f8e-af87-a85cde0fc337"
+    },
+    {
+      "kind": "setup",
+      "id": "99da5c26-98ed-403e-98f4-66ff95ae93d6"
+    },
+    {
+      "kind": "setup",
+      "id": "b03fb068-be79-46c3-be3b-4d947e04334b"
+    },
+    {
+      "kind": "smoke",
+      "id": "f8863a0c-a2a0-4615-8ae0-c72488962480"
+    },
+    {
+      "kind": "pilot",
+      "id": "0d76ef42-1a60-4472-9416-4a10665fc464"
+    },
+    {
+      "kind": "timeout-check",
+      "id": "23dcaca5-0912-45ba-9bbc-54d5e8b5e426"
+    },
+    {
+      "kind": "pilot-progress",
+      "id": "c0daee00-df9d-44a7-bc3b-d7131a68cb6b"
+    },
+    {
+      "kind": "pilot-progress",
+      "id": "9c277bd2-ba63-43ae-bbfa-a02c10c91f63"
+    },
+    {
+      "kind": "start",
+      "id": "e0643e8d-f4de-4b82-a588-2898651a5377"
+    },
+    {
+      "kind": "resume-check",
+      "id": "1d7efc40-fe32-4aa3-ac49-8763db906ef5"
+    },
+    {
+      "kind": "start",
+      "id": "d4d033aa-a69c-48fb-9f89-46a86187ff89"
+    },
+    {
+      "kind": "term-check",
+      "id": "4347fee2-0073-49c6-84f5-ab4f3bbca982"
+    },
+    {
+      "kind": "term-diagnostic",
+      "id": "0a96a77e-6ca1-4a7a-bdb3-57639cf2fbfc"
+    },
+    {
+      "kind": "diagnostic-start",
+      "id": "6634a18b-f140-4c40-8028-f3fbed16ebd0"
+    },
+    {
+      "kind": "term-diagnostic",
+      "id": "251c294d-3d9c-4b78-8e31-46d17ba6b5aa"
+    },
+    {
+      "kind": "pilot-progress",
+      "id": "cbec1307-e728-470d-8569-194bc9fa0539"
+    },
+    {
+      "kind": "term-check",
+      "id": "ceec6adc-c74c-48cb-91fb-f05bc8760c05"
+    },
+    {
+      "kind": "term-diagnostic",
+      "id": "8ea7282e-f696-440c-882f-8e8ddd0f08db"
+    },
+    {
+      "kind": "preserve-failed",
+      "id": "874f5163-e9ac-4fc6-9ff9-784a0724f384"
+    },
+    {
+      "kind": "setup",
+      "id": "3238b250-e7b8-4910-b78c-97e8acd472d6"
+    },
+    {
+      "kind": "smoke",
+      "id": "3afe2300-3751-4ed4-8485-0d7efe68e1e7"
+    },
+    {
+      "kind": "start",
+      "id": "d50989fb-cbcd-4843-b09b-b896ffdc5a74"
+    },
+    {
+      "kind": "resume-check",
+      "id": "ee49de04-9f0d-4332-bf82-df08ca94df54"
+    },
+    {
+      "kind": "start",
+      "id": "a821f3ba-85a0-4753-a608-a3d1b5f9b452"
+    }
+  ],
+  "verification": {
+    "status": {
+      "state": "complete",
+      "exit_code": 0
+    },
+    "checkpoint_manifests": {
+      "chunk-0000": {
+        "action_schema": 1,
+        "budget": null,
+        "chunk": 0,
+        "chunk_steps": 20480,
+        "complete_chunk": true,
+        "device": "cpu",
+        "dynamics": "marine",
+        "env_config": {
+          "collision_penalty": 10.0,
+          "domain_m": 1.0,
+          "filtered": true,
+          "limit": null,
+          "observation": {},
+          "penalty": 0.0,
+          "progress_weight": 1.0,
+          "success_reward": 10.0,
+          "time_penalty": 0.01
+        },
+        "envs": 8,
+        "files": {
+          "policy.zip": "43ce7137f1f257e29e6b685db55de2c50584e510639846a7c5fc7d46acd55774",
+          "rng.json": "8aa3511628ff070897aa1df51bc9bae2fa4851f21ddd3f268fc792634d184dab",
+          "state.pt": "d178d5d2b644ae81808a59736f51f0b1d1f3fb6f091d4c761fcc4fe9012a7050"
+        },
+        "num_timesteps": 20480,
+        "observation_schema": 1,
+        "penalty_next": 0.0,
+        "penalty_used": 0.0,
+        "provenance": {
+          "dirty_diff_sha256": null,
+          "git_error": "[Errno 2] No such file or directory: 'git'",
+          "git_revision": null,
+          "platform": "Linux-6.18.51-120.163.amzn2023.x86_64-x86_64-with-glibc2.34",
+          "python_implementation": "CPython",
+          "python_version": "3.14.6",
+          "settings_sha256": "64dac0c9efc1288ae1e75438368985c2cc3e40a060d2b47bd5fe6e59371b0b2a",
+          "uv_lock_sha256": "0634316d78689442e4f1bccb9b345cfda401b0696d3804fc2711fb2357badd79"
+        },
+        "resume_mode": "restart-equivalent",
+        "scenario_manifest_sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747",
+        "seed": 0,
+        "source_commit": "be1cd8c1ee73d30c9f875d9731a45388e6b80d0e",
+        "variant": "ppo",
+        "versions": {
+          "gymnasium": "1.3.0",
+          "stable_baselines3": "2.9.0",
+          "torch": "2.14.0+cu130"
+        }
+      },
+      "chunk-0001": {
+        "action_schema": 1,
+        "budget": null,
+        "chunk": 1,
+        "chunk_steps": 20480,
+        "complete_chunk": true,
+        "device": "cpu",
+        "dynamics": "marine",
+        "env_config": {
+          "collision_penalty": 10.0,
+          "domain_m": 1.0,
+          "filtered": true,
+          "limit": null,
+          "observation": {},
+          "penalty": 0.0,
+          "progress_weight": 1.0,
+          "success_reward": 10.0,
+          "time_penalty": 0.01
+        },
+        "envs": 8,
+        "files": {
+          "policy.zip": "8f1416853697655503128f1c1289fcc5bb6f2aec7898b038910fa64e5eab791b",
+          "rng.json": "de7ea947429b46fe998bd2c602469c8f77b45bedf31425d7aeb88d11518bc9c5",
+          "state.pt": "7598805cade6b0718f9d74d3a05808c189ba35236254407af54bc3160f562b6b"
+        },
+        "num_timesteps": 40960,
+        "observation_schema": 1,
+        "penalty_next": 0.0,
+        "penalty_used": 0.0,
+        "provenance": {
+          "dirty_diff_sha256": null,
+          "git_error": "[Errno 2] No such file or directory: 'git'",
+          "git_revision": null,
+          "platform": "Linux-6.18.51-120.163.amzn2023.x86_64-x86_64-with-glibc2.34",
+          "python_implementation": "CPython",
+          "python_version": "3.14.6",
+          "settings_sha256": "64dac0c9efc1288ae1e75438368985c2cc3e40a060d2b47bd5fe6e59371b0b2a",
+          "uv_lock_sha256": "0634316d78689442e4f1bccb9b345cfda401b0696d3804fc2711fb2357badd79"
+        },
+        "resume_mode": "restart-equivalent",
+        "scenario_manifest_sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747",
+        "seed": 0,
+        "source_commit": "be1cd8c1ee73d30c9f875d9731a45388e6b80d0e",
+        "variant": "ppo",
+        "versions": {
+          "gymnasium": "1.3.0",
+          "stable_baselines3": "2.9.0",
+          "torch": "2.14.0+cu130"
+        }
+      },
+      "partial-0001-26624": {
+        "action_schema": 1,
+        "budget": null,
+        "chunk": 1,
+        "chunk_steps": 20480,
+        "complete_chunk": false,
+        "device": "cpu",
+        "dynamics": "marine",
+        "env_config": {
+          "collision_penalty": 10.0,
+          "domain_m": 1.0,
+          "filtered": true,
+          "limit": null,
+          "observation": {},
+          "penalty": 0.0,
+          "progress_weight": 1.0,
+          "success_reward": 10.0,
+          "time_penalty": 0.01
+        },
+        "envs": 8,
+        "files": {
+          "policy.zip": "0a0ce02909f66c6cc9f22950b2819e6dc51d4429aa26daadae8a6bc7142ab495",
+          "rng.json": "935f5b059e3c554878f1909c0c5641bf4d85bf76575970b51b5a18667afdf635",
+          "state.pt": "54a63cda2e10757f44d613daa00110da9d619f4a40fed7f55e8f9cc1fa0bca8d"
+        },
+        "num_timesteps": 26624,
+        "observation_schema": 1,
+        "penalty_next": 0.0,
+        "penalty_used": 0.0,
+        "provenance": {
+          "dirty_diff_sha256": null,
+          "git_error": "[Errno 2] No such file or directory: 'git'",
+          "git_revision": null,
+          "platform": "Linux-6.18.51-120.163.amzn2023.x86_64-x86_64-with-glibc2.34",
+          "python_implementation": "CPython",
+          "python_version": "3.14.6",
+          "settings_sha256": "64dac0c9efc1288ae1e75438368985c2cc3e40a060d2b47bd5fe6e59371b0b2a",
+          "uv_lock_sha256": "0634316d78689442e4f1bccb9b345cfda401b0696d3804fc2711fb2357badd79"
+        },
+        "resume_mode": "restart-equivalent",
+        "scenario_manifest_sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747",
+        "seed": 0,
+        "source_commit": "be1cd8c1ee73d30c9f875d9731a45388e6b80d0e",
+        "variant": "ppo",
+        "versions": {
+          "gymnasium": "1.3.0",
+          "stable_baselines3": "2.9.0",
+          "torch": "2.14.0+cu130"
+        }
+      },
+      "chunk-0002": {
+        "action_schema": 1,
+        "budget": null,
+        "chunk": 2,
+        "chunk_steps": 20480,
+        "complete_chunk": true,
+        "device": "cpu",
+        "dynamics": "marine",
+        "env_config": {
+          "collision_penalty": 10.0,
+          "domain_m": 1.0,
+          "filtered": true,
+          "limit": null,
+          "observation": {},
+          "penalty": 0.0,
+          "progress_weight": 1.0,
+          "success_reward": 10.0,
+          "time_penalty": 0.01
+        },
+        "envs": 8,
+        "files": {
+          "policy.zip": "052d98acc22965fab3dadcd8c85411411a4d972a687e0ddf015549b81ee529a0",
+          "rng.json": "c3e655c66cbb3e79a70dbbb5cda086e80a0555b8f34d76f0652599be36370efb",
+          "state.pt": "b0703b0a6802274703cc976ea9886bc74c0cc5febd322ebe1b2ed633b490d695"
+        },
+        "num_timesteps": 61440,
+        "observation_schema": 1,
+        "penalty_next": 0.0,
+        "penalty_used": 0.0,
+        "provenance": {
+          "dirty_diff_sha256": null,
+          "git_error": "[Errno 2] No such file or directory: 'git'",
+          "git_revision": null,
+          "platform": "Linux-6.18.51-120.163.amzn2023.x86_64-x86_64-with-glibc2.34",
+          "python_implementation": "CPython",
+          "python_version": "3.14.6",
+          "settings_sha256": "64dac0c9efc1288ae1e75438368985c2cc3e40a060d2b47bd5fe6e59371b0b2a",
+          "uv_lock_sha256": "0634316d78689442e4f1bccb9b345cfda401b0696d3804fc2711fb2357badd79"
+        },
+        "resume_mode": "restart-equivalent",
+        "scenario_manifest_sha256": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747",
+        "seed": 0,
+        "source_commit": "be1cd8c1ee73d30c9f875d9731a45388e6b80d0e",
+        "variant": "ppo",
+        "versions": {
+          "gymnasium": "1.3.0",
+          "stable_baselines3": "2.9.0",
+          "torch": "2.14.0+cu130"
+        }
+      }
+    },
+    "curve": [
+      {
+        "chunk": 0,
+        "complete_chunk": true,
+        "num_timesteps": 20480,
+        "episodes": 55,
+        "mean_episode_cost": 1.7954545454545454,
+        "success_rate": 0.23636363636363636,
+        "collision_rate": 0.05454545454545454,
+        "penalty_used": 0.0,
+        "penalty_next": 0.0,
+        "wall_s": 66.81757239599995
+      },
+      {
+        "chunk": 1,
+        "complete_chunk": false,
+        "num_timesteps": 26624,
+        "episodes": 19,
+        "mean_episode_cost": 2.9210526315789473,
+        "success_rate": 0.42105263157894735,
+        "collision_rate": 0.10526315789473684,
+        "penalty_used": 0.0,
+        "penalty_next": 0.0,
+        "wall_s": 22.135881179999956
+      },
+      {
+        "chunk": 1,
+        "complete_chunk": true,
+        "num_timesteps": 40960,
+        "episodes": 52,
+        "mean_episode_cost": 9.33173076923077,
+        "success_rate": 0.7307692307692307,
+        "collision_rate": 0.0,
+        "penalty_used": 0.0,
+        "penalty_next": 0.0,
+        "wall_s": 49.23403819400001
+      },
+      {
+        "chunk": 2,
+        "complete_chunk": true,
+        "num_timesteps": 61440,
+        "episodes": 111,
+        "mean_episode_cost": 8.527027027027026,
+        "success_rate": 0.8558558558558559,
+        "collision_rate": 0.02702702702702703,
+        "penalty_used": 0.0,
+        "penalty_next": 0.0,
+        "wall_s": 69.11444091999999
+      }
+    ],
+    "local_service": {
+      "status": "success",
+      "metrics": {
+        "status": "success",
+        "ship_collision": false,
+        "land_collision": false,
+        "elapsed_s": 28.0,
+        "distance_m": 22.216998972219073,
+        "min_ship_clearance": 0.3265280000674734,
+        "domain_time_s": 10.75,
+        "detour_ratio": 1.0381025730524411,
+        "overrides": 71,
+        "override_rate": 0.6339285714285714,
+        "no_feasible_actions": 0,
+        "solver_failures": 0,
+        "decision_mean_ms": 9.422411499794439,
+        "decision_p95_ms": 10.88765464937751,
+        "decision_p99_ms": 27.6748526213487,
+        "deadline_misses": 0
+      }
+    },
+    "note": "Selection-split smoke episode only; this is not a held-out evaluation or a policy quality claim."
+  },
+  "failures": [
+    "Initial smoke command disabled wrong pytest plugin; fixed ff18e33.",
+    "Repeat setup SIGPIPE at ldd --version | head -1; fixed 0a47475.",
+    "Two mid-chunk TERM attempts deadlocked Event.set; fixed be1cd8c. Failed attempt retained in S3 and results/pilot-failed."
+  ],
+  "validation": {
+    "local_full_suite_passed": 534,
+    "linux_smoke_passed": 39,
+    "cloud_tests_passed_before_version_probe_addition": 62
+  },
+  "limitations": [
+    "No configuration or held-out protocol frozen.",
+    "No full training run or held-out evaluation performed.",
+    "Throughput measured on the pre-signal-fix source; fix only changes termination handling.",
+    "S3 status remained terminated during resume until the final complete upload; it is updated on process exit."
+  ],
+  "cleanup": {
+    "instance_state": "terminated",
+    "schedule_deleted": true,
+    "residual_volumes": 0,
+    "residual_snapshots": 0,
+    "residual_addresses": 0,
+    "residual_endpoints": 0,
+    "residual_nat_gateways": 0,
+    "source_archives_deleted": true,
+    "retained": "Pilot checkpoint payloads, curves and logs in S3; no-cost IAM roles/profile and security group for later approved training."
+  }
+}
