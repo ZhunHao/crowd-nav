@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "variants": [
+    "ppo",
+    "ppo_lagrangian"
+  ],
+  "chunks": 100,
+  "chunk_steps": 20480,
+  "envs": 8,
+  "filtered": true,
+  "observation": {},
+  "budget_domain_s": 6.688,
+  "budget_n_scenarios": 200,
+  "budget_mpc_status_counts": {
+    "collision": 8,
+    "success": 163,
+    "timeout": 29
+  },
+  "budget_source": "marine_mpc mean domain_time_s on select split",
+  "selection": {
+    "split": "select",
+    "every_chunks": 5,
+    "include_last": true,
+    "collision_max": 0.05,
+    "rule": "max success among collision<=max; else min collision then max success; ties: lower mean domain_time_s, then earlier chunk"
+  },
+  "corpus_sha256": {
+    "select": "eba4d2c737c76fb9356ace404cbf25ed0a57fbddb54a9a64e677f1344af6227b",
+    "train": "94a71bf76a3a3ce9aa0e892ed11391b1b79aa55e9d6f1eabe659505f8dbda747"
+  },
+  "source_commit": "7115da70092c388b7e3f03b18a926685326c73cd"
+}
