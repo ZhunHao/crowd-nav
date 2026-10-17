@@ -139,8 +139,53 @@ manifest preserves the historical scenarios and separates Ubin development from
 Southern Islands geographic testing. Nearby synthetic perturbations provide
 limited scenario diversity, not a sample of every maritime operating condition.
 The supplied checkpoint is one fixed policy: scenario intervals do not constitute
-independent training replication. Future training needs at least three independent
-training seeds and hierarchical seed/scenario intervals.
+independent training replication. The retraining below uses five training seeds
+per variant and hierarchical seed/scenario intervals.
+
+## Retraining PPO
+
+The training and selection corpus is generated deterministically into
+`scenarios/training/`. Failed generator seeds are recorded, not retried.
+Regenerate it only to check its committed hashes:
+
+```sh
+.venv-modern/bin/python tools/generate_training_scenarios.py
+```
+
+A short local smoke run (two chunks, CPU) writes hash-verified checkpoints
+`chunk-0000`, `chunk-0001`, a `curve.jsonl` and a `status.json`:
+
+```sh
+.venv-modern/bin/python -m shipnav.training.train --scenarios scenarios/training \
+  --output results/train-smoke-readme --seed 0 --variant ppo --chunks 2 --envs 2 \
+  --device cpu --max-seconds 1800
+```
+
+Use `--variant ppo_lagrangian --budget <domain seconds>` for the constrained
+variant, and `--resume` to continue an interrupted output folder. A stop saves
+`partial-NNNN-<steps>`, and resuming finishes that same chunk. Smoke checkpoints
+are not comparable to the frozen runs: those used 100 chunks, 8 environments and
+the [frozen configuration](evidence/retraining/training_config.json).
+
+To drive a checkpoint, choose **ppo** as the policy and **marine** dynamics, then
+**Load model** and pick a checkpoint folder such as
+`results/train/ppo/seed0/chunk-0054`. The trained policy refuses holonomic dynamics.
+From the CLI:
+
+```sh
+.venv-modern/bin/python -m shipnav.service --policy ppo --dynamics marine --filtered \
+  --model results/train/ppo/seed0/chunk-0054 \
+  --map maps/harbour.json --start 2 12 --goal 22 12 --count 3 --seed 2000 \
+  --output results/ppo-run.json
+```
+
+Loading reads only policy weights; it never unpickles saved model data.
+[Retraining protocol and results](evidence/retraining/README.md) record the frozen
+configuration and protocol, training curves, checkpoint selections and the
+held-out comparison against marine MPC and SARL. Southern Islands results are
+reported separately as zero-shot transfer. The EC2 tooling under `cloud/` and the
+[pilot](evidence/retraining/pilot/README.md) remain available for cloud runs.
+Checkpoints and traces stay in ignored `results/`.
 
 ## Controller limits
 
